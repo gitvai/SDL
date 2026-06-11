@@ -1,7 +1,7 @@
 // Auto-redirect from file:/// to localhost:5000 to prevent CORS and Origin security errors
 if (window.location.protocol === 'file:') {
     const filename = window.location.pathname.split('/').pop() || 'index.html';
-    const newUrl = 'https://software-e857.onrender.com/' + filename + window.location.search + window.location.hash;
+    const newUrl = 'https://sdl-backend-l5r2.onrender.com/' + filename + window.location.search + window.location.hash;
     window.location.replace(newUrl);
 }
 
