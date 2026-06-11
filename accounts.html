@@ -533,13 +533,13 @@
         function updateHeaders(mode) {
             const thead = document.querySelector('#accounts-table thead');
             if (mode === 'invoices') {
-                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th>#</th><th>Invoice #</th><th>Order #</th><th>Invoice Date</th><th>Client</th><th>Amount</th><th>Due Date</th><th>Paid</th><th>Balance</th><th>Actions</th></tr>';
+                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th data-col="sr">#</th><th data-col="invoiceNumber">Invoice #</th><th data-col="orderNumber">Order #</th><th data-col="invoiceDate">Invoice Date</th><th data-col="clientName">Client</th><th data-col="amount">Amount</th><th data-col="dueDate">Due Date</th><th data-col="paid">Paid</th><th data-col="balance">Balance</th><th data-col="actions">Actions</th></tr>';
             } else if (mode === 'generate') {
-                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th>#</th><th>Order #</th><th>Order Date</th><th>Client</th><th>Patient</th><th>Product</th><th>Model #</th><th>Status</th><th>Actions</th></tr>';
+                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th data-col="sr">#</th><th data-col="orderNumber">Order #</th><th data-col="orderDate">Order Date</th><th data-col="clientName">Client</th><th data-col="patientName">Patient</th><th data-col="product">Product</th><th data-col="model">Model #</th><th data-col="status">Status</th><th data-col="actions">Actions</th></tr>';
             } else if (mode === 'payments') {
-                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th>#</th><th>Receipt #</th><th>Date</th><th>Client</th><th>Amount</th><th>Applied</th><th>Balance</th><th>Actions</th></tr>';
+                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th data-col="sr">#</th><th data-col="receiptNumber">Receipt #</th><th data-col="receiptDate">Date</th><th data-col="clientName">Client</th><th data-col="amount">Amount</th><th data-col="applied">Applied</th><th data-col="balance">Balance</th><th data-col="actions">Actions</th></tr>';
             } else if (mode === 'adjustments') {
-                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th>Sr</th><th>Adj. #</th><th>Adj. Date</th><th>Client</th><th>Amount</th><th>Adjustment Type</th><th>Applied To</th><th>Edit</th></tr>';
+                thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th data-col="sr">Sr</th><th data-col="adjustmentNumber">Adj. #</th><th data-col="adjustmentDate">Adj. Date</th><th data-col="clientName">Client</th><th data-col="amount">Amount</th><th data-col="type">Adjustment Type</th><th data-col="appliedTo">Applied To</th><th data-col="actions">Edit</th></tr>';
             }
         }
 
@@ -1790,5 +1790,19 @@
         window.deleteReceipt = deleteReceipt;
     
 </script>
+
+<!-- Fields Settings Modal -->
+<div id="fields-settings-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:400px; border-radius:8px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; font-family:'Inter', sans-serif;">Select Fields</h3>
+        <div id="fields-checklist" style="max-height:300px; overflow-y:auto; padding:10px 0; font-family:'Inter', sans-serif; font-size:14px;">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+            <button onclick="document.getElementById('fields-settings-modal').style.display='none'" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:4px; cursor:pointer;">Cancel</button>
+            <button onclick="saveFieldsSettings()" style="padding:8px 15px; border:none; background:#3b82f6; color:#fff; border-radius:4px; cursor:pointer; font-weight:bold;">Save</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
