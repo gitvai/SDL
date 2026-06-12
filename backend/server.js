@@ -408,6 +408,25 @@ app.post('/api/orders', async (req, res) => {
       data: cleanData,
       include: { jobs: true }
     });
+
+    // Update Global Product Prices
+    if (jobsData && jobsData.length > 0) {
+      for (const j of jobsData) {
+        if (j.productName && (j.price !== undefined || j.rate !== undefined)) {
+           const pCharge = Number(j.price) || Number(j.rate) || 0;
+           await prisma.product.updateMany({
+             where: { name: j.productName },
+             data: { charge: pCharge }
+           });
+        }
+      }
+    } else if (cleanData.productName && cleanData.price !== undefined) {
+       await prisma.product.updateMany({
+         where: { name: cleanData.productName },
+         data: { charge: Number(cleanData.price) || 0 }
+       });
+    }
+
     res.status(201).json(order);
   } catch (error) { 
     console.error("Create order error:", error);
