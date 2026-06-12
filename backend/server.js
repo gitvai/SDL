@@ -544,6 +544,25 @@ app.put('/api/orders/:id', async (req, res) => {
       where: { id: Number(req.params.id) },
       data: { ...cleanData, ...updateJobsQuery }
     });
+
+    // Update Global Product Prices on Edit
+    if (req.body.jobs && Array.isArray(req.body.jobs)) {
+        for (const j of req.body.jobs) {
+          const pName = j.productName || j.product || null;
+          if (pName && (j.price !== undefined || j.rate !== undefined)) {
+             const pCharge = Number(j.price) || Number(j.rate) || 0;
+             await prisma.product.updateMany({
+               where: { name: pName },
+               data: { charge: pCharge }
+             });
+          }
+        }
+    } else if (cleanData.productName && cleanData.price !== undefined) {
+         await prisma.product.updateMany({
+           where: { name: cleanData.productName },
+           data: { charge: Number(cleanData.price) || 0 }
+         });
+    }
     res.json(order);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
