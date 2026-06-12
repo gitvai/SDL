@@ -165,6 +165,45 @@ app.delete('/api/clients/:id', async (req, res) => {
 });
 
 // --- ORDERS ---
+
+app.get('/api/client-product-rate', async (req, res) => {
+  const { clientId, productName } = req.query;
+  if (!clientId || !productName) return res.status(400).json({ error: 'Missing parameters' });
+  
+  try {
+    const lastJob = await prisma.orderJob.findFirst({
+      where: {
+        order: { clientId: Number(clientId) },
+        productName: productName
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    if (lastJob) {
+      return res.json({ rate: lastJob.price });
+    }
+    
+    // Fallback to Order model if no job is found (legacy orders)
+    const lastOrder = await prisma.order.findFirst({
+      where: {
+        clientId: Number(clientId),
+        productName: productName
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    if (lastOrder && lastOrder.price) {
+      // In old schema, price was unit rate
+      return res.json({ rate: lastOrder.price });
+    }
+    
+    res.json({ rate: null });
+  } catch (error) {
+    console.error('Error fetching client product rate:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get('/api/orders', async (req, res) => {
   try {
     const { status, search, clientSearch, clientId, invoiceStatus, invoiceId, shippingStatus, dateFrom, dateTo } = req.query;
