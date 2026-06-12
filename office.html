@@ -1113,6 +1113,7 @@
                 const currentValue = filterSelect.value;
                 filterSelect.innerHTML = '<option value="">All Types</option>';
                 const uniqueTypes = [...new Set(allProducts.map(p => p.type).filter(t => t))];
+                window.uniqueProductTypes = uniqueTypes;
                 uniqueTypes.forEach(t => {
                     const opt = document.createElement('option');
                     opt.value = t;
@@ -1878,13 +1879,30 @@
         async function openOutwardModal() { 
             showInlineNewOutward();
         }
+        
+        function populateProductTypes(selectedValue = 'General') {
+            const typeSelect = document.getElementById('prod-type');
+            const defaultTypes = ['PFM', 'Zirconia', 'E-Max', 'Denture', 'Implant', 'General'];
+            let types = [...new Set([...defaultTypes, ...(window.uniqueProductTypes || [])])];
+            
+            typeSelect.innerHTML = types.map(t => `<option value="${t}">${t}</option>`).join('') + '<option value="Other">Other (Custom)</option>';
+            
+            if (types.includes(selectedValue)) {
+                typeSelect.value = selectedValue;
+                document.getElementById('prod-type-new').style.display = 'none';
+                document.getElementById('prod-type-new').required = false;
+            } else {
+                typeSelect.value = 'Other';
+                document.getElementById('prod-type-new').style.display = 'block';
+                document.getElementById('prod-type-new').value = selectedValue;
+                document.getElementById('prod-type-new').required = true;
+            }
+        }
+
         function openProductModal() {
             document.getElementById('prod-id').value = '';
             document.getElementById('prod-name').value = '';
-            document.getElementById('prod-type').value = 'General';
-            document.getElementById('prod-type-new').value = '';
-            document.getElementById('prod-type-new').style.display = 'none';
-            document.getElementById('prod-type-new').required = false;
+            populateProductTypes('General');
             document.getElementById('prod-rate').value = '';
             document.getElementById('prod-modal-title').textContent = 'Add New Product';
             openModal('product-modal'); 

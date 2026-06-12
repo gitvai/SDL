@@ -609,7 +609,7 @@
                                     <option>New</option>
                                     <option>In Production</option>
                                     <option>Complete</option>
-                                    <option>Hold</option>
+                                    <option>On Hold</option>
                                     <option>Try In</option>
                                     <option>Cancelled</option>
                                 </select>
@@ -804,7 +804,7 @@
                                     <option>New</option>
                                     <option>In Production</option>
                                     <option>Complete</option>
-                                    <option>Hold</option>
+                                    <option>On Hold</option>
                                     <option>Try In</option>
                                     <option>Cancelled</option>
                                 </select>
@@ -1278,7 +1278,7 @@
                 }
             } else {
                 // Triggered by tooth selection or product change.
-                unitCount = selectedTeeth.length;
+                unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
                 document.getElementById('unit-count').value = unitCount;
             }
             document.getElementById('selected-teeth-list').value = selectedTeeth.sort((a,b) => a - b).join(', ');

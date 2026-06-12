@@ -1608,8 +1608,8 @@
                                         style="padding:10px; border:1px solid #e2e8f0; text-align:right;">0</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding:10px; border:1px solid #e2e8f0; color:#f59e0b;">Hold</td>
-                                    <td id="ov-Hold" style="padding:10px; border:1px solid #e2e8f0; text-align:right;">0
+                                    <td style="padding:10px; border:1px solid #e2e8f0; color:#f59e0b;">On Hold</td>
+                                    <td id="ov-On Hold" style="padding:10px; border:1px solid #e2e8f0; text-align:right;">0
                                     </td>
                                 </tr>
                                 <tr>
@@ -1662,8 +1662,8 @@
                             Complete</label>
                         <label><input type="radio" name="cal-display" value="Delivered" onchange="refreshCalendar()">
                             Delivered</label>
-                        <label><input type="radio" name="cal-display" value="Hold" onchange="refreshCalendar()">
-                            Hold</label>
+                        <label><input type="radio" name="cal-display" value="On Hold" onchange="refreshCalendar()">
+                            On Hold</label>
                         <label><input type="radio" name="cal-display" value="Try In" onchange="refreshCalendar()"> Try
                             In</label>
                         <label><input type="radio" name="cal-display" value="Cancelled" onchange="refreshCalendar()">
@@ -1880,7 +1880,7 @@
                                 <option value="New">New</option>
                                 <option value="In Production">In Production</option>
                                 <option value="Complete">Complete</option>
-                                <option value="Hold">Hold</option>
+                                <option value="On Hold">On Hold</option>
                                 <option value="Try In">Try In</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Delivered">Delivered</option>
@@ -2155,7 +2155,7 @@
                 const res = await fetch(url);
                 const stats = await res.json();
 
-                const statuses = ['New', 'In Production', 'Complete', 'Delivered', 'Hold', 'Try In', 'Cancelled'];
+                const statuses = ['New', 'In Production', 'Complete', 'Delivered', 'On Hold', 'Try In', 'Cancelled'];
                 statuses.forEach(s => {
                     const id = `ov-${s.replace(' ', '')}`;
                     const el = document.getElementById(id);
