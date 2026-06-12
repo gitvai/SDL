@@ -2718,9 +2718,11 @@ Products: ${products.join(' | ')}
                                 rowHTML += `<td>${order.patientName || '-'}</td>`;
                                 break;
                             case 'products':
-                                let displayProducts = order.productName || order.productType || '-';
+                                let displayProducts = '';
                                 if (order.jobs && order.jobs.length > 0) {
-                                    displayProducts += ', ' + order.jobs.map(j => j.productName || j.productType).join(', ');
+                                    displayProducts = order.jobs.map(j => j.productName || j.productType).join(', ');
+                                } else {
+                                    displayProducts = order.productName || order.productType || '-';
                                 }
                                 rowHTML += `<td style="color: ${getProductColor(order.productType)}; font-weight: 600;">${displayProducts}</td>`;
                                 break;
