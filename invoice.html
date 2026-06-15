@@ -704,7 +704,7 @@
 
                     let itemIndex = 1;
                     orders.forEach((o, idx) => {
-                        const jobsToRender = (o.jobs && o.jobs.length > 0) ? [o, ...o.jobs] : [o];
+                        const jobsToRender = (o.jobs && o.jobs.length > 0) ? o.jobs : [o];
 
                         jobsToRender.forEach((job, jIdx) => {
                             const units = job.units || 1;

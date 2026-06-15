@@ -674,7 +674,7 @@
                     const clientName = item.client ? item.client.name : 'Unknown';
                     const clientId = item.client ? item.client.id : '';
                     const clientHtml = clientId ? `<a href="shipments.html?clientId=${clientId}" class="client-link">${clientName}</a>` : clientName;
-                    const totalAmount = (item.orders || []).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+                    const totalAmount = (item.orders || []).reduce((sum, o) => sum + (o.netAmount || o.totalAmount || 0), 0);
                     
                     row.innerHTML = `
                         <td><input type="checkbox"></td>
@@ -722,7 +722,7 @@
                         <td style="font-weight:bold;">${item.modelNumber || ''}</td>
                         <td style="font-weight:bold; color:${statusColor};">${item.status || ''}</td>
                         <td>${item.dueDate ? displayDate(item.dueDate) : 'N/A'}</td>
-                        <td style="font-weight:bold; color:#10b981;">${(item.totalAmount || 0).toFixed(2)}</td>
+                        <td style="font-weight:bold; color:#10b981;">${(item.netAmount || item.totalAmount || 0).toFixed(2)}</td>
                         <td style="text-align:right;">
                             <button class="btn-toolbar" onclick="shipOrder(${item.id}, ${clientId})" style="padding:4px; margin:0;"><i class="fas fa-truck"></i></button>
                         </td>
@@ -798,7 +798,7 @@
                         <td style="padding:10px; border-bottom:1px solid #eee;">${o.productName || o.productType || '...'}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;"><span style="background:#f3f4f6; padding:2px 6px; border-radius:4px;">${o.status}</span></td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${o.dueDate ? new Date(o.dueDate).toLocaleDateString() : 'N/A'}</td>
-                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700; color:#10b981;">${(o.totalAmount || 0).toFixed(2)}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700; color:#10b981;">${(o.netAmount || o.totalAmount || 0).toFixed(2)}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">
                             <div style="display:flex; gap:5px;">
                                 <button class="btn-toolbar" title="Print Invoice" onclick="printInvoice(${o.id}, 'order')"><i class="fas fa-print"></i></button>
@@ -812,7 +812,7 @@
                 // Populate Shipments Tab
                 const shipBody = document.getElementById('prof-shipments-body');
                 shipBody.innerHTML = (client.shipmentNotes || []).map((s, idx) => {
-                    const amount = (s.orders || []).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+                    const amount = (s.orders || []).reduce((sum, o) => sum + (o.netAmount || o.totalAmount || 0), 0);
                     return `
                     <tr data-id="${s.id}">
                         <td style="padding:10px; border-bottom:1px solid #eee;"><input type="checkbox"></td>
@@ -1038,13 +1038,13 @@
                                     ${data.orders.map(o => `
                                         <div style="display:flex; justify-content:space-between; font-size:12px; padding:4px 0; border-bottom:1px dotted #eee;">
                                             <span># ${o.orderNumber || o.id} - ${o.patientName}</span>
-                                            <span style="font-weight:bold;">OMR ${(o.totalAmount || 0).toFixed(2)}</span>
+                                            <span style="font-weight:bold;">OMR ${(o.netAmount || o.totalAmount || 0).toFixed(2)}</span>
                                         </div>
                                     `).join('')}
                                 </div>
                                 <div style="margin-top:10px; display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
                                     <span>Total Amount :</span>
-                                    <span>OMR ${data.orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0).toFixed(2)}</span>
+                                    <span>OMR ${data.orders.reduce((sum, o) => sum + (o.netAmount || o.totalAmount || 0), 0).toFixed(2)}</span>
                                 </div>
                                 <button class="btn-action" style="width:100%; margin-top:10px; background:#f3f4f6;" onclick="viewInvoice(${data.id}, 'shipment')">View Full Delivery Note</button>
                             </div>

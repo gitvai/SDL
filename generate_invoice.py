@@ -117,83 +117,112 @@ def generate_invoice(data, output):
     if orders and orders[0].get("doctorName"):
         table_data.append(["", Paragraph(f"Requested by Dr. {orders[0].get('doctorName').upper()}", styles["RequestedBy"]), "", "", "", "", "", "", ""])
 
+    # Date formatter helper
+    def format_date(date_str):
+        if not date_str: return ""
+        try:
+            if 'T' in str(date_str):
+                from datetime import datetime
+                clean_date = str(date_str).split('T')[0]
+                dt = datetime.strptime(clean_date, "%Y-%m-%d")
+                return dt.strftime("%d/%m/%Y")
+            return str(date_str)
+        except:
+            return str(date_str)
+
     total_units = 0
-    total_amount = sum((o.get("totalAmount") or o.get("price") or 0) for o in orders)
+    total_amount = 0
 
-    for i, o in enumerate(orders):
-        units = o.get("units") or 1
-        total_units += units
-        price = o.get("totalAmount") or o.get("price") or 0
-        rate = price / units if units else 0
-        
-        p_type = (o.get('productType') or '').strip()
-        p_name = (o.get('productName') or '').strip()
-        product_desc = p_name if p_name else p_type
-        shades = [o.get('shade1'), o.get('shade2'), o.get('shade3')]
-        shades = [s for s in shades if s]
-        if shades:
-            product_desc += f"<br/><font size='7' color='gray'>Shade: {' / '.join(shades)}</font>"
+    # Calculate totals first, considering jobs
+    for o in orders:
+        jobs_to_render = o.get("jobs") if (o.get("jobs") and len(o.get("jobs")) > 0) else [o]
+        for job in jobs_to_render:
+            units = job.get("units") or 1
+            total_units += units
+            price = job.get("totalAmount") or job.get("price") or 0
+            total_amount += price
 
-        # Dental Chart Grid for PDF
-        teeth_str = o.get("teethSelection") or ""
-        teeth_grid = ""
-        if teeth_str:
-            quads = {1: [], 2: [], 3: [], 4: []}
-            import re
-            nums = re.split(r'[\s,]+', str(teeth_str))
-            for n in nums:
-                if n.isdigit():
-                    val = int(n)
-                    q = val // 10
-                    num = val % 10
-                    # Map deciduous quadrants (5-8) to permanent (1-4)
-                    if q == 5: q = 1
-                    if q == 6: q = 2
-                    if q == 7: q = 3
-                    if q == 8: q = 4
-                    if q in quads: quads[q].append(num)
+    item_index = 1
+    for o in orders:
+        jobs_to_render = o.get("jobs") if (o.get("jobs") and len(o.get("jobs")) > 0) else [o]
+        for job in jobs_to_render:
+            units = job.get("units") or 1
+            price = job.get("totalAmount") or job.get("price") or 0
+            rate = price / units if units else 0
             
-            def make_quad_table_right(quad):
-                row = [str(i) if i in quad else "" for i in range(8, 0, -1)]
-                t = Table([row], colWidths=[42.5/8]*8)
-                t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
-                return t
+            p_type = (job.get('productType') or '').strip()
+            p_name = (job.get('productName') or '').strip()
+            product_desc = p_name if p_name else p_type
+            shades = [job.get('shade1'), job.get('shade2'), job.get('shade3')]
+            shades = [s for s in shades if s]
+            if shades:
+                product_desc += f"<br/><font size='7' color='gray'>Shade: {' / '.join(shades)}</font>"
 
-            def make_quad_table_left(quad):
-                row = [str(i) if i in quad else "" for i in range(1, 9)]
-                t = Table([row], colWidths=[42.5/8]*8)
-                t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
-                return t
+            # Dental Chart Grid for PDF
+            teeth_str = job.get("teethSelection") or ""
+            teeth_grid = ""
+            if teeth_str:
+                quads = {1: [], 2: [], 3: [], 4: []}
+                import re
+                nums = re.split(r'[\s,]+', str(teeth_str))
+                for n in nums:
+                    if n.isdigit():
+                        val = int(n)
+                        q = val // 10
+                        num = val % 10
+                        # Map deciduous quadrants (5-8) to permanent (1-4)
+                        if q == 5: q = 1
+                        if q == 6: q = 2
+                        if q == 7: q = 3
+                        if q == 8: q = 4
+                        if q in quads: quads[q].append(num)
+                
+                def make_quad_table_right(quad):
+                    row = [str(i) if i in quad else "" for i in range(8, 0, -1)]
+                    t = Table([row], colWidths=[42.5/8]*8)
+                    t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
+                    return t
 
-            # Dental Chart 2x2 Cross
-            grid_data = [
-                [make_quad_table_right(quads[1]), make_quad_table_left(quads[2])],
-                [make_quad_table_right(quads[4]), make_quad_table_left(quads[3])]
-            ]
-            # Use fixed column widths but allow dynamic row heights for alignment
-            teeth_grid = Table(grid_data, colWidths=[42.5, 42.5])
-            teeth_grid.setStyle(TableStyle([
-                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-                ('LEFTPADDING', (0,0), (-1,-1), 2),
-                ('RIGHTPADDING', (0,0), (-1,-1), 2),
-                ('TOPPADDING', (0,0), (-1,-1), 4),
-                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-                # FDI Cross Borders - Thick and Clear
-                ('LINEAFTER', (0,0), (0,1), 1.5, colors.black),
-                ('LINEBELOW', (0,0), (1,0), 1.5, colors.black),
-            ]))
+                def make_quad_table_left(quad):
+                    row = [str(i) if i in quad else "" for i in range(1, 9)]
+                    t = Table([row], colWidths=[42.5/8]*8)
+                    t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
+                    return t
 
-        table_data.append([
-            str(i+1),
-            str(o.get("orderNumber") or o.get("id", "")),
-            Paragraph(o.get("patientName", ""), styles["TableText"]),
-            o.get("finishDate") or "",
-            Paragraph(product_desc, styles["TableText"]),
-            teeth_grid if teeth_grid else "",
-            str(units),
-            f"{rate:.2f}",
-            f"{price:.2f}"
-        ])
+                # Dental Chart 2x2 Cross
+                grid_data = [
+                    [make_quad_table_right(quads[1]), make_quad_table_left(quads[2])],
+                    [make_quad_table_right(quads[4]), make_quad_table_left(quads[3])]
+                ]
+                # Use fixed column widths but allow dynamic row heights for alignment
+                teeth_grid = Table(grid_data, colWidths=[42.5, 42.5])
+                teeth_grid.setStyle(TableStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('LEFTPADDING', (0,0), (-1,-1), 2),
+                    ('RIGHTPADDING', (0,0), (-1,-1), 2),
+                    ('TOPPADDING', (0,0), (-1,-1), 4),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+                    # FDI Cross Borders - Thick and Clear
+                    ('LINEAFTER', (0,0), (0,1), 1.5, colors.black),
+                    ('LINEBELOW', (0,0), (1,0), 1.5, colors.black),
+                ]))
+
+            # Format display date
+            raw_date = o.get("finishDate") or o.get("dueDate") or ""
+            display_date = format_date(raw_date)
+
+            table_data.append([
+                str(item_index),
+                str(o.get("orderNumber") or o.get("id", "")),
+                Paragraph(o.get("patientName", ""), styles["TableText"]),
+                display_date,
+                Paragraph(product_desc, styles["TableText"]),
+                teeth_grid if teeth_grid else "",
+                str(units),
+                f"{rate:.2f}",
+                f"{price:.2f}"
+            ])
+            item_index += 1
 
     table_data.append(["", "", "", "", "", Paragraph("<b>Total :</b>", styles["TableTextRight"]), Paragraph(f"<b>{total_units}</b>", styles["TableTextCenter"]), "", Paragraph(f"<b>{total_amount:.2f}</b>", styles["TableTextRight"])])
 

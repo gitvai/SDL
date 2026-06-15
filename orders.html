@@ -3520,7 +3520,7 @@ Products: ${products.join(' | ')}
                 // Populate Shipments
                 const shipments = client.shipmentNotes || [];
                 document.getElementById('cd-shipments-body').innerHTML = shipments.map(s => {
-                    const shipmentTotal = (s.orders || []).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+                    const shipmentTotal = (s.orders || []).reduce((sum, o) => sum + (o.netAmount || o.totalAmount || 0), 0);
                     return `
                         <tr>
                             <td style="padding:10px; border-bottom:1px solid #eee;">${s.noteNumber || s.id}</td>

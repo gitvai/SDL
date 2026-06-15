@@ -322,7 +322,8 @@ app.post('/api/orders', async (req, res) => {
     }
     
     const basePrice = (jobsData && jobsData.length > 0) ? 0 : (toNum(data.price) || 0);
-    data.netAmount = toNum(req.body.netAmount) || (basePrice + jobsTotal - data.discountAmount + data.taxAmount);
+    data.grossAmount = basePrice + jobsTotal;
+    data.netAmount = toNum(req.body.netAmount) || (data.grossAmount - (data.discountAmount || 0) + (data.taxAmount || 0));
     data.totalAmount = data.netAmount;
     
     data.receivedDate = toDate(data.receivedDate) || new Date();
@@ -570,8 +571,9 @@ app.put('/api/orders/:id', async (req, res) => {
 
       // Recalculate netAmount and totalAmount based on jobs
       const jobsTotal = req.body.jobs.reduce((sum, j) => sum + (toNum(j.totalAmount) || toNum(j.total) || (toNum(j.units) || 1) * (toNum(j.price) || toNum(j.rate) || 0)), 0);
-      cleanData.totalAmount = jobsTotal;
+      cleanData.grossAmount = jobsTotal;
       cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toNum(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toNum(data.taxAmount) || 0);
+      cleanData.totalAmount = cleanData.netAmount;
     }
 
     const order = await prisma.order.update({
@@ -919,7 +921,7 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
 
     const invoice = await prisma.invoice.findUnique({
       where: { id: Number(req.params.id) },
-      include: { client: true, orders: true }
+      include: { client: true, orders: { include: { jobs: true } } }
     });
 
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
@@ -927,7 +929,8 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
     // Recovery logic: If orders array is empty, explicitly fetch orders by invoiceId
     if (invoice.orders.length === 0) {
       const recoveredOrders = await prisma.order.findMany({
-        where: { invoiceId: invoice.id }
+        where: { invoiceId: invoice.id },
+        include: { jobs: true }
       });
       if (recoveredOrders.length > 0) {
         invoice.orders = recoveredOrders;
@@ -990,7 +993,7 @@ app.get('/api/invoices/:id', async (req, res) => {
           { invoiceNumber: idParam }
         ]
       },
-      include: { client: true, orders: true, adjustments: true }
+      include: { client: true, orders: { include: { jobs: true } }, adjustments: true }
     });
     
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
@@ -999,7 +1002,7 @@ app.get('/api/invoices/:id', async (req, res) => {
     if (!invoice.orders || invoice.orders.length === 0) {
       const recoveredOrders = await prisma.order.findMany({
         where: { invoiceId: invoice.id },
-        include: { client: true }
+        include: { client: true, jobs: true }
       });
       if (recoveredOrders.length > 0) {
         invoice.orders = recoveredOrders;
