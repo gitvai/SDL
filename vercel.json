@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://sdl-backend-l5r2.onrender.com/api/$1"
+    }
+  ]
+}
