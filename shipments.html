@@ -617,7 +617,7 @@
                     if (tbodyId === 'prof-shipments-body' || (typeof currentMode !== 'undefined' && (currentMode === 'note' || currentMode === 'notes'))) {
                         window.open(`delivery_note.html?id=${id}`, '_blank');
                     } else {
-                        window.open(`invoice.html?id=${id}`, '_blank');
+                        window.open(`delivery_note.html?id=${id}&type=order`, '_blank');
                     }
                 });
             } else if (action === 'email') {
@@ -883,6 +883,8 @@
         function printInvoice(id, type = 'invoice') {
             if (type === 'shipment') {
                 window.open(`delivery_note.html?id=${id}`, '_blank');
+            } else if (type === 'order') {
+                window.open(`delivery_note.html?id=${id}&type=order`, '_blank');
             } else {
                 window.open(`invoice.html?id=${id}&type=${type}`, '_blank');
             }
@@ -891,6 +893,8 @@
         function viewInvoice(id, type = 'invoice') {
             if (type === 'shipment') {
                 window.open(`delivery_note.html?id=${id}`, '_blank');
+            } else if (type === 'order') {
+                window.open(`delivery_note.html?id=${id}&type=order`, '_blank');
             } else {
                 window.open(`invoice.html?id=${id}&type=${type}`, '_blank');
             }
