@@ -153,22 +153,22 @@ def generate_invoice(data, output):
                     if q == 8: q = 4
                     if q in quads: quads[q].append(num)
             
-            def format_quad_right(quad):
-                s = ""
-                for i in range(8, 0, -1):
-                    s += str(i) if i in quad else "&nbsp;"
-                return s
+            def make_quad_table_right(quad):
+                row = [str(i) if i in quad else "" for i in range(8, 0, -1)]
+                t = Table([row], colWidths=[42.5/8]*8)
+                t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
+                return t
 
-            def format_quad_left(quad):
-                s = ""
-                for i in range(1, 9):
-                    s += str(i) if i in quad else "&nbsp;"
-                return s
+            def make_quad_table_left(quad):
+                row = [str(i) if i in quad else "" for i in range(1, 9)]
+                t = Table([row], colWidths=[42.5/8]*8)
+                t.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 7), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
+                return t
 
             # Dental Chart 2x2 Cross
             grid_data = [
-                [Paragraph(format_quad_right(quads[1]), styles["TableTeethMono"]), Paragraph(format_quad_left(quads[2]), styles["TableTeethMono"])],
-                [Paragraph(format_quad_right(quads[4]), styles["TableTeethMono"]), Paragraph(format_quad_left(quads[3]), styles["TableTeethMono"])]
+                [make_quad_table_right(quads[1]), make_quad_table_left(quads[2])],
+                [make_quad_table_right(quads[4]), make_quad_table_left(quads[3])]
             ]
             # Use fixed column widths but allow dynamic row heights for alignment
             teeth_grid = Table(grid_data, colWidths=[42.5, 42.5])
