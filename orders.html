@@ -3806,7 +3806,7 @@ Products: ${products.join(' | ')}
                     let html = '<table style="width:100%; height:100%; table-layout:fixed; border-collapse:collapse; border:none; margin:0; padding:0;"><tr style="border:none;">';
                     for (let i = 8; i >= 1; i--) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : ''}</td>`;
+                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : '&nbsp;'}</td>`;
                     }
                     html += '</tr></table>';
                     return html;
@@ -3817,7 +3817,7 @@ Products: ${products.join(' | ')}
                     let html = '<table style="width:100%; height:100%; table-layout:fixed; border-collapse:collapse; border:none; margin:0; padding:0;"><tr style="border:none;">';
                     for (let i = 1; i <= 8; i++) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : ''}</td>`;
+                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : '&nbsp;'}</td>`;
                     }
                     html += '</tr></table>';
                     return html;
