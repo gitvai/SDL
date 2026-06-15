@@ -581,15 +581,22 @@ app.put('/api/orders/:id', async (req, res) => {
       cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toNum(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toNum(data.taxAmount) || 0);
       cleanData.totalAmount = cleanData.netAmount;
     } else {
-      const finalPrice = cleanData.price !== undefined ? cleanData.price : existingOrder.price;
+      // Fallback to totalAmount if price is not explicitly set in the request body
+      const finalPrice = cleanData.price !== undefined ? cleanData.price : (cleanData.totalAmount !== undefined ? cleanData.totalAmount : existingOrder.price);
       const finalUnits = cleanData.units !== undefined ? cleanData.units : existingOrder.units;
       const finalDiscount = cleanData.discountAmount !== undefined ? cleanData.discountAmount : existingOrder.discountAmount;
       const finalTax = cleanData.taxAmount !== undefined ? cleanData.taxAmount : existingOrder.taxAmount;
 
+      // Ensure cleanData has the updated price and units so they are persisted in Order table
+      cleanData.price = finalPrice;
+      cleanData.units = finalUnits;
+
       if (existingOrder.jobs && existingOrder.jobs.length > 1) {
-        const jobsTotal = existingOrder.jobs.reduce((sum, j) => sum + j.totalAmount, 0);
-        cleanData.grossAmount = jobsTotal;
-        cleanData.netAmount = jobsTotal - finalDiscount + finalTax;
+        // Recalculate using the updated first job (finalPrice) + other unchanged jobs
+        const otherJobsTotal = existingOrder.jobs.slice(1).reduce((sum, j) => sum + j.totalAmount, 0);
+        const grossAmount = finalPrice + otherJobsTotal;
+        cleanData.grossAmount = grossAmount;
+        cleanData.netAmount = grossAmount - finalDiscount + finalTax;
         cleanData.totalAmount = cleanData.netAmount;
       } else {
         cleanData.grossAmount = finalPrice;
