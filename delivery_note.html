@@ -534,7 +534,7 @@
     </div>
 
     <script>
-        const API_BASE = 'https://sdl-backend-l5r2.onrender.com/api';
+        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         const urlParams = new URLSearchParams(window.location.search);
 
         function numberToWords(num) {
@@ -597,21 +597,23 @@
                 // Helper to render 8 cells per quadrant
                 // UR (Q1) and LR (Q4) go from 8 down to 1
                 const renderQuadRight = (quad) => {
-                    let html = '';
+                    let html = '<div style="display:flex; width:100%; height:100%; align-items:center;">';
                     for (let i = 8; i >= 1; i--) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<span class="tooth-cell">${hasTooth ? i : '&nbsp;'}</span>`;
+                        html += `<div style="flex:1; text-align:center;">${hasTooth ? i : ''}</div>`;
                     }
+                    html += '</div>';
                     return html;
                 };
 
                 // UL (Q2) and LL (Q3) go from 1 to 8
                 const renderQuadLeft = (quad) => {
-                    let html = '';
+                    let html = '<div style="display:flex; width:100%; height:100%; align-items:center;">';
                     for (let i = 1; i <= 8; i++) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<span class="tooth-cell">${hasTooth ? i : '&nbsp;'}</span>`;
+                        html += `<div style="flex:1; text-align:center;">${hasTooth ? i : ''}</div>`;
                     }
+                    html += '</div>';
                     return html;
                 };
 
