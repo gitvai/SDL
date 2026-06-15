@@ -50,6 +50,7 @@ def generate_invoice(data, output):
     styles.add(ParagraphStyle(name='TableTextCenter', parent=styles['Normal'], fontSize=9, leading=11, alignment=1, fontName='Helvetica-Bold'))
     styles.add(ParagraphStyle(name='TableTextRight', parent=styles['Normal'], fontSize=9, leading=11, alignment=2, fontName='Helvetica-Bold'))
     styles.add(ParagraphStyle(name='TableTeeth', parent=styles['Normal'], fontSize=9, leading=11, alignment=1, fontName='Helvetica-Bold'))
+    styles.add(ParagraphStyle(name='TableTeethMono', parent=styles['Normal'], fontSize=8, leading=11, alignment=1, fontName='Courier-Bold'))
     styles.add(ParagraphStyle(name='RequestedBy', parent=styles['Normal'], fontSize=10, leading=12, fontName='Helvetica-Bold'))
     styles.add(ParagraphStyle(name='InvoiceTitle', parent=styles['Heading1'], fontSize=16, leading=20, alignment=1, spaceBefore=5, spaceAfter=5))
 
@@ -152,16 +153,22 @@ def generate_invoice(data, output):
                     if q == 8: q = 4
                     if q in quads: quads[q].append(num)
             
-            # Sort teeth within each quadrant for consistency (Q1/Q4 descending, Q2/Q3 ascending)
-            quads[1].sort(reverse=True)
-            quads[2].sort()
-            quads[3].sort()
-            quads[4].sort(reverse=True)
+            def format_quad_right(quad):
+                s = ""
+                for i in range(8, 0, -1):
+                    s += str(i) if i in quad else "&nbsp;"
+                return s
+
+            def format_quad_left(quad):
+                s = ""
+                for i in range(1, 9):
+                    s += str(i) if i in quad else "&nbsp;"
+                return s
 
             # Dental Chart 2x2 Cross
             grid_data = [
-                [Paragraph("".join(map(str, quads[1])), styles["TableTeeth"]), Paragraph("".join(map(str, quads[2])), styles["TableTeeth"])],
-                [Paragraph("".join(map(str, quads[4])), styles["TableTeeth"]), Paragraph("".join(map(str, quads[3])), styles["TableTeeth"])]
+                [Paragraph(format_quad_right(quads[1]), styles["TableTeethMono"]), Paragraph(format_quad_left(quads[2]), styles["TableTeethMono"])],
+                [Paragraph(format_quad_right(quads[4]), styles["TableTeethMono"]), Paragraph(format_quad_left(quads[3]), styles["TableTeethMono"])]
             ]
             # Use fixed column widths but allow dynamic row heights for alignment
             teeth_grid = Table(grid_data, colWidths=[42.5, 42.5])
