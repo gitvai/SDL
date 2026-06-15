@@ -501,6 +501,12 @@ app.get('/api/orders/:id', async (req, res) => {
 
 app.put('/api/orders/:id', async (req, res) => {
   try {
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: Number(req.params.id) },
+      include: { jobs: true }
+    });
+    if (!existingOrder) return res.status(404).json({ error: 'Order not found' });
+
     const data = { ...req.body };
     if (data.clientId) data.clientId = Number(data.clientId);
     if (data.age) data.age = toNum(data.age);
@@ -574,6 +580,22 @@ app.put('/api/orders/:id', async (req, res) => {
       cleanData.grossAmount = jobsTotal;
       cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toNum(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toNum(data.taxAmount) || 0);
       cleanData.totalAmount = cleanData.netAmount;
+    } else {
+      const finalPrice = cleanData.price !== undefined ? cleanData.price : existingOrder.price;
+      const finalUnits = cleanData.units !== undefined ? cleanData.units : existingOrder.units;
+      const finalDiscount = cleanData.discountAmount !== undefined ? cleanData.discountAmount : existingOrder.discountAmount;
+      const finalTax = cleanData.taxAmount !== undefined ? cleanData.taxAmount : existingOrder.taxAmount;
+
+      if (existingOrder.jobs && existingOrder.jobs.length > 1) {
+        const jobsTotal = existingOrder.jobs.reduce((sum, j) => sum + j.totalAmount, 0);
+        cleanData.grossAmount = jobsTotal;
+        cleanData.netAmount = jobsTotal - finalDiscount + finalTax;
+        cleanData.totalAmount = cleanData.netAmount;
+      } else {
+        cleanData.grossAmount = finalPrice;
+        cleanData.netAmount = finalPrice - finalDiscount + finalTax;
+        cleanData.totalAmount = cleanData.netAmount;
+      }
     }
 
     const order = await prisma.order.update({
@@ -583,24 +605,26 @@ app.put('/api/orders/:id', async (req, res) => {
 
     // Synchronize first/single job in database if no jobs were provided in request
     if (!req.body.jobs) {
+      const finalPrice = cleanData.price !== undefined ? cleanData.price : existingOrder.price;
+      const finalUnits = cleanData.units !== undefined ? cleanData.units : existingOrder.units;
       const existingJobs = await prisma.orderJob.findMany({ where: { orderId: Number(req.params.id) } });
       const jobData = {
-        productType: cleanData.productType || 'General',
-        productName: cleanData.productName || null,
-        material: cleanData.material || null,
-        teethSelection: cleanData.teethSelection || null,
-        shade1: cleanData.shade1 || null,
-        shade2: cleanData.shade2 || null,
-        shade3: cleanData.shade3 || null,
-        shadeNotes: cleanData.shadeNotes || null,
-        stumpShade: cleanData.stumpShade || null,
-        units: toNum(cleanData.units) || 1,
-        price: toNum(req.body.unitRate) || (cleanData.units ? (toNum(cleanData.price) / cleanData.units) : toNum(cleanData.price)) || 0,
-        totalAmount: toNum(cleanData.totalAmount) || 0,
-        slab1Rate: toNum(cleanData.slab1Rate) || null,
-        slab2Rate: toNum(cleanData.slab2Rate) || null,
-        slab1Units: toNum(cleanData.slab1Units) || null,
-        slab2Units: toNum(cleanData.slab2Units) || null
+        productType: cleanData.productType || existingOrder.productType || 'General',
+        productName: cleanData.productName !== undefined ? cleanData.productName : existingOrder.productName,
+        material: cleanData.material !== undefined ? cleanData.material : existingOrder.material,
+        teethSelection: cleanData.teethSelection !== undefined ? cleanData.teethSelection : existingOrder.teethSelection,
+        shade1: cleanData.shade1 !== undefined ? cleanData.shade1 : existingOrder.shade1,
+        shade2: cleanData.shade2 !== undefined ? cleanData.shade2 : existingOrder.shade2,
+        shade3: cleanData.shade3 !== undefined ? cleanData.shade3 : existingOrder.shade3,
+        shadeNotes: cleanData.shadeNotes !== undefined ? cleanData.shadeNotes : existingOrder.shadeNotes,
+        stumpShade: cleanData.stumpShade !== undefined ? cleanData.stumpShade : existingOrder.stumpShade,
+        units: finalUnits,
+        price: toNum(req.body.unitRate) || (finalUnits ? (finalPrice / finalUnits) : finalPrice) || 0,
+        totalAmount: finalPrice,
+        slab1Rate: cleanData.slab1Rate !== undefined ? cleanData.slab1Rate : existingOrder.slab1Rate,
+        slab2Rate: cleanData.slab2Rate !== undefined ? cleanData.slab2Rate : existingOrder.slab2Rate,
+        slab1Units: cleanData.slab1Units !== undefined ? cleanData.slab1Units : existingOrder.slab1Units,
+        slab2Units: cleanData.slab2Units !== undefined ? cleanData.slab2Units : existingOrder.slab2Units
       };
 
       if (existingJobs.length > 0) {
@@ -608,7 +632,7 @@ app.put('/api/orders/:id', async (req, res) => {
           where: { id: existingJobs[0].id },
           data: jobData
         });
-      } else if (cleanData.productName) {
+      } else if (cleanData.productName || existingOrder.productName) {
         await prisma.orderJob.create({
           data: { ...jobData, orderId: Number(req.params.id) }
         });
