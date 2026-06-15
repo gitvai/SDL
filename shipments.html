@@ -614,7 +614,7 @@
 
             if (action === 'print') {
                 ids.forEach(id => {
-                    if (tbodyId === 'prof-shipments-body' || (typeof currentMode !== 'undefined' && currentMode === 'note')) {
+                    if (tbodyId === 'prof-shipments-body' || (typeof currentMode !== 'undefined' && (currentMode === 'note' || currentMode === 'notes'))) {
                         window.open(`delivery_note.html?id=${id}`, '_blank');
                     } else {
                         window.open(`invoice.html?id=${id}`, '_blank');
