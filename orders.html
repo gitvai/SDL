@@ -3803,23 +3803,23 @@ Products: ${products.join(' | ')}
                 // Helper to render 8 cells per quadrant
                 // UR (Q1) and LR (Q4) go from 8 down to 1
                 const renderQuadRight = (quad) => {
-                    let html = '<div style="display:flex; width:100%; height:100%; align-items:center;">';
+                    let html = '<table style="width:100%; height:100%; table-layout:fixed; border-collapse:collapse; border:none; margin:0; padding:0;"><tr style="border:none;">';
                     for (let i = 8; i >= 1; i--) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<div style="flex:1; text-align:center;">${hasTooth ? i : ''}</div>`;
+                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : ''}</td>`;
                     }
-                    html += '</div>';
+                    html += '</tr></table>';
                     return html;
                 };
 
                 // UL (Q2) and LL (Q3) go from 1 to 8
                 const renderQuadLeft = (quad) => {
-                    let html = '<div style="display:flex; width:100%; height:100%; align-items:center;">';
+                    let html = '<table style="width:100%; height:100%; table-layout:fixed; border-collapse:collapse; border:none; margin:0; padding:0;"><tr style="border:none;">';
                     for (let i = 1; i <= 8; i++) {
                         const hasTooth = quadrants[quad].includes(i);
-                        html += `<div style="flex:1; text-align:center;">${hasTooth ? i : ''}</div>`;
+                        html += `<td style="border:none; padding:0 !important; text-align:center; width:12.5%; vertical-align:middle; font-size:10px; font-weight:800;">${hasTooth ? i : ''}</td>`;
                     }
-                    html += '</div>';
+                    html += '</tr></table>';
                     return html;
                 };
                 return `
