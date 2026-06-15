@@ -459,7 +459,7 @@
     </div>
 
     <script>
-        const API_BASE = 'https://sdl-backend-l5r2.onrender.com/api';
+        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let allClients = [];
         let selectedClientId = null;
         let selectedProduct = null;
@@ -666,9 +666,11 @@
               if (rateInput) rateInput.value = p.charge || 0;
               
               updateTeethUI(true);
+              /* Disable client-specific rate overrides to enforce global rate usage
               if (window.fetchCustomRate) {
                   window.fetchCustomRate(selectedClientId, p.name);
               }
+              */
     
             
             selectedTeeth = [];
@@ -1049,6 +1051,7 @@
                 teethSelection: customTeethText ? customTeethText : document.getElementById('selected-teeth-list').value,
                 units: parseInt(document.getElementById('unit-count').value) || 0,
                 price: parseFloat(document.getElementById('total-price').value) || 0,
+                unitRate: parseFloat(document.getElementById('unit-rate').value) || 0,
                 status: document.getElementById('order-status') ? document.getElementById('order-status').value : 'New',
                 receivedDate: document.getElementById('order-date-input') ? new Date(document.getElementById('order-date-input').value).toISOString() : new Date().toISOString(),
                 dueDate: document.getElementById('due-date-input') && document.getElementById('due-date-input').value ? new Date(document.getElementById('due-date-input').value).toISOString() : null,

@@ -438,7 +438,7 @@
 
 
 
-        const API_BASE = 'https://sdl-backend-l5r2.onrender.com/api';
+        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let currentMode = 'notes';
 
         function formatLocalDate(date) {

@@ -1,4 +1,4 @@
-const API_BASE = 'https://sdl-backend-l5r2.onrender.com/api';
+const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
 
 // --- DATA FETCHING ---
 async function fetchData(endpoint) {

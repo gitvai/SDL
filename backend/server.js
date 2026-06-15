@@ -321,7 +321,8 @@ app.post('/api/orders', async (req, res) => {
       jobsTotal = jobsData.reduce((sum, job) => sum + (toNum(job.totalAmount) || toNum(job.price) || 0), 0);
     }
     
-    data.netAmount = toNum(req.body.netAmount) || (data.price + jobsTotal - data.discountAmount + data.taxAmount);
+    const basePrice = (jobsData && jobsData.length > 0) ? 0 : (toNum(data.price) || 0);
+    data.netAmount = toNum(req.body.netAmount) || (basePrice + jobsTotal - data.discountAmount + data.taxAmount);
     data.totalAmount = data.netAmount;
     
     data.receivedDate = toDate(data.receivedDate) || new Date();
@@ -381,7 +382,14 @@ app.post('/api/orders', async (req, res) => {
           slab2Units: toNum(job.slab2Units)
         }))
       };
+      // Update the main order fields to match the first job for backward compatibility
+      const firstJob = jobsData[0];
+      cleanData.productName = firstJob.productName || firstJob.product || null;
+      cleanData.productType = firstJob.productType || firstJob.type || 'General';
+      cleanData.units = toNum(firstJob.units) || 1;
+      cleanData.price = toNum(firstJob.price) || toNum(firstJob.rate) || 0;
     } else if (cleanData.productName) {
+      const uRate = toNum(req.body.unitRate) || (cleanData.units ? (toNum(cleanData.price) / cleanData.units) : toNum(cleanData.price)) || 0;
       cleanData.jobs = {
         create: [{
           productType: cleanData.productType || 'General',
@@ -394,7 +402,7 @@ app.post('/api/orders', async (req, res) => {
           shadeNotes: cleanData.shadeNotes,
           stumpShade: cleanData.stumpShade,
           units: toNum(cleanData.units) || 1,
-          price: toNum(req.body.unitRate) || toNum(cleanData.price) || 0,
+          price: uRate,
           totalAmount: toNum(cleanData.totalAmount) || 0,
           slab1Rate: toNum(cleanData.slab1Rate),
           slab2Rate: toNum(cleanData.slab2Rate),
@@ -420,10 +428,11 @@ app.post('/api/orders', async (req, res) => {
            });
         }
       }
-    } else if (cleanData.productName && cleanData.price !== undefined) {
+    } else if (cleanData.productName && (req.body.unitRate !== undefined || cleanData.price !== undefined)) {
+       const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : (cleanData.units ? (Number(cleanData.price) / cleanData.units) : Number(cleanData.price));
        await prisma.product.updateMany({
          where: { name: cleanData.productName },
-         data: { charge: Number(cleanData.price) || 0 }
+         data: { charge: pCharge || 0 }
        });
     }
 
@@ -538,6 +547,7 @@ app.put('/api/orders/:id', async (req, res) => {
           create: req.body.jobs.map(j => ({
             productName: j.productName || j.product || null,
             productType: j.productType || j.type || 'General',
+            teethSelection: j.teethSelection || (Array.isArray(j.teeth) ? j.teeth.join(', ') : j.teeth) || null,
             units: toNum(j.units) || 1,
             price: toNum(j.price) || toNum(j.rate) || 0,
             totalAmount: toNum(j.totalAmount) || toNum(j.total) || 0,
@@ -557,12 +567,51 @@ app.put('/api/orders/:id', async (req, res) => {
           cleanData.units = toNum(firstJob.units) || 1;
           cleanData.price = toNum(firstJob.price) || toNum(firstJob.rate) || 0;
       }
+
+      // Recalculate netAmount and totalAmount based on jobs
+      const jobsTotal = req.body.jobs.reduce((sum, j) => sum + (toNum(j.totalAmount) || toNum(j.total) || (toNum(j.units) || 1) * (toNum(j.price) || toNum(j.rate) || 0)), 0);
+      cleanData.totalAmount = jobsTotal;
+      cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toNum(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toNum(data.taxAmount) || 0);
     }
 
     const order = await prisma.order.update({
       where: { id: Number(req.params.id) },
       data: { ...cleanData, ...updateJobsQuery }
     });
+
+    // Synchronize first/single job in database if no jobs were provided in request
+    if (!req.body.jobs) {
+      const existingJobs = await prisma.orderJob.findMany({ where: { orderId: Number(req.params.id) } });
+      const jobData = {
+        productType: cleanData.productType || 'General',
+        productName: cleanData.productName || null,
+        material: cleanData.material || null,
+        teethSelection: cleanData.teethSelection || null,
+        shade1: cleanData.shade1 || null,
+        shade2: cleanData.shade2 || null,
+        shade3: cleanData.shade3 || null,
+        shadeNotes: cleanData.shadeNotes || null,
+        stumpShade: cleanData.stumpShade || null,
+        units: toNum(cleanData.units) || 1,
+        price: toNum(req.body.unitRate) || (cleanData.units ? (toNum(cleanData.price) / cleanData.units) : toNum(cleanData.price)) || 0,
+        totalAmount: toNum(cleanData.totalAmount) || 0,
+        slab1Rate: toNum(cleanData.slab1Rate) || null,
+        slab2Rate: toNum(cleanData.slab2Rate) || null,
+        slab1Units: toNum(cleanData.slab1Units) || null,
+        slab2Units: toNum(cleanData.slab2Units) || null
+      };
+
+      if (existingJobs.length > 0) {
+        await prisma.orderJob.update({
+          where: { id: existingJobs[0].id },
+          data: jobData
+        });
+      } else if (cleanData.productName) {
+        await prisma.orderJob.create({
+          data: { ...jobData, orderId: Number(req.params.id) }
+        });
+      }
+    }
 
     // Update Global Product Prices on Edit
     if (req.body.jobs && Array.isArray(req.body.jobs)) {
@@ -576,10 +625,11 @@ app.put('/api/orders/:id', async (req, res) => {
              });
           }
         }
-    } else if (cleanData.productName && cleanData.price !== undefined) {
+    } else if (cleanData.productName && (req.body.unitRate !== undefined || cleanData.price !== undefined)) {
+         const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : (cleanData.units ? (Number(cleanData.price) / cleanData.units) : Number(cleanData.price));
          await prisma.product.updateMany({
            where: { name: cleanData.productName },
-           data: { charge: Number(cleanData.price) || 0 }
+           data: { charge: pCharge || 0 }
          });
     }
     res.json(order);
@@ -592,6 +642,11 @@ app.delete('/api/orders/:id', async (req, res) => {
     
     // First, delete related OrderMedia to avoid foreign key constraints
     await prisma.media.deleteMany({
+      where: { orderId: id }
+    });
+    
+    // Delete related OrderJobs to avoid foreign key constraints
+    await prisma.orderJob.deleteMany({
       where: { orderId: id }
     });
     
