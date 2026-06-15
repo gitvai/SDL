@@ -1045,7 +1045,7 @@
                 await loadProducts();
 
                 // If order has multiple items/jobs, load them into orderJobs and display them in the jobs list
-                if (order.jobs && order.jobs.length > 1) {
+                if (order.jobs && order.jobs.length > 0) {
                     orderJobs = order.jobs.map(j => ({
                         product: j.productName,
                         productType: j.productType || 'General',
@@ -1378,6 +1378,7 @@
         }
 
         let orderJobs = [];
+        let editingJobIndex = -1;
 
         function handleAddProductFromBottom() {
             if (selectedProduct) {
@@ -1411,7 +1412,13 @@
                 slab1Units: (document.getElementById('slabs-container').style.display === 'block') ? Math.min(parseInt(document.getElementById('unit-count').value)||0, 1) : null,
                 slab2Units: (document.getElementById('slabs-container').style.display === 'block') ? Math.max(0, (parseInt(document.getElementById('unit-count').value)||0) - 1) : null
             };
-            orderJobs.push(job);
+
+            if (editingJobIndex >= 0) {
+                orderJobs[editingJobIndex] = job;
+                editingJobIndex = -1;
+            } else {
+                orderJobs.push(job);
+            }
 
             // Show jobs list
             renderJobsList();
@@ -1430,7 +1437,64 @@
 
         function removeJob(index) {
             orderJobs.splice(index, 1);
+            if (editingJobIndex === index) {
+                editingJobIndex = -1;
+                selectedTeeth = [];
+                document.querySelectorAll('.tooth-num.selected').forEach(el => el.classList.remove('selected'));
+                updateTeethUI();
+                cancelTeethSelection();
+            } else if (editingJobIndex > index) {
+                editingJobIndex--;
+            }
             renderJobsList();
+        }
+
+        function editJobInList(idx) {
+            editingJobIndex = idx;
+            const j = orderJobs[idx];
+            
+            // Set active selection
+            document.getElementById('selected-product-name').textContent = j.product;
+            document.getElementById('unit-rate').value = j.rate;
+            document.getElementById('unit-count').value = j.units;
+            document.getElementById('total-price').value = j.total;
+            
+            selectedProduct = { name: j.product, charge: j.rate };
+            selectedProductType = j.productType || 'General';
+            
+            selectedTeeth = j.teeth ? [...j.teeth] : [];
+            updateTeethUI();
+            
+            const slabsContainer = document.getElementById('slabs-container');
+            const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
+            const productNameUpper = (j.product || '').toUpperCase();
+            const isSlabProduct = slabProducts.some(sp => productNameUpper.includes(sp));
+            
+            if (slabsContainer) {
+                slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
+            }
+            
+            const customUnitContainer = document.getElementById('custom-unit-text-container');
+            if (customUnitContainer) {
+                customUnitContainer.style.display = isSlabProduct ? 'block' : 'none';
+            }
+            if (isSlabProduct && customUnitContainer) {
+                if (j.teeth && j.teeth.length === 1 && isNaN(j.teeth[0])) {
+                    document.getElementById('custom-unit-text').value = j.teeth[0];
+                } else {
+                    document.getElementById('custom-unit-text').value = '';
+                }
+            }
+            
+            const s1 = document.getElementById('slab1-rate');
+            if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : j.rate;
+            const s2 = document.getElementById('slab2-rate');
+            if (s2) s2.value = (j.slab2Rate !== null && j.slab2Rate !== undefined) ? j.slab2Rate : 2;
+            
+            updateTeethUI();
+            
+            document.getElementById('product-selection-area').style.display = 'none';
+            document.getElementById('teeth-selection-area').style.display = 'block';
         }
 
         function renderJobsList() {
@@ -1465,6 +1529,9 @@
                             <td style="padding: 8px 12px; text-align:right; color: #4b5563;">${j.rate}</td>
                             <td style="padding: 8px 12px; text-align:right; font-weight: 600; color: #111827;">${parseFloat(j.total).toFixed(2)}</td>
                             <td style="padding: 8px 12px; text-align:center;">
+                                <button type="button" onclick="editJobInList(${idx})" style="background:none; border:none; color:#3b82f6; font-size:14px; cursor:pointer; margin-right:8px;" title="Edit Job">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                                 <button type="button" onclick="removeJob(${idx})" style="background:none; border:none; color:#ef4444; font-size:14px; cursor:pointer;" title="Remove Job">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -1530,6 +1597,35 @@
                 if (customInput) customTeethText = customInput.value;
             }
 
+            if (selectedProduct) {
+                const job = {
+                    product: selectedProduct.name,
+                    productType: selectedProductType || 'General',
+                    teeth: customTeethText ? [customTeethText] : [...selectedTeeth],
+                    units: document.getElementById('unit-count') ? document.getElementById('unit-count').value : '1',
+                    rate: document.getElementById('unit-rate') ? document.getElementById('unit-rate').value : '0',
+                    total: document.getElementById('total-price') ? document.getElementById('total-price').value : '0',
+                    slab1Rate: isSlabActive && document.getElementById('slab1-rate') ? parseFloat(document.getElementById('slab1-rate').value) : null,
+                    slab2Rate: isSlabActive && document.getElementById('slab2-rate') ? parseFloat(document.getElementById('slab2-rate').value) : null,
+                    slab1Units: isSlabActive ? Math.min(parseInt(document.getElementById('unit-count').value)||0, 1) : null,
+                    slab2Units: isSlabActive ? Math.max(0, (parseInt(document.getElementById('unit-count').value)||0) - 1) : null
+                };
+                if (editingJobIndex >= 0) {
+                    orderJobs[editingJobIndex] = job;
+                } else {
+                    orderJobs.push(job);
+                }
+                selectedProduct = null;
+                editingJobIndex = -1;
+            }
+
+            let grandTotal = 0;
+            if (orderJobs && orderJobs.length > 0) {
+                orderJobs.forEach(j => {
+                    grandTotal += parseFloat(j.total) || 0;
+                });
+            }
+
             const data = {
                 clientId: selectedClientId,
                 patientName: patientName,
@@ -1537,7 +1633,7 @@
                 productType: selectedProductType,
                 teethSelection: customTeethText ? customTeethText : (document.getElementById('selected-teeth-list') ? document.getElementById('selected-teeth-list').value : ''),
                 units: parseInt(document.getElementById('unit-count') ? document.getElementById('unit-count').value : 0) || 0,
-                price: parseFloat(document.getElementById('total-price') ? document.getElementById('total-price').value : 0) || 0,
+                price: grandTotal || parseFloat(document.getElementById('total-price') ? document.getElementById('total-price').value : 0) || 0,
                 unitRate: parseFloat(document.getElementById('unit-rate') ? document.getElementById('unit-rate').value : 0) || 0,
                 status: document.getElementById('order-status') ? document.getElementById('order-status').value : 'New',
                 receivedDate: document.getElementById('order-date-input') ? new Date(document.getElementById('order-date-input').value).toISOString() : new Date().toISOString(),
@@ -1561,8 +1657,8 @@
                 // Slabs data
                 slab1Rate: isSlabActive && document.getElementById('slab1-rate') ? parseFloat(document.getElementById('slab1-rate').value) : null,
                 slab2Rate: isSlabActive && document.getElementById('slab2-rate') ? parseFloat(document.getElementById('slab2-rate').value) : null,
-                slab1Units: isSlabActive ? Math.min(selectedTeeth.length, 1) : null,
-                slab2Units: isSlabActive ? Math.max(0, selectedTeeth.length - 1) : null
+                slab1Units: isSlabActive ? Math.min(parseInt(document.getElementById('unit-count').value)||0, 1) : null,
+                slab2Units: isSlabActive ? Math.max(0, (parseInt(document.getElementById('unit-count').value)||0) - 1) : null
             };
 
             if (typeof orderJobs !== 'undefined' && orderJobs && orderJobs.length > 0) {

@@ -762,6 +762,117 @@
             <script>
 
     window.editOrderJobs = [];
+    window.editingJobIndex = -1;
+
+    window.clearActiveEditFields = function() {
+        document.getElementById('eo-prod-name').textContent = 'PRODUCT';
+        document.getElementById('eo-prod-name').dataset.type = 'General';
+        document.getElementById('eo-rate').value = 0;
+        document.getElementById('eo-units').value = 1;
+        document.getElementById('eo-total-charge-text').textContent = '0';
+        document.querySelectorAll('.tooth-num').forEach(t => t.classList.remove('selected'));
+        if (document.getElementById('eo-slabs-container')) document.getElementById('eo-slabs-container').style.display = 'none';
+        if (document.getElementById('eo-custom-unit-text-container')) {
+            document.getElementById('eo-custom-unit-text-container').style.display = 'none';
+            document.getElementById('eo-custom-unit-text').value = '';
+        }
+        window.editingJobIndex = -1;
+    };
+
+    window.saveActiveEditJob = function() {
+        const eoProdName = document.getElementById('eo-prod-name').textContent.trim();
+        if (!eoProdName || eoProdName === 'PRODUCT') {
+            alert('Please select a product first.');
+            return;
+        }
+        
+        const selectedTeethElements = document.querySelectorAll('.tooth-num.selected');
+        const selectedTeeth = Array.from(selectedTeethElements).map(el => el.getAttribute('data-tooth')).sort();
+        const customUnitContainer = document.getElementById('eo-custom-unit-text-container');
+        let customTeethText = '';
+        if (customUnitContainer && customUnitContainer.style.display === 'block') {
+            customTeethText = document.getElementById('eo-custom-unit-text').value;
+        }
+        const isSlabsVisible = document.getElementById('eo-slabs-container') && document.getElementById('eo-slabs-container').style.display === 'block';
+        const unitsVal = parseInt(document.getElementById('eo-units').value) || 1;
+
+        const job = {
+            productName: eoProdName,
+            productType: document.getElementById('eo-prod-name').dataset.type || 'General',
+            teethSelection: customTeethText ? customTeethText : selectedTeeth.join(', '),
+            units: unitsVal,
+            price: parseFloat(document.getElementById('eo-rate').value) || 0,
+            totalAmount: parseFloat(document.getElementById('eo-total-charge-text').textContent) || 0,
+            slab1Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab1-rate').value) : null,
+            slab2Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab2-rate').value) : null,
+            slab1Units: isSlabsVisible ? Math.min(unitsVal, 1) : null,
+            slab2Units: isSlabsVisible ? Math.max(0, unitsVal - 1) : null
+        };
+        
+        if (window.editingJobIndex >= 0) {
+            window.editOrderJobs[window.editingJobIndex] = job;
+        } else {
+            window.editOrderJobs.push(job);
+        }
+        window.editingJobIndex = -1;
+        
+        window.renderEditOrderJobs();
+        window.clearActiveEditFields();
+        alert('Item saved successfully!');
+    };
+
+    window.editJobInList = function(idx) {
+        window.editingJobIndex = idx;
+        const j = window.editOrderJobs[idx];
+        
+        document.getElementById('eo-prod-name').textContent = j.productName || j.product || 'PRODUCT';
+        document.getElementById('eo-prod-name').dataset.type = j.productType || 'General';
+        
+        const rateVal = j.price !== undefined ? j.price : (j.rate !== undefined ? j.rate : j.unitRate || 0);
+        document.getElementById('eo-rate').value = rateVal;
+        document.getElementById('eo-units').value = j.units || 1;
+        document.getElementById('eo-total-charge-text').textContent = (j.totalAmount !== undefined ? j.totalAmount : j.total || 0).toFixed(2);
+        
+        // Load teeth Selection
+        document.querySelectorAll('.tooth-num').forEach(t => t.classList.remove('selected'));
+        const teethStr = j.teethSelection || (Array.isArray(j.teeth) ? j.teeth.join(', ') : j.teeth) || '';
+        if (teethStr) {
+            const teeth = teethStr.split(',').map(t => t.trim());
+            document.querySelectorAll('.tooth-num').forEach(t => {
+                if (teeth.includes(t.getAttribute('data-tooth'))) t.classList.add('selected');
+            });
+        }
+        
+        // Handle slabs
+        const slabsContainer = document.getElementById('eo-slabs-container');
+        const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
+        const pName = (j.productName || j.product || '').toUpperCase();
+        const pType = (j.productType || 'General').toUpperCase();
+        const isSlabProduct = slabProducts.some(sp => pName.includes(sp) || pType.includes(sp));
+        if (slabsContainer) {
+            slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
+        }
+        
+        const customUnitContainer = document.getElementById('eo-custom-unit-text-container');
+        if (customUnitContainer) {
+            customUnitContainer.style.display = isSlabProduct ? 'block' : 'none';
+        }
+        if (isSlabProduct && customUnitContainer) {
+            const isNumericTeeth = teethStr.split(',').map(t => parseInt(t.trim())).some(t => !isNaN(t));
+            if (!isNumericTeeth && teethStr) {
+                document.getElementById('eo-custom-unit-text').value = teethStr;
+            } else {
+                document.getElementById('eo-custom-unit-text').value = '';
+            }
+        }
+        
+        const s1 = document.getElementById('eo-slab1-rate');
+        if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : rateVal;
+        const s2 = document.getElementById('eo-slab2-rate');
+        if (s2) s2.value = (j.slab2Rate !== null && j.slab2Rate !== undefined) ? j.slab2Rate : 2;
+        
+        updateEditOrderCalculation();
+    };
 
     window.renderEditOrderJobs = function() {
         const wrapper = document.getElementById('eo-jobs-wrapper');
@@ -795,6 +906,7 @@
                 </td>
                 <td style="padding: 6px; text-align:right; font-weight:bold; color: #111827;">${total.toFixed(2)}</td>
                 <td style="padding: 6px; text-align:center;">
+                    <button type="button" onclick="editJobInList(${idx})" style="color:#3b82f6; background:none; border:none; cursor:pointer; margin-right:8px;" title="Edit Job"><i class="fas fa-edit"></i></button>
                     <button type="button" onclick="removeEditJob(${idx})" style="color:#ef4444; background:none; border:none; cursor:pointer;" title="Remove Job"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
@@ -824,6 +936,11 @@
 
     window.removeEditJob = function(idx) {
         window.editOrderJobs.splice(idx, 1);
+        if (window.editingJobIndex === idx) {
+            window.clearActiveEditFields();
+        } else if (window.editingJobIndex > idx) {
+            window.editingJobIndex--;
+        }
         window.renderEditOrderJobs();
     };
     
@@ -1304,7 +1421,9 @@
                                 oninput="updateEditOrderCalculation(true)" onchange="updateEditOrderCalculation(true)">
                             <span style="margin-left:40px;">Total charge: <span
                                     id="eo-total-charge-text">0</span></span>
+                            <button type="button" onclick="saveActiveEditJob()" style="margin-left: 20px; padding: 4px 10px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">+ Save Item</button>
                         </div>
+                        <div id="eo-jobs-wrapper" style="margin-top:10px;"></div>
 
                         <!-- Slabs for RPD Products -->
                         <div id="eo-slabs-container"
@@ -2995,6 +3114,46 @@ Products: ${products.join(' | ')}
             const selectedTeethElements = document.querySelectorAll('.tooth-num.selected');
             const selectedTeeth = Array.from(selectedTeethElements).map(el => el.getAttribute('data-tooth')).sort();
 
+            const customUnitContainer = document.getElementById('eo-custom-unit-text-container');
+            let customTeethText = '';
+            if (customUnitContainer && customUnitContainer.style.display === 'block') {
+                customTeethText = document.getElementById('eo-custom-unit-text').value;
+            }
+
+            const eoProdName = document.getElementById('eo-prod-name').textContent.trim();
+            const isSlabsVisible = document.getElementById('eo-slabs-container') && document.getElementById('eo-slabs-container').style.display === 'block';
+            const unitsVal = parseInt(document.getElementById('eo-units').value) || 1;
+
+            if (eoProdName && eoProdName !== 'PRODUCT') {
+                const job = {
+                    productName: eoProdName,
+                    productType: document.getElementById('eo-prod-name').dataset.type || 'General',
+                    teethSelection: customTeethText ? customTeethText : selectedTeeth.join(', '),
+                    units: unitsVal,
+                    price: parseFloat(document.getElementById('eo-rate').value) || 0,
+                    totalAmount: parseFloat(document.getElementById('eo-total-charge-text').textContent) || 0,
+                    slab1Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab1-rate').value) : null,
+                    slab2Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab2-rate').value) : null,
+                    slab1Units: isSlabsVisible ? Math.min(unitsVal, 1) : null,
+                    slab2Units: isSlabsVisible ? Math.max(0, unitsVal - 1) : null
+                };
+                
+                if (window.editingJobIndex >= 0) {
+                    window.editOrderJobs[window.editingJobIndex] = job;
+                } else {
+                    window.editOrderJobs.push(job);
+                }
+                window.editingJobIndex = -1;
+                clearActiveEditFields();
+            }
+
+            let grandTotal = 0;
+            if (window.editOrderJobs && window.editOrderJobs.length > 0) {
+                window.editOrderJobs.forEach(j => {
+                    grandTotal += parseFloat(j.totalAmount) || 0;
+                });
+            }
+
             const shades = {
                 main: document.getElementById('eo-shade-main') ? document.getElementById('eo-shade-main').value : '',
                 s1: document.getElementById('eo-shade-1') ? document.getElementById('eo-shade-1').value : '',
@@ -3003,23 +3162,20 @@ Products: ${products.join(' | ')}
                 notes: document.getElementById('eo-shade-notes') ? document.getElementById('eo-shade-notes').value : ''
             };
 
-            const isSlabsVisible = document.getElementById('eo-slabs-container') && document.getElementById('eo-slabs-container').style.display === 'block';
-            const unitsVal = parseInt(document.getElementById('eo-units').value) || 1;
-
             const data = {
                 patientName: document.getElementById('eo-patient-name').value,
-                totalAmount: parseFloat(document.getElementById('eo-total').value) || 0,
-                price: parseFloat(document.getElementById('eo-total').value) || 0,
+                totalAmount: grandTotal || parseFloat(document.getElementById('eo-total').value) || 0,
+                price: grandTotal || parseFloat(document.getElementById('eo-total').value) || 0,
                 modelNumber: document.getElementById('eo-model').value,
                 receivedDate: document.getElementById('eo-date').value,
                 dueDate: document.getElementById('eo-due').value,
                 doctorName: document.getElementById('eo-sub-doctor') ? document.getElementById('eo-sub-doctor').value : null,
-                teethSelection: (document.getElementById('eo-custom-unit-text-container') && document.getElementById('eo-custom-unit-text-container').style.display === 'block' && document.getElementById('eo-custom-unit-text').value) ? document.getElementById('eo-custom-unit-text').value : selectedTeeth.join(', '),
+                teethSelection: customTeethText ? customTeethText : selectedTeeth.join(', '),
                 deliveryMethod: document.getElementById('eo-delivery-method') ? document.getElementById('eo-delivery-method').value : null,
                 assignTo: document.getElementById('eo-assign-to') ? document.getElementById('eo-assign-to').value : null,
                 department: document.getElementById('eo-department') ? document.getElementById('eo-department').value : null,
                 dropLocation: document.getElementById('eo-drop-location') ? document.getElementById('eo-drop-location').value : null,
-                productName: document.getElementById('eo-prod-name').textContent,
+                productName: eoProdName,
                 productType: document.getElementById('eo-prod-name').dataset.type || 'General',
                 unitRate: parseFloat(document.getElementById('eo-rate').value) || 0,
                 units: unitsVal,
@@ -3030,7 +3186,8 @@ Products: ${products.join(' | ')}
                 slab1Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab1-rate').value) : null,
                 slab2Rate: isSlabsVisible ? parseFloat(document.getElementById('eo-slab2-rate').value) : null,
                 slab1Units: isSlabsVisible ? Math.min(unitsVal, 1) : null,
-                slab2Units: isSlabsVisible ? Math.max(0, unitsVal - 1) : null
+                slab2Units: isSlabsVisible ? Math.max(0, unitsVal - 1) : null,
+                jobs: window.editOrderJobs
             };
 
             try {
@@ -3134,6 +3291,27 @@ Products: ${products.join(' | ')}
             try {
                 const res = await fetch(`${API_BASE}/orders/${id}`);
                 const order = await res.json();
+
+                editOrderJobs = order.jobs || [];
+                editingJobIndex = editOrderJobs.length > 0 ? 0 : -1;
+                
+                if (editOrderJobs.length === 0 && (order.productName || order.productType)) {
+                    editOrderJobs.push({
+                        productName: order.productName,
+                        productType: order.productType || 'General',
+                        teethSelection: order.teethSelection || '',
+                        units: order.units || 1,
+                        price: (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : (order.units ? (order.totalAmount / order.units) : 0),
+                        totalAmount: order.totalAmount || 0,
+                        slab1Rate: order.slab1Rate,
+                        slab2Rate: order.slab2Rate,
+                        slab1Units: order.slab1Units,
+                        slab2Units: order.slab2Units
+                    });
+                    editingJobIndex = 0;
+                }
+                
+                window.renderEditOrderJobs();
 
                 document.getElementById('eo-id').value = order.id;
 
@@ -3265,6 +3443,18 @@ Products: ${products.join(' | ')}
             updateEditOrderCalculation();
         }
 
+        function getGrandTotalEditOrder(activeCharge) {
+            let sum = 0;
+            if (window.editOrderJobs) {
+                window.editOrderJobs.forEach((j, idx) => {
+                    if (idx !== window.editingJobIndex) {
+                        sum += parseFloat(j.totalAmount !== undefined ? j.totalAmount : j.total) || 0;
+                    }
+                });
+            }
+            return sum + activeCharge;
+        }
+
         function updateEditOrderCalculation(fromRateInput = false) {
             const units = parseInt(document.getElementById('eo-units').value) || 0;
 
@@ -3299,7 +3489,9 @@ Products: ${products.join(' | ')}
             }
 
             document.getElementById('eo-total-charge-text').textContent = total.toFixed(2);
-            document.getElementById('eo-total').value = total.toFixed(2);
+            
+            const grandTotal = getGrandTotalEditOrder(total);
+            document.getElementById('eo-total').value = grandTotal.toFixed(2);
         }
 
         async function openEditProductModal() {
