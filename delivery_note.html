@@ -440,6 +440,13 @@
             }
             .actions { display: none; }
         }
+
+        /* Bulletproof override to force remove nested borders inside teeth chart under all conditions */
+        .invoice-table td .teeth-chart td,
+        .invoice-container.html2pdf-printing-container .invoice-table td .teeth-chart td {
+            border: none !important;
+        }
+
     </style>
 </head>
 <body>
