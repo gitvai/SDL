@@ -873,7 +873,7 @@
         }
 
         function downloadInvoicePDF(id) {
-            window.location.href = `${API_BASE}/invoices/${id}/pdf`;
+            window.open(`invoice.html?id=${id}&download=true`, '_blank');
         }
 
         function viewInvoice(id) {
@@ -1113,7 +1113,7 @@
                     });
                     if (res.ok) {
                         const invoice = await res.json();
-                        window.open(`${API_BASE}/invoices/${invoice.id}/pdf`, '_blank');
+                        window.open(`invoice.html?id=${invoice.id}&download=true`, '_blank');
                     } else {
                         const errData = await res.json().catch(() => ({}));
                         throw new Error(errData.error || `Failed to create invoice (status: ${res.status})`);

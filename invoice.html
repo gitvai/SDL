@@ -775,7 +775,18 @@
             }
         }
 
-        init();
+        init().then(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('download') === 'true') {
+                setTimeout(() => {
+                    downloadPDF();
+                }, 500);
+            } else if (urlParams.get('print') === 'true') {
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
+        });
     </script>
 </body>
 </html>

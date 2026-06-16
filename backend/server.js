@@ -945,70 +945,10 @@ app.post('/api/invoices', async (req, res) => {
 
 app.get('/api/invoices/:id/pdf', async (req, res) => {
   try {
-    const { exec } = require('child_process');
-    const fs = require('fs');
-    const tempDir = path.join(__dirname, 'temp');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-
-    const invoice = await prisma.invoice.findUnique({
-      where: { id: Number(req.params.id) },
-      include: { client: true, orders: { include: { jobs: true } } }
-    });
-
-    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
-
-    // Recovery logic: If orders array is empty, explicitly fetch orders by invoiceId
-    if (invoice.orders.length === 0) {
-      const recoveredOrders = await prisma.order.findMany({
-        where: { invoiceId: invoice.id },
-        include: { jobs: true }
-      });
-      if (recoveredOrders.length > 0) {
-        invoice.orders = recoveredOrders;
-      }
-    }
-
-    // Format dates for the Python script
-    const formattedInvoice = {
-      ...invoice,
-      invoiceDate: invoice.invoiceDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      dueDate: invoice.dueDate ? invoice.dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'
-    };
-
-    const jsonPath = path.join(tempDir, `invoice_${invoice.id}.json`);
-    const pdfPath = path.join(tempDir, `invoice_${invoice.id}.pdf`);
-    
-    fs.writeFileSync(jsonPath, JSON.stringify(formattedInvoice));
-
-    const pythonCmd = `py "${path.join(__dirname, '..', 'generate_invoice.py')}" "${jsonPath}" "${pdfPath}"`;
-    
-    exec(pythonCmd, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Python Error:', error);
-        console.error('Stderr:', stderr);
-        return res.status(500).json({ error: 'Failed to generate PDF' });
-      }
-      
-      if (fs.existsSync(pdfPath)) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=Invoice_${invoice.id}.pdf`);
-        const stream = fs.createReadStream(pdfPath);
-        stream.pipe(res);
-        
-        // Cleanup after stream ends
-        stream.on('end', () => {
-          try {
-            fs.unlinkSync(jsonPath);
-            fs.unlinkSync(pdfPath);
-          } catch (e) { console.error('Cleanup error:', e); }
-        });
-      } else {
-        res.status(500).json({ error: 'PDF file not created' });
-      }
-    });
-
+    const id = req.params.id;
+    res.redirect(`/invoice.html?id=${id}&download=true`);
   } catch (error) { 
-    console.error("PDF Generation Error:", error);
+    console.error("PDF Redirect Error:", error);
     res.status(500).json({ error: error.message }); 
   }
 });
