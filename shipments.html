@@ -154,15 +154,21 @@
                         <div style="font-size:12px;">
                             <label>Shipment Date</label>
                             <select id="filter-date-range" style="padding:4px; margin-left:10px;" onchange="updateDateRange(); loadData();">
-                                <option>Month To Date</option>
-                                <option>Today</option>
-                                <option>Yesterday</option>
-                                <option>Last 7 Days</option>
-                                <option>Last 30 Days</option>
-                                <option>This Month</option>
-                                <option>Last Month</option>
-                                <option>Custom Date</option>
-                            </select>
+    <option value="Custom Date">Custom Date</option>
+    <option value="Recent">Recent</option>
+    <option value="Today">Today</option>
+    <option value="Yesterday">Yesterday</option>
+    <option value="This week from Sunday">This week from Sunday</option>
+    <option value="Month To Date" selected>Month To Date</option>
+    <option value="Last 7 Days">Last 7 Days</option>
+    <option value="Last Full Week">Last Full Week</option>
+    <option value="Last Full Month">Last Full Month</option>
+    <option value="Last 30 Days">Last 30 Days</option>
+    <option value="Year To Date">Year To Date</option>
+    <option value="Financial Year To Date">Financial Year To Date</option>
+    <option value="Last 6 Months">Last 6 Months</option>
+    <option value="Last 12 Months">Last 12 Months</option>
+                        </select>
                         </div>
                         <input type="date" id="filter-date-start" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
                         <input type="date" id="filter-date-end" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
@@ -2127,57 +2133,57 @@
 
     <label style="display:block; font-size:11px; font-weight:700; margin-bottom:2px;">Order Date</label>
     <select id="opt-order-date" style="width:100%; padding:4px; border:1px solid #333; margin-bottom:8px; font-size:12px;">
-        
-    <option value="Upcoming">Upcoming</option>
-    <option value="Today">Today</option>
-    <option value="Tomorrow">Tomorrow</option>
+    <option value="Custom Date">Custom Date</option>
     <option value="Recent">Recent</option>
+    <option value="Today">Today</option>
     <option value="Yesterday">Yesterday</option>
     <option value="This week from Sunday">This week from Sunday</option>
     <option value="Month To Date" selected>Month To Date</option>
     <option value="Last 7 Days">Last 7 Days</option>
     <option value="Last Full Week">Last Full Week</option>
     <option value="Last Full Month">Last Full Month</option>
-    <option value="All dates to yesterday">All dates to yesterday</option>
-    <option value="All dates to today">All dates to today</option>
-
-    </select>
+    <option value="Last 30 Days">Last 30 Days</option>
+    <option value="Year To Date">Year To Date</option>
+    <option value="Financial Year To Date">Financial Year To Date</option>
+    <option value="Last 6 Months">Last 6 Months</option>
+    <option value="Last 12 Months">Last 12 Months</option>
+                        </select>
 
     <label style="display:block; font-size:11px; font-weight:700; margin-bottom:2px;">Date In</label>
     <select id="opt-date-in" style="width:100%; padding:4px; border:1px solid #333; margin-bottom:8px; font-size:12px;">
-        
-    <option value="Upcoming">Upcoming</option>
-    <option value="Today">Today</option>
-    <option value="Tomorrow">Tomorrow</option>
+    <option value="Custom Date">Custom Date</option>
     <option value="Recent">Recent</option>
+    <option value="Today">Today</option>
     <option value="Yesterday">Yesterday</option>
     <option value="This week from Sunday">This week from Sunday</option>
     <option value="Month To Date" selected>Month To Date</option>
     <option value="Last 7 Days">Last 7 Days</option>
     <option value="Last Full Week">Last Full Week</option>
     <option value="Last Full Month">Last Full Month</option>
-    <option value="All dates to yesterday">All dates to yesterday</option>
-    <option value="All dates to today">All dates to today</option>
-
-    </select>
+    <option value="Last 30 Days">Last 30 Days</option>
+    <option value="Year To Date">Year To Date</option>
+    <option value="Financial Year To Date">Financial Year To Date</option>
+    <option value="Last 6 Months">Last 6 Months</option>
+    <option value="Last 12 Months">Last 12 Months</option>
+                        </select>
 
     <label style="display:block; font-size:11px; font-weight:700; margin-bottom:2px;">Status Date</label>
     <select id="opt-status-date" style="width:100%; padding:4px; border:1px solid #333; margin-bottom:8px; font-size:12px;">
-        
-    <option value="Upcoming">Upcoming</option>
-    <option value="Today">Today</option>
-    <option value="Tomorrow">Tomorrow</option>
+    <option value="Custom Date">Custom Date</option>
     <option value="Recent">Recent</option>
+    <option value="Today">Today</option>
     <option value="Yesterday">Yesterday</option>
     <option value="This week from Sunday">This week from Sunday</option>
     <option value="Month To Date" selected>Month To Date</option>
     <option value="Last 7 Days">Last 7 Days</option>
     <option value="Last Full Week">Last Full Week</option>
     <option value="Last Full Month">Last Full Month</option>
-    <option value="All dates to yesterday">All dates to yesterday</option>
-    <option value="All dates to today">All dates to today</option>
-
-    </select>
+    <option value="Last 30 Days">Last 30 Days</option>
+    <option value="Year To Date">Year To Date</option>
+    <option value="Financial Year To Date">Financial Year To Date</option>
+    <option value="Last 6 Months">Last 6 Months</option>
+    <option value="Last 12 Months">Last 12 Months</option>
+                        </select>
 
 </div>
 
