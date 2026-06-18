@@ -997,11 +997,10 @@
         // Real Data Report Generation
         async function runReport(name) {
             showToast(`Generating report: ${name}...`);
-            document.querySelector('.reports-content').style.display = 'none';
-            document.querySelector('.search-bar-container').style.display = 'none';
-            document.querySelector('.sub-tabs-container').style.display = 'none';
+            document.getElementById('report-placeholder').style.display = 'none';
             document.getElementById('report-screen').style.display = 'flex';
             document.getElementById('modal-report-title').textContent = name;
+            document.getElementById('modal-report-title-top').textContent = name;
             document.getElementById('report-viewer-content').innerHTML = `
                 <div style="text-align:center; padding:50px; color:#666;">
                     <i class="fas fa-spinner fa-spin" style="font-size:30px; margin-bottom:15px;"></i>
