@@ -1049,7 +1049,10 @@
                     orderJobs = order.jobs.map(j => ({
                         product: j.productName,
                         productType: j.productType || 'General',
-                        teeth: j.teethSelection ? j.teethSelection.split(',').map(t => parseInt(t.trim())).filter(t => !isNaN(t)) : [],
+                        teeth: j.teethSelection ? j.teethSelection.split(',').map(t => {
+                            const parsed = parseInt(t.trim());
+                            return isNaN(parsed) ? t.trim() : parsed;
+                        }).filter(t => t !== '') : [],
                         units: j.units,
                         rate: j.price,
                         total: j.totalAmount || (j.units * j.price),
@@ -1292,21 +1295,22 @@
         function updateTeethUI(fromRateInput = false, fromUnitInput = false) {
             let unitCount;
             if (fromUnitInput) {
-                // User is typing in the box. Read the value but don't write back to it.
                 unitCount = parseInt(document.getElementById('unit-count').value) || 0;
             } else if (fromRateInput) {
-                // Rate changed, keep the manual unit count if no teeth are selected
                 unitCount = parseInt(document.getElementById('unit-count').value) || 0;
                 if (selectedTeeth.length > 0 && unitCount === 0) {
                     unitCount = selectedTeeth.length;
                     document.getElementById('unit-count').value = unitCount;
                 }
             } else {
-                // Triggered by tooth selection or product change.
-                unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
+                if (selectedTeeth.length > 0) {
+                    unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
+                } else {
+                    unitCount = parseInt(document.getElementById('unit-count').value) || 0;
+                }
                 document.getElementById('unit-count').value = unitCount;
             }
-            document.getElementById('selected-teeth-list').value = selectedTeeth.sort((a,b) => a - b).join(', ');
+            document.getElementById('selected-teeth-list').value = selectedTeeth.every(t => !isNaN(t)) ? [...selectedTeeth].sort((a,b) => a - b).join(', ') : selectedTeeth.join(', ');
 
             const slabsContainer = document.getElementById('slabs-container');
             const isSlabActive = slabsContainer && slabsContainer.style.display === 'block';

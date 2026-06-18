@@ -158,10 +158,19 @@
                 <div style="display: flex; gap: 15px; align-items: center; background: #f9fafb; padding: 10px; border: 1px solid #ddd;">
                     <div style="font-size:12px;">
                         <label>Invoice Date</label>
-                        <select style="padding:4px; margin-left:10px;"><option>Month To Date</option></select>
+                        <select id="filter-date-range" style="padding:4px; margin-left:10px;" onchange="updateDateRange(); loadData()">
+                            <option>Today</option>
+                            <option>Yesterday</option>
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>This Month</option>
+                            <option>Last Month</option>
+                            <option selected>Month To Date</option>
+                            <option>Custom Date</option>
+                        </select>
                     </div>
-                    <input type="date" value="2026-04-01" style="padding:4px; border:1px solid #ccc;">
-                    <input type="date" value="2026-04-25" style="padding:4px; border:1px solid #ccc;">
+                    <input type="date" id="filter-date-start" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
+                    <input type="date" id="filter-date-end" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
                 </div>
                 <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
                     <span style="font-size:13px; font-weight:700; color: var(--accent-pink);">Client Search</span>
@@ -248,6 +257,72 @@
         let currentMode = 'invoices';
         let currentAdjustmentType = 'Credit';
         let currentEditingReceiptId = null;
+
+        function formatLocalDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function updateDateRange() {
+            const rangeType = document.getElementById('filter-date-range').value;
+            const startInput = document.getElementById('filter-date-start');
+            const endInput = document.getElementById('filter-date-end');
+            const today = new Date();
+            let startDate, endDate;
+
+            switch (rangeType) {
+                case 'Today':
+                    startDate = new Date(today);
+                    endDate = new Date(today);
+                    break;
+                case 'Yesterday':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 1);
+                    endDate = new Date(startDate);
+                    break;
+                case 'Last 7 Days':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 6);
+                    endDate = new Date(today);
+                    break;
+                case 'Last 30 Days':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 29);
+                    endDate = new Date(today);
+                    break;
+                case 'This Month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    break;
+                case 'Last Month':
+                    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+                    break;
+                case 'Month To Date':
+                default:
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today);
+                    break;
+                case 'Custom Date':
+                    return;
+            }
+
+            if (startDate && endDate) {
+                startInput.value = formatLocalDate(startDate);
+                endInput.value = formatLocalDate(endDate);
+            }
+        }
+
+        function handleManualDateChange() {
+            document.getElementById('filter-date-range').value = 'Custom Date';
+            loadData();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDateRange();
+        });
 
         function formatDateToDDMMYY(dateStr) {
             if (!dateStr) return '';
@@ -388,17 +463,18 @@
                         </td>
                     `;
                 } else if (type === 'order') {
-                    tr.dataset.orderId = item.id;
-                    tr.innerHTML = `
-                        <td><input type="checkbox" class="order-cb"></td>
-                        <td>${index + 1}</td>
-                        <td style="font-weight: 600; color: #1e3a8a;">${item.orderNumber || item.id}</td>
-                        <td>${new Date(item.receivedDate).toLocaleDateString()}</td>
-                        <td style="font-weight: 500;">${item.client ? item.client.name : 'Unknown'}</td>
-                        <td>${item.patientName || '-'}</td>
-                        <td>${item.productName || '-'}</td>
-                        <td>${item.modelNumber || '-'}</td>
-                        <td><span class="status-badge" style="background: ${getStatusColor(item.status)}20; color: ${getStatusColor(item.status)}; border: 1px solid ${getStatusColor(item.status)}40;">${item.status}</span></td>
+                        const productNames = (item.jobs && item.jobs.length > 0) ? [...new Set(item.jobs.map(j => j.productName || j.productType || '').filter(Boolean))].join(', ') : (item.productName || '-');
+                        tr.dataset.orderId = item.id;
+                        tr.innerHTML = `
+                            <td><input type="checkbox" class="order-cb"></td>
+                            <td>${index + 1}</td>
+                            <td style="font-weight: 600; color: #1e3a8a;">${item.orderNumber || item.id}</td>
+                            <td>${new Date(item.receivedDate).toLocaleDateString()}</td>
+                            <td style="font-weight: 500;">${item.client ? item.client.name : 'Unknown'}</td>
+                            <td>${item.patientName || '-'}</td>
+                            <td>${productNames}</td>
+                            <td>${item.modelNumber || '-'}</td>
+                            <td><span class="status-badge" style="background: ${getStatusColor(item.status)}20; color: ${getStatusColor(item.status)}; border: 1px solid ${getStatusColor(item.status)}40;">${item.status}</span></td>
                         <td>
                             <button class="btn-toolbar" style="color: #2563eb;" onclick="window.open('edit-order.html?id=${item.id}', '_blank')"><i class="fas fa-edit"></i> View Order</button>
                         </td>
@@ -475,6 +551,22 @@
         }
 
 
+        function filterByDateLocal(items, dateField) {
+            const startStr = document.getElementById('filter-date-start').value;
+            const endStr = document.getElementById('filter-date-end').value;
+            if (!startStr || !endStr) return items;
+            
+            const fromDate = new Date(startStr);
+            fromDate.setHours(0,0,0,0);
+            const toDate = new Date(endStr);
+            toDate.setHours(23,59,59,999);
+            
+            return items.filter(item => {
+                const d = new Date(item[dateField]);
+                return d >= fromDate && d <= toDate;
+            });
+        }
+
         async function loadInvoices(filter, title) {
             currentMode = 'invoices';
             document.getElementById('page-title').textContent = title;
@@ -497,7 +589,8 @@
                 }
 
                 const res = await fetch(url);
-                const invoices = await res.json();
+                let invoices = await res.json();
+                invoices = filterByDateLocal(invoices, 'invoiceDate');
                 renderTable(invoices, 'invoice');
             } catch (err) { console.error(err); }
         }
@@ -520,7 +613,8 @@
                 }
                 
                 const res = await fetch(url);
-                const orders = await res.json();
+                let orders = await res.json();
+                orders = filterByDateLocal(orders, 'receivedDate');
                 renderTable(orders, 'order');
             } catch (err) { console.error(err); }
         }
@@ -545,7 +639,8 @@
                 }
 
                 const res = await fetch(url);
-                const receipts = await res.json();
+                let receipts = await res.json();
+                receipts = filterByDateLocal(receipts, 'receiptDate');
                 renderTable(receipts, 'receipt');
             } catch (err) { console.error(err); }
         }
@@ -599,6 +694,7 @@
                     });
                 }
                 
+                adjustments = filterByDateLocal(adjustments, 'date');
                 renderTable(adjustments, 'adjustment');
             } catch (err) { console.error(err); }
         }
@@ -1967,7 +2063,7 @@
         }
         
         let ALL_COLUMNS = [];
-        let draftSettings = { columns: [] };
+        draftSettings = { columns: [] };
         let gridUserFields = JSON.parse(localStorage.getItem('accounts.htmlFieldsSettings')) || {};
 
         

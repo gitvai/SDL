@@ -746,7 +746,7 @@
                     body: JSON.stringify({
                         clientId: clientId,
                         orderIds: [orderId],
-                        noteNumber: 'SN-' + Date.now().toString().slice(-6)
+                        noteNumber: 'DN-' + Date.now().toString().slice(-6)
                     })
                 });
 
@@ -1617,7 +1617,7 @@
                         body: JSON.stringify({
                             clientId: parseInt(clientId),
                             orderIds: orderIds,
-                            noteNumber: 'SN-' + Date.now().toString().slice(-6),
+                            noteNumber: 'DN-' + Date.now().toString().slice(-6),
                             deliveryMode: deliveryMode,
                             notes: notes,
                             noteDate: shipmentDate
@@ -1960,8 +1960,8 @@
                     { key: 'balance', name: 'Balance', caption: 'Balance' }, { key: 'shipments', name: 'Shipments', caption: 'Shipments' }, { key: 'actions', name: 'Actions', caption: 'Actions' }
                 ],
                 'note': [
-                    { key: 'sr', name: '#', caption: '#' }, { key: 'noteNumber', name: 'Note #', caption: 'Note #' }, { key: 'orderNumber', name: 'Order #', caption: 'Order #' },
-                    { key: 'noteDate', name: 'Note Date', caption: 'Note Date' }, { key: 'clientName', name: 'Client', caption: 'Client' },
+                    { key: 'sr', name: '#', caption: '#' }, { key: 'noteNumber', name: 'Shipment #', caption: 'Shipment #' }, { key: 'orderNumber', name: 'Order #', caption: 'Order #' },
+                    { key: 'noteDate', name: 'Shipment Date', caption: 'Shipment Date' }, { key: 'clientName', name: 'Client', caption: 'Client' },
                     { key: 'amount', name: 'Amount', caption: 'Amount' }, { key: 'actions', name: 'Actions', caption: 'Actions' }
                 ],
                 'order': [

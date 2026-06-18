@@ -737,17 +737,24 @@
             let unitCount;
             if (fromManualUnit) {
                 unitCount = parseInt(document.getElementById('unit-count').value) || 0;
+            } else if (fromRateInput) {
+                unitCount = parseInt(document.getElementById('unit-count').value) || 0;
+                if (selectedTeeth.length > 0 && unitCount === 0) {
+                    unitCount = selectedTeeth.length;
+                    document.getElementById('unit-count').value = unitCount;
+                }
             } else {
-                  if (selectedTeeth.length > 0) {
-                        unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
-                    } else {
-                      unitCount = parseInt(document.getElementById('unit-count').value) || 0;
-                  }
-                  document.getElementById('unit-count').value = unitCount;
-              }
+                if (selectedTeeth.length > 0) {
+                    unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
+                } else {
+                    unitCount = parseInt(document.getElementById('unit-count').value) || 0;
+                }
+                document.getElementById('unit-count').value = unitCount;
+            }
+            if(document.getElementById('slab-total-units')) document.getElementById('slab-total-units').value = unitCount;
             
             if (!fromManualTeeth) {
-                document.getElementById('selected-teeth-list').value = selectedTeeth.sort((a,b) => a - b).join(', ');
+                document.getElementById('selected-teeth-list').value = selectedTeeth.every(t => !isNaN(t)) ? [...selectedTeeth].sort((a,b) => a - b).join(', ') : selectedTeeth.join(', ');
             }
             
             const rateInput = document.getElementById('unit-rate');

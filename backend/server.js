@@ -1245,6 +1245,16 @@ app.post('/api/products', async (req, res) => {
   try {
     const data = { ...req.body };
     data.charge = toNum(data.charge) || 0;
+    
+    if (data.name) {
+      const existing = await prisma.product.findFirst({
+        where: { name: { equals: data.name } } // Prisma doesn't support case-insensitive equals easily in sqlite without lowercasing, but exact match prevention helps
+      });
+      if (existing) {
+        return res.status(400).json({ error: 'Product with this name already exists' });
+      }
+    }
+
     const product = await prisma.product.create({ data });
     res.status(201).json(product);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -1488,7 +1498,7 @@ app.get('/api/shipment-notes/next-number', async (req, res) => {
         if (nextNum > 99999) nextNum = 1;
       }
     }
-    const shipmentNumber = 'SN-' + nextNum.toString().padStart(5, '0');
+    const shipmentNumber = 'DN-' + nextNum.toString().padStart(5, '0');
     res.json({ shipmentNumber });
   } catch (error) {
     res.status(500).json({ error: error.message });

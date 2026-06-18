@@ -834,25 +834,23 @@
         </div>
     </main>
 
-    <!-- Report Viewer Modal -->
-    <div id="report-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center; padding: 20px;">
-        <div style="background:#fff; width:90%; height:90%; border-radius:4px; display:flex; flex-direction:column; overflow:hidden;">
-            <div style="padding:15px 20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#f8f9fa;">
-                <h3 id="modal-report-title" style="margin:0; font-size:16px;">Report</h3>
-                <div style="display:flex; gap:10px;">
-                    
-                    <button class="btn-action" style="padding:4px 12px; font-size:12px; background:#10b981; color:#fff; border:1px solid #059669; cursor:pointer;" onclick="exportReportToCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
-                    <button class="btn-action" style="padding:4px 12px; font-size:12px; background:#fff; border:1px solid #ccc; cursor:pointer;" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-
-                    <button class="btn-action" style="padding:4px 12px; font-size:12px; background:#fff; border:1px solid #ccc; cursor:pointer;" onclick="closeModal()">&times; Close</button>
-                </div>
+    <!-- Report Viewer Screen -->
+    <div id="report-screen" style="display:none; flex:1; flex-direction:column; overflow:hidden; background:#fff; margin:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+        <div style="padding:15px 20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#f8f9fa;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-action" style="padding:6px 12px; font-size:13px; background:#fff; border:1px solid #ccc; cursor:pointer; border-radius:4px;" onclick="closeModal()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3 id="modal-report-title" style="margin:0; font-size:18px;">Report</h3>
             </div>
-            <div id="report-viewer-content" style="flex:1; overflow:auto; padding:20px;">
-                <!-- Report data will be rendered here -->
-                <div style="text-align:center; padding:50px; color:#666;">
-                    <i class="fas fa-spinner fa-spin" style="font-size:30px; margin-bottom:15px;"></i>
-                    <p>Generating Report...</p>
-                </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-action" style="padding:6px 12px; font-size:13px; background:#10b981; color:#fff; border:1px solid #059669; cursor:pointer; border-radius:4px;" onclick="exportReportToCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+                <button class="btn-action" style="padding:6px 12px; font-size:13px; background:#fff; border:1px solid #ccc; cursor:pointer; border-radius:4px;" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+        <div id="report-viewer-content" style="flex:1; overflow:auto; padding:20px;">
+            <!-- Report data will be rendered here -->
+            <div style="text-align:center; padding:50px; color:#666;">
+                <i class="fas fa-spinner fa-spin" style="font-size:30px; margin-bottom:15px;"></i>
+                <p>Generating Report...</p>
             </div>
         </div>
     </div>
@@ -965,7 +963,10 @@
         // Real Data Report Generation
         async function runReport(name) {
             showToast(`Generating report: ${name}...`);
-            document.getElementById('report-modal').style.display = 'flex';
+            document.querySelector('.reports-content').style.display = 'none';
+            document.querySelector('.search-bar-container').style.display = 'none';
+            document.querySelector('.sub-tabs-container').style.display = 'none';
+            document.getElementById('report-screen').style.display = 'flex';
             document.getElementById('modal-report-title').textContent = name;
             document.getElementById('report-viewer-content').innerHTML = `
                 <div style="text-align:center; padding:50px; color:#666;">
@@ -1017,22 +1018,43 @@
                     const res = await fetch(`${API_BASE}/orders`);
                     data = await res.json();
                     headers = ['Due Date', 'Trial Date', 'Order #', 'Client', 'Patient', 'Product', 'Teeth', 'Units', 'Shade', 'Amount', 'Status'];
-                    rows = data
-                        .filter(o => o.dueDate && !['Complete', 'Delivered', 'Cancelled'].includes(o.status))
+                    let newRows = [];
+                    data.filter(o => o.dueDate && !['Complete', 'Delivered', 'Cancelled'].includes(o.status))
                         .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                        .map(o => [
-                            new Date(o.dueDate).toLocaleDateString('en-GB'),
-                            o.trialDate ? new Date(o.trialDate).toLocaleDateString('en-GB') : '-',
-                            o.orderNumber || o.id,
-                            o.client ? o.client.name : 'Unknown',
-                            o.patientName || '-',
-                            o.productName || o.productType || '-',
-                            createTeethGrid(o.teethSelection),
-                            o.units || '1',
-                            [o.shade1, o.shade2, o.shade3].filter(s => s).join('/') || '-',
-                            (o.totalAmount || 0).toFixed(2),
-                            o.status
-                        ]);
+                        .forEach(o => {
+                            if (o.jobs && o.jobs.length > 0) {
+                                o.jobs.forEach(j => {
+                                    newRows.push([
+                                        new Date(o.dueDate).toLocaleDateString('en-GB'),
+                                        o.trialDate ? new Date(o.trialDate).toLocaleDateString('en-GB') : '-',
+                                        o.orderNumber || o.id,
+                                        o.client ? o.client.name : 'Unknown',
+                                        o.patientName || '-',
+                                        j.productName || j.productType || '-',
+                                        createTeethGrid(j.teethSelection),
+                                        j.units || '1',
+                                        [j.shade1, j.shade2, j.shade3].filter(s => s).join('/') || '-',
+                                        (j.totalAmount || 0).toFixed(2),
+                                        o.status
+                                    ]);
+                                });
+                            } else {
+                                newRows.push([
+                                    new Date(o.dueDate).toLocaleDateString('en-GB'),
+                                    o.trialDate ? new Date(o.trialDate).toLocaleDateString('en-GB') : '-',
+                                    o.orderNumber || o.id,
+                                    o.client ? o.client.name : 'Unknown',
+                                    o.patientName || '-',
+                                    o.productName || o.productType || '-',
+                                    createTeethGrid(o.teethSelection),
+                                    o.units || '1',
+                                    [o.shade1, o.shade2, o.shade3].filter(s => s).join('/') || '-',
+                                    (o.netAmount || o.totalAmount || 0).toFixed(2),
+                                    o.status
+                                ]);
+                            }
+                        });
+                    rows = newRows;
                 } else if (name === 'Monthly Collection Amount') {
                     const res = await fetch(`${API_BASE}/receipts`);
                     const receipts = await res.json();
@@ -1186,14 +1208,32 @@
                     const res = await fetch(`${API_BASE}/orders`);
                     const allOrders = await res.json();
                     data = allOrders.filter(o => o.invoiceId);
-                    headers = ['Client', 'Order #', 'Patient', 'Invoice ID', 'Amount'];
-                    rows = data.map(o => [
-                        o.client ? o.client.name : 'Unknown',
-                        o.orderNumber || o.id,
-                        o.patientName,
-                        o.invoiceId,
-                        (o.netAmount || 0).toFixed(2)
-                    ]).sort((a, b) => a[0].localeCompare(b[0]));
+                    headers = ['Client', 'Order #', 'Patient', 'Product', 'Invoice ID', 'Amount'];
+                    let newRows = [];
+                    data.forEach(o => {
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    o.client ? o.client.name : 'Unknown',
+                                    o.orderNumber || o.id,
+                                    o.patientName,
+                                    j.productName || j.productType || '-',
+                                    o.invoiceId,
+                                    (j.totalAmount || 0).toFixed(2)
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                o.client ? o.client.name : 'Unknown',
+                                o.orderNumber || o.id,
+                                o.patientName,
+                                o.productName || o.productType || '-',
+                                o.invoiceId,
+                                (o.netAmount || o.totalAmount || 0).toFixed(2)
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name.includes('Tax Information') || name.includes('GST')) {
                     const res = await fetch(`${API_BASE}/invoices`);
                     data = await res.json();
@@ -1210,8 +1250,15 @@
                     const orders = await res.json();
                     const typeData = {};
                     orders.forEach(o => {
-                        const type = o.productType || 'Unknown';
-                        typeData[type] = (typeData[type] || 0) + 1;
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                const type = j.productType || 'Unknown';
+                                typeData[type] = (typeData[type] || 0) + 1;
+                            });
+                        } else {
+                            const type = o.productType || 'Unknown';
+                            typeData[type] = (typeData[type] || 0) + 1;
+                        }
                     });
                     headers = ['Product Type', 'Order Count'];
                     rows = Object.entries(typeData).map(([type, count]) => [type, count]);
@@ -1226,15 +1273,16 @@
                     headers = ['Date', 'New Orders'];
                     rows = Object.entries(daily).map(([d, count]) => [d, count]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
                 } else if (name.includes('Shipment') || name.includes('Shipped')) {
-                    const res = await fetch(`${API_BASE}/shipments`);
+                    const res = await fetch(`${API_BASE}/orders`);
                     data = await res.json();
+                    data = data.filter(o => ['Dispatched', 'Delivered'].includes(o.shippingStatus));
                     headers = ['Shipment #', 'Order #', 'Client', 'Date', 'Status'];
-                    rows = data.map(s => [
-                        s.id,
-                        s.orderId,
-                        s.clientName || 'Unknown',
-                        new Date(s.shippedAt).toLocaleDateString(),
-                        s.status
+                    rows = data.map(o => [
+                        o.shipmentNoteId || '-',
+                        o.orderNumber || o.id,
+                        o.client ? o.client.name : 'Unknown',
+                        new Date(o.updatedAt).toLocaleDateString(),
+                        o.shippingStatus || 'Unknown'
                     ]);
                 } else if (name === 'Employee Master List' || name === 'Department wise Employees') {
                     const res = await fetch(`${API_BASE}/staff`);
@@ -1257,7 +1305,7 @@
                             <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:15px; color:#f59e0b;"></i>
                             <p style="font-size:16px; font-weight:600;">Report Logic Not Implemented</p>
                             <p>The data processing logic for "<strong>${name}</strong>" is not yet available.</p>
-                            <button onclick="document.getElementById('report-modal').style.display='none'" style="margin-top:20px; padding:8px 20px; background:#3b82f6; color:#fff; border:none; border-radius:4px; cursor:pointer;">Close</button>
+                            <button onclick="closeModal()" style="margin-top:20px; padding:8px 20px; background:#3b82f6; color:#fff; border:none; border-radius:4px; cursor:pointer;">Close</button>
                         </div>
                     `;
                     return;
@@ -1276,7 +1324,10 @@
         }
 
         function closeModal() {
-            document.getElementById('report-modal').style.display = 'none';
+            document.querySelector('.reports-content').style.display = 'block';
+            document.querySelector('.search-bar-container').style.display = 'flex';
+            document.querySelector('.sub-tabs-container').style.display = 'flex';
+            document.getElementById('report-screen').style.display = 'none';
         }
 
         function showToast(msg) {
@@ -1354,13 +1405,17 @@
                 });
             } else {
                 // Default flat table
-                let total = 0;
-                const numericColIdx = headers.findIndex(h => h.toLowerCase().includes('amount') || h.toLowerCase().includes('total') || h.toLowerCase().includes('balance'));
+                const numericColIndices = headers.map((h, i) => (h.toLowerCase().includes('amount') || h.toLowerCase().includes('total') || h.toLowerCase().includes('balance')) ? i : -1).filter(i => i !== -1);
                 
-                if (numericColIdx !== -1) {
+                let totals = {};
+                numericColIndices.forEach(idx => totals[idx] = 0);
+                
+                if (numericColIndices.length > 0) {
                     rows.forEach(row => {
-                        const val = parseFloat(row[numericColIdx].replace(/,/g, ''));
-                        if (!isNaN(val)) total += val;
+                        numericColIndices.forEach(idx => {
+                            const val = parseFloat(row[idx] ? String(row[idx]).replace(/,/g, '') : '0');
+                            if (!isNaN(val)) totals[idx] += val;
+                        });
                     });
                 }
                 
@@ -1376,18 +1431,30 @@
                 rows.forEach(row => {
                     html += `<tr style="background:#fff; transition:background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">
                         ${row.map((val, idx) => {
-                            const align = idx === numericColIdx ? 'right' : 'left';
-                            const bold = idx === numericColIdx ? 'font-weight:600;' : '';
+                            const isNum = numericColIndices.includes(idx);
+                            const align = isNum ? 'right' : 'left';
+                            const bold = isNum ? 'font-weight:600;' : '';
                             return `<td style="padding:8px 10px; border:1px solid #e5e7eb; text-align:${align}; ${bold}">${val}</td>`;
                         }).join('')}
                     </tr>`;
                 });
                 html += `</tbody>`;
-                if (numericColIdx !== -1) {
+                if (numericColIndices.length > 0) {
+                    const firstNumericIdx = numericColIndices[0];
                     html += `
                         <tfoot>
                             <tr style="background:#f3f4f6; font-weight:bold;">
-                                ${headers.map((h, i) => i === numericColIdx ? `<td style="padding:10px; border:1px solid #ccc; text-align:right;">${total.toFixed(2)}</td>` : (i === 0 ? `<td style="padding:10px; border:1px solid #ccc; text-align:right;" colspan="${numericColIdx}">Total</td>` : (i < numericColIdx ? '' : `<td style="padding:10px; border:1px solid #ccc;"></td>`))).join('')}
+                                ${headers.map((h, i) => {
+                                    if (numericColIndices.includes(i)) {
+                                        return `<td style="padding:10px; border:1px solid #ccc; text-align:right;">${totals[i].toFixed(2)}</td>`;
+                                    } else if (i === 0 && firstNumericIdx > 0) {
+                                        return `<td style="padding:10px; border:1px solid #ccc; text-align:right;" colspan="${firstNumericIdx}">Total</td>`;
+                                    } else if (i < firstNumericIdx && i !== 0) {
+                                        return '';
+                                    } else {
+                                        return `<td style="padding:10px; border:1px solid #ccc;"></td>`;
+                                    }
+                                }).join('')}
                             </tr>
                         </tfoot>
                     `;

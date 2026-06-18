@@ -129,7 +129,8 @@
                         case 'patientName': cellVal = order.patientName || '-'; break;
                         case 'product': 
                             if (order.jobs && order.jobs.length > 0) {
-                                cellVal = order.jobs.map(j => `<span class="product-badge" style="background: ${getProductColor(j.productType)}20; color: ${getProductColor(j.productType)}; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${j.productName || j.productType || '-'}</span>`).join('');
+                                const uniqueProducts = [...new Set(order.jobs.map(j => j.productName || j.productType || '-').filter(Boolean))];
+                                cellVal = uniqueProducts.map(p => `<span class="product-badge" style="background: ${getProductColor(p)}20; color: ${getProductColor(p)}; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${p}</span>`).join('');
                             } else {
                                 cellVal = `<span class="product-badge" style="background: ${getProductColor(order.productType)}20; color: ${getProductColor(order.productType)}">${order.productName || '-'}</span>`; 
                             }
@@ -1763,13 +1764,14 @@
                         <button class="btn-toolbar" style="background: #007bff; color: white; border: none;"><i
                                 class="fas fa-print"></i> Print <i class="fas fa-caret-down"></i></button>
                         <div class="dropdown-content" style="min-width: 180px;">
-                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Lab Slip')">Lab Slip</a>
+                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Work Slip')">Work Slip</a>
+                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Delivery Note')">Delivery Note</a>
+                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Invoice')">Invoice</a>
                             <a href="javascript:void(0)" onclick="bulkPrintOrders('Model Label')">Model Label</a>
                             <a href="javascript:void(0)" onclick="bulkPrintOrders('Order Sticker')">Order Sticker</a>
                             <a href="javascript:void(0)" onclick="bulkPrintOrders('Job Sticker')">Job Sticker</a>
                             <a href="javascript:void(0)" onclick="bulkPrintOrders('Mailing Labels')">Mailing Labels</a>
-                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Dispatch Labels')">Dispatch
-                                Labels</a>
+                            <a href="javascript:void(0)" onclick="bulkPrintOrders('Dispatch Labels')">Dispatch Labels</a>
                         </div>
                     </div>
                     <button class="btn-toolbar" onclick="emailClient()"><i class="fas fa-envelope"></i> Email</button>
@@ -2912,7 +2914,7 @@ Products: ${products.join(' | ')}
                             case 'products':
                                 let displayProducts = '';
                                 if (order.jobs && order.jobs.length > 0) {
-                                    displayProducts = order.jobs.map(j => j.productName || j.productType).join(', ');
+                                    displayProducts = [...new Set(order.jobs.map(j => j.productName || j.productType).filter(Boolean))].join(', ');
                                 } else {
                                     displayProducts = order.productName || order.productType || '-';
                                 }
@@ -3042,7 +3044,7 @@ Products: ${products.join(' | ')}
                     body: JSON.stringify({
                         orderIds: [orderId],
                         clientId: clientId,
-                        noteNumber: 'SN-' + Date.now().toString().slice(-6),
+                        noteNumber: 'DN-' + Date.now().toString().slice(-6),
                         deliveryMode: 'Courier',
                         notes: '',
                         noteDate: new Date().toISOString()
@@ -4048,6 +4050,32 @@ Products: ${products.join(' | ')}
                     if (res.ok) orders.push(await res.json());
                 }
 
+                if (type === 'Delivery Note') {
+                    let missing = [];
+                    orders.forEach(o => {
+                        if (o.shipmentNoteId) {
+                            window.open(`delivery_note.html?id=${o.shipmentNoteId}&print=true`, '_blank');
+                        } else {
+                            missing.push(o.id);
+                        }
+                    });
+                    if (missing.length > 0) alert(`Orders without Delivery Note: ${missing.join(', ')}`);
+                    return;
+                }
+
+                if (type === 'Invoice') {
+                    let missing = [];
+                    orders.forEach(o => {
+                        if (o.invoiceId) {
+                            window.open(`invoice.html?id=${o.invoiceId}&print=true`, '_blank');
+                        } else {
+                            missing.push(o.id);
+                        }
+                    });
+                    if (missing.length > 0) alert(`Orders without Invoice: ${missing.join(', ')}`);
+                    return;
+                }
+
                 const printWin = window.open('', '', 'width=900,height=600');
                 printWin.document.write(`
                     <html>
@@ -4059,8 +4087,11 @@ Products: ${products.join(' | ')}
                                 border: 1px solid #333; 
                                 padding: 20px; 
                                 margin-bottom: 20px; 
-                                page-break-inside: avoid;
+                                page-break-after: always;
                                 border-radius: 8px;
+                            }
+                            .print-item:last-child {
+                                page-break-after: avoid;
                             }
                             .sticker {
                                 width: 300px;
@@ -4094,7 +4125,7 @@ Products: ${products.join(' | ')}
                     } else {
                         return `
                                     <div class="print-item">
-                                        <div class="header">LAB SLIP - Order #${o.id}</div>
+                                        <div class="header">${type === 'Work Slip' ? 'LAB SLIP' : type} - Order #${o.id}</div>
                                         <div class="row"><span class="label">Client:</span> <span class="value">${o.client ? o.client.name : 'N/A'}</span></div>
                                         <div class="row"><span class="label">Patient:</span> <span class="value">${o.patientName}</span></div>
                                         <div class="row"><span class="label">Product:</span> <span class="value">${o.productName || o.productType}</span></div>
