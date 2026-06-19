@@ -4133,7 +4133,7 @@ Products: ${products.join(' | ')}
                     /* Job Sticker Styles */
                     .job-sticker-container { width: 350px; padding: 15px; font-family: Arial, sans-serif; display: inline-block; margin: 10px; border: 1px solid #000; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
                     .js-row-top { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 5px; }
-                    .js-client { font-size: 16px; text-transform: uppercase; margin-bottom: 15px; }
+                    .js-client { font-size: 16px; text-transform: uppercase; margin-bottom: 15px; white-space: nowrap; }
                     .js-product { font-size: 16px; text-transform: uppercase; margin-bottom: 10px; }
                     .js-teeth-cross { width: 150px; height: 30px; border-bottom: 2px solid #000080; position: relative; margin-top: 10px; }
                     .js-teeth-cross::after { content: ""; position: absolute; top: -10px; bottom: -10px; left: 50%; border-left: 2px solid #000080; }
@@ -4275,10 +4275,9 @@ Products: ${products.join(' | ')}
                                 <div class="sticker-barcode">
                                     <img src="https://barcodeapi.org/api/128/${o.id}" alt="Barcode">
                                 </div>
-                                <div class="sticker-order">${o.id}</div>
-                                <div class="sticker-client">M/S ${clientName}</div>
-                                <div class="sticker-product">${product}</div>
-                                <div class="sticker-date">${orderDate} ${new Date(o.orderDate).getFullYear().toString().substr(-2)}</div>
+                                <div class="sticker-client">M/S ${clientName.toUpperCase()}</div>
+                                <div class="sticker-product">${product.toUpperCase()}</div>
+                                <div class="sticker-date">${(orderDate + ' ' + new Date(o.orderDate).getFullYear().toString().substr(-2)).toUpperCase()}</div>
                             </div>
                             `;
                         }
@@ -4289,8 +4288,8 @@ Products: ${products.join(' | ')}
                                     <span>${o.id}</span>
                                     <span>${orderDate}</span>
                                 </div>
-                                <div class="js-client">M/s ${clientName}</div>
-                                <div class="js-product">${product}</div>
+                                <div class="js-client">M/s ${clientName.toUpperCase()}</div>
+                                <div class="js-product">${product.toUpperCase()}</div>
                                 <div class="js-teeth-cross"></div>
                             </div>
                             `;
