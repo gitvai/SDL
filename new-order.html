@@ -744,11 +744,7 @@
                     document.getElementById('unit-count').value = unitCount;
                 }
             } else {
-                if (selectedTeeth.length > 0) {
-                    unitCount = Math.max(selectedTeeth.length, parseInt(document.getElementById('unit-count').value) || 0);
-                } else {
-                    unitCount = parseInt(document.getElementById('unit-count').value) || 0;
-                }
+                unitCount = selectedTeeth.length;
                 document.getElementById('unit-count').value = unitCount;
             }
             if(document.getElementById('slab-total-units')) document.getElementById('slab-total-units').value = unitCount;
