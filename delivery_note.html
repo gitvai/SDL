@@ -17,7 +17,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 20px;
             background: #f4f7f9;
@@ -52,17 +52,35 @@
 
         /* Header Layout */
         .header-section {
-            border-bottom: 2px solid #000;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
             padding-bottom: 5px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .header-logo {
+            flex-shrink: 0;
+        }
+
+        .header-logo img {
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .header-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .lab-name {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
+            text-align: left;
+            font-size: 26px;
+            font-weight: bold;
             margin: 0 0 5px 0;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .header-columns {
@@ -71,38 +89,18 @@
             align-items: flex-start;
         }
 
-        .header-left {
-            display: flex;
-            gap: 15px;
-            width: 55%;
-        }
-
-        .logo-box {
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
         .lab-info {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: normal;
             line-height: 1.4;
         }
 
         .header-right {
-            width: 40%;
-            text-align: right;
-            font-size: 13px;
-            font-weight: 600;
+            text-align: left;
+            font-size: 15px;
+            font-weight: normal;
             line-height: 1.4;
+            padding-right: 20px;
         }
 
         .invoice-title {
@@ -459,21 +457,21 @@
     <div id="invoice-content" class="invoice-container">
         <!-- Header -->
         <header class="header-section">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <img src="logo.jpeg" alt="Logo" style="height: 80px; object-fit: contain;">
+            <div class="header-logo">
+                <img src="logo.jpeg" alt="Logo">
             </div>
-            <h1 class="lab-name">SOHAR DENTAL LABORATORY</h1>
-            <div class="header-columns">
-                <div class="header-left">
+            <div class="header-content">
+                <h1 class="lab-name">SOHAR DENTAL LABORATORY</h1>
+                <div class="header-columns">
                     <div class="lab-info">
                         <div>AL HAMBAR, C.R.NO. 3203549,</div>
                         <div>MOH NO. 1771,</div>
                         <div>WEST SOHAR Pin - 311</div>
                     </div>
-                </div>
-                <div class="header-right">
-                    <div>Phone : 99622728, 92501576</div>
-                    <div>email : sohardentallab@gmail.com</div>
+                    <div class="header-right">
+                        <div>Phone : 99622728, 92501576</div>
+                        <div>email : sohardentallab@gmail.com</div>
+                    </div>
                 </div>
             </div>
         </header>
