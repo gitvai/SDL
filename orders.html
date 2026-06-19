@@ -4113,7 +4113,7 @@ Products: ${products.join(' | ')}
                     .ls-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 15px; }
                     .ls-table { width: 100%; border-collapse: collapse; border: 1px solid #000; margin-bottom: 15px; font-size: 14px; }
                     .ls-table td, .ls-table th { border: 1px solid #000; padding: 6px 10px; }
-                    .ls-teeth-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                    .ls-teeth-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
                     .ls-teeth-table td { border: none !important; text-align: center; padding: 2px; }
                     .ls-teeth-cross td { border-bottom: 1px solid #000 !important; }
                     .ls-teeth-center { border-right: 1px solid #000 !important; }
@@ -4173,9 +4173,9 @@ Products: ${products.join(' | ')}
                                     
                                     <table class="ls-table">
                                         <tr>
-                                            <td style="width: 33%;">Order #<br><strong>${o.id}</strong></td>
-                                            <td style="width: 33%;">Model #<br><strong>${o.patientName || 'N/A'}</strong></td>
-                                            <td style="width: 33%;">Order Date<br><strong>${orderDate}</strong></td>
+                                            <td style="width: 42%;">Order #<br><strong>${o.id}</strong></td>
+                                            <td style="width: 42%;">Model #<br><strong>${o.patientName || 'N/A'}</strong></td>
+                                            <td style="width: 16%;">Order Date<br><strong>${orderDate}</strong></td>
                                         </tr>
                                         <tr>
                                             <td>Due Date<br><strong>${dueDate}</strong></td>
@@ -4194,8 +4194,8 @@ Products: ${products.join(' | ')}
                                             <td colspan="2" style="padding: 0;">
                                                 <table class="ls-teeth-table">
                                                     <tr class="ls-teeth-cross">
-                                                        <td style="width:12.5%">8</td><td style="width:12.5%">7</td><td style="width:12.5%">6</td><td style="width:12.5%">5</td><td style="width:12.5%">4</td><td style="width:12.5%">3</td><td style="width:12.5%">2</td><td class="ls-teeth-center" style="width:12.5%">1</td>
-                                                        <td style="width:12.5%">1</td><td style="width:12.5%">2</td><td style="width:12.5%">3</td><td style="width:12.5%">4</td><td style="width:12.5%">5</td><td style="width:12.5%">6</td><td style="width:12.5%">7</td><td style="width:12.5%">8</td>
+                                                        <td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td class="ls-teeth-center">1</td>
+                                                        <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td>
                                                     </tr>
                                                     <tr>
                                                         <td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td class="ls-teeth-center">1</td>
