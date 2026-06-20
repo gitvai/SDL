@@ -460,6 +460,7 @@
 
     <script>
         const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const JOB_COLORS = ['#ec4899', '#9f1239', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316'];
         let allClients = [];
         let selectedClientId = null;
         let selectedProduct = null;
@@ -734,6 +735,52 @@
         }
 
         function updateTeethUI(fromRateInput = false, fromManualTeeth = false, fromManualUnit = false) {
+            // Reset all visual states
+            document.querySelectorAll('#teeth-selection-area .tooth-num').forEach(el => {
+                el.style.border = '';
+                el.style.color = '';
+                el.style.backgroundColor = '';
+                el.classList.remove('selected');
+            });
+
+            // Draw outlines for previously added jobs
+            if (typeof orderJobs !== 'undefined') {
+                orderJobs.forEach((job, idx) => {
+                    if (typeof editingJobIndex !== 'undefined' && editingJobIndex === idx) return; // Skip if currently editing this job
+                    if (job.teeth && Array.isArray(job.teeth)) {
+                        job.teeth.forEach(t => {
+                            if(isNaN(t)) return; // skip custom text
+                            const el = document.querySelector('#teeth-selection-area .tooth-num[onclick*="' + t + '"]');
+                            if (el) {
+                                el.style.border = '2px solid ' + (job.color || '#ec4899');
+                                el.style.color = (job.color || '#ec4899');
+                                el.style.borderRadius = '50%';
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Draw solid fill for currently selected teeth
+            let activeColor = '#ec4899';
+            if (typeof editingJobIndex !== 'undefined' && editingJobIndex !== -1 && orderJobs[editingJobIndex]) {
+                activeColor = orderJobs[editingJobIndex].color || activeColor;
+            } else if (typeof orderJobs !== 'undefined') {
+                activeColor = JOB_COLORS[orderJobs.length % JOB_COLORS.length] || activeColor;
+            }
+
+            selectedTeeth.forEach(t => {
+                if(isNaN(t)) return;
+                const el = document.querySelector('#teeth-selection-area .tooth-num[onclick*="' + t + '"]');
+                if (el) {
+                    el.classList.add('selected');
+                    el.style.backgroundColor = activeColor;
+                    el.style.color = '#fff';
+                    el.style.border = '2px solid ' + activeColor;
+                    el.style.borderRadius = '50%';
+                }
+            });
+
             let unitCount;
             if (fromManualUnit) {
                 unitCount = parseInt(document.getElementById('unit-count').value) || 0;
@@ -895,9 +942,11 @@
             };
 
             if (editingJobIndex >= 0) {
+                job.color = orderJobs[editingJobIndex].color || JOB_COLORS[editingJobIndex % JOB_COLORS.length];
                 orderJobs[editingJobIndex] = job;
                 editingJobIndex = -1;
             } else {
+                job.color = JOB_COLORS[orderJobs.length % JOB_COLORS.length];
                 orderJobs.push(job);
             }
             
@@ -980,60 +1029,95 @@
             document.getElementById('teeth-selection-area').style.display = 'block';
         }
 
-        function renderJobsList() {
+        
+        function generateQuadrantHTML(teeth, isLeft) {
+            let html = '<div style="display:flex; gap:6px;">';
+            teeth.forEach(t => {
+                let circleColors = [];
+                if (typeof orderJobs !== 'undefined') {
+                    orderJobs.forEach((j, idx) => {
+                        if (j.teeth && j.teeth.includes(t.toString())) {
+                            circleColors.push(j.color || '#ec4899');
+                        }
+                    });
+                }
+                
+                let style = 'width:22px; height:22px; text-align:center; font-weight:600; color:#444; display:flex; justify-content:center; align-items:center; box-sizing:border-box;';
+                if (circleColors.length > 0) {
+                    let mainColor = circleColors[0];
+                    style += 'border: 2px solid ' + mainColor + '; border-radius: 50%; color: ' + mainColor + ';';
+                    if (circleColors.length > 1) {
+                        style += 'outline: 2px solid ' + circleColors[1] + '; outline-offset: 1px;';
+                    }
+                }
+                
+                let displayNum = (t % 10);
+                html += '<div style="' + style + '">' + displayNum + '</div>';
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function generateGlobalTeethGridHTML() {
+            if (typeof orderJobs === 'undefined' || orderJobs.length === 0) return '';
+            
+            let html = '<div style="display:flex; justify-content:center; margin-bottom: 20px; user-select:none; font-size:18px;">';
+            html += '<div style="display:flex; flex-direction:column; align-items:center; gap:0;">';
+            
+            html += '<div style="display:flex; gap:12px; align-items:center; border-bottom: 1px solid #444; padding-bottom:6px;">';
+            html += generateQuadrantHTML([18,17,16,15,14,13,12,11], true) + '<div style="width:1px; height:25px; background:#444;"></div>' + generateQuadrantHTML([21,22,23,24,25,26,27,28], false);
+            html += '</div>';
+
+            html += '<div style="display:flex; gap:12px; align-items:center; padding-top:6px;">';
+            html += generateQuadrantHTML([48,47,46,45,44,43,42,41], true) + '<div style="width:1px; height:25px; background:#444;"></div>' + generateQuadrantHTML([31,32,33,34,35,36,37,38], false);
+            html += '</div>';
+
+            html += '</div></div>';
+            return html;
+        }
+
+function renderJobsList() {
             const container = document.getElementById('jobs-container');
             const wrapper = document.getElementById('added-jobs-list');
             if (orderJobs.length > 0) {
                 wrapper.style.display = 'block';
-                let tableHtml = `
-                    <div style="overflow-x:auto;">
-                    <table style="width:100%; border-collapse: collapse; font-size: 13px; text-align: left; margin-bottom: 10px; border: 1px solid #e5e7eb;">
-                        <thead>
-                            <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                <th style="padding: 8px 12px;">#</th>
-                                <th style="padding: 8px 12px;">Product</th>
-                                <th style="padding: 8px 12px;">Teeth</th>
-                                <th style="padding: 8px 12px; text-align:center;">Units</th>
-                                <th style="padding: 8px 12px; text-align:right;">Rate/unit</th>
-                                <th style="padding: 8px 12px; text-align:right;">Total</th>
-                                <th style="padding: 8px 12px; text-align:center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+                
+                let html = generateGlobalTeethGridHTML();
+                html += '<div style="display:flex; flex-direction:column; gap:10px;">';
                 
                 orderJobs.forEach((j, idx) => {
-                    tableHtml += `
-                        <tr style="border-bottom: 1px solid #e5e7eb; background-color: #ffffff;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#ffffff'">
-                            <td style="padding: 8px 12px; color: #6b7280;">${idx + 1}</td>
-                            <td style="padding: 8px 12px; font-weight: 600; color: #1f2937;">${j.product}</td>
-                            <td style="padding: 8px 12px; color: #4b5563;">${j.teeth ? j.teeth.sort((a,b) => a - b).join(', ') : ''}</td>
-                            <td style="padding: 8px 12px; text-align:center; color: #4b5563;">${j.units}</td>
-                            <td style="padding: 8px 12px; text-align:right; color: #4b5563;">${j.rate}</td>
-                            <td style="padding: 8px 12px; text-align:right; font-weight: 600; color: #111827;">${parseFloat(j.total).toFixed(2)}</td>
-                            <td style="padding: 8px 12px; text-align:center;">
-                                <button type="button" onclick="editJobInList(${idx})" style="background:none; border:none; color:#3b82f6; font-size:14px; cursor:pointer; margin-right:8px;" title="Edit Job">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button type="button" onclick="removeJob(${idx})" style="background:none; border:none; color:#ef4444; font-size:14px; cursor:pointer;" title="Remove Job">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    const color = j.color || '#ec4899';
+                    const teethStr = j.teeth && j.teeth.length > 0 && j.teeth.every(t => !isNaN(t)) ? j.teeth.sort((a,b) => a - b).join(',') : (j.teeth ? j.teeth.join(', ') : '');
+                    const productType = j.productType || 'General';
+                    
+                    html += '<div style="border-bottom:1px solid #ddd; padding-bottom:10px; font-size:13px; position:relative;">';
+                    html += '    <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">';
+                    html += '        <div style="width:14px; height:14px; background:' + color + '; border:1px solid #ccc;"></div>';
+                    html += '        <div style="border:1px solid #ccc; padding:2px 6px; font-size:11px; color:#555; background:#f9f9f9; border-radius:3px;">' + productType + '</div>';
+                    html += '        <div style="border:1px solid ' + color + '; padding:2px 6px; font-size:11px; color:' + color + '; text-transform:uppercase; border-radius:3px; font-weight:600;">' + productType + '</div>';
+                    html += '    </div>';
+                    html += '    <div style="display:flex; align-items:center; gap:10px; font-weight:bold; font-size:14px; color:#0056b3;">';
+                    html += '        <div>' + j.product + '</div>';
+                    html += '        <div style="color:#333;">' + teethStr + '</div>';
+                    html += '    </div>';
+                    html += '    <div style="display:flex; align-items:center; gap:20px; margin-top:4px; color:#555;">';
+                    html += '        <div>' + j.units + ' Units @' + j.rate + '</div>';
+                    html += '        <div>Total charge: <span style="font-weight:bold; color:#111;">' + parseFloat(j.total).toFixed(2) + '</span></div>';
+                    html += '    </div>';
+                    html += '    <div style="position:absolute; right:0; bottom:10px; display:flex; gap:10px;">';
+                    html += '        <button type="button" onclick="editJobInList(' + idx + ')" style="padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; color:#0056b3; border-radius:3px;"><i class="fas fa-edit"></i></button>';
+                    html += '        <button type="button" onclick="removeJob(' + idx + ')" style="padding:4px 8px; border:1px solid #ec4899; background:#fff; cursor:pointer; color:#ec4899; border-radius:3px;"><i class="fas fa-trash"></i></button>';
+                    html += '    </div>';
+                    html += '</div>';
                 });
                 
-                tableHtml += `
-                        </tbody>
-                    </table>
-                    </div>
-                `;
-                
-                container.innerHTML = tableHtml;
+                html += '</div>';
+                container.innerHTML = html;
             } else {
                 wrapper.style.display = 'none';
                 container.innerHTML = '';
             }
+        }
         }
 
         function handleStatusChange() {
