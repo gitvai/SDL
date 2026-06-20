@@ -1143,6 +1143,34 @@
             return { name: n, type: type, charge: 0 };
         });
 
+        async function loadStaff() {
+            try {
+                const res = await fetch(`${API_BASE}/staff` + ( `staff`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
+                const staff = await res.json();
+                const select = document.getElementById('assign-to');
+                if (select) {
+                    const currentValue = select.value;
+                    select.innerHTML = '<option></option>';
+                    staff.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.name;
+                        opt.textContent = s.name;
+                        select.appendChild(opt);
+                    });
+                    
+                    // Add "Add New" option
+                    const addNewOpt = document.createElement('option');
+                    addNewOpt.value = "__add_new__";
+                    addNewOpt.textContent = "+ Add New Staff...";
+                    addNewOpt.style.fontWeight = "bold";
+                    addNewOpt.style.color = "#3b82f6";
+                    select.appendChild(addNewOpt);
+                    
+                    if (currentValue) select.value = currentValue;
+                }
+            } catch (err) { console.error(err); }
+        }
+
         async function loadProducts() {
             try {
                 // Load Product Types for dropdown
