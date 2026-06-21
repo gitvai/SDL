@@ -214,7 +214,7 @@
             const thead = document.querySelector('#shipments-table thead');
             thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox"></th><th>#</th><th>Order #</th><th>Order Date</th><th>Client</th><th>Patient</th><th>Products</th><th>Model #</th><th>Status</th><th>Due Date</th><th>Order Amount</th><th></th></tr>';
 
-            document.getElementById('btn-generate-shipment').style.display = 'block';
+            document.getElementById('btn-generate-shipment').style.display = (filter === 'ready') ? 'block' : 'none';
 
             // Sidebar active state
             document.querySelectorAll('.sidebar-link').forEach(l => {
@@ -225,7 +225,20 @@
             try {
                 const start = document.getElementById('filter-date-start').value;
                 const end = document.getElementById('filter-date-end').value;
-                let url = `${API_BASE}/orders?shippingStatus=Pending`;
+                
+                let url = `${API_BASE}/orders?`;
+                if (filter === 'ready') {
+                    url += 'shippingStatus=Pending';
+                } else if (filter === 'outbox') {
+                    url += 'shippingStatus=Dispatched';
+                } else if (filter === 'today') {
+                    url += 'shippingStatus=Dispatched';
+                    if (!start && !end) {
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        url += `&dateFrom=${todayStr}&dateTo=${todayStr}&dateField=updatedAt`;
+                    }
+                }
+                
                 if (start) url += `&dateFrom=${start}`;
                 if (end) url += `&dateTo=${end}`;
                 const search = document.getElementById('shipment-search-input').value;
@@ -370,7 +383,13 @@
                         <td>${item.dueDate ? displayDate(item.dueDate) : 'N/A'}</td>
                         <td style="font-weight:bold; color:#10b981;">${(item.netAmount || item.totalAmount || 0).toFixed(2)}</td>
                         <td style="text-align:right;">
-                            <button class="btn-toolbar" onclick="shipOrder(${item.id}, ${clientId})" style="padding:4px; margin:0;"><i class="fas fa-truck"></i></button>
+                            ${item.shippingStatus === 'Dispatched' ? `
+                                <div style="display:flex; gap:5px; justify-content:flex-end;">
+                                    <button class="btn-toolbar" title="View Delivery Note" onclick="window.open('delivery_note.html?id=${item.id}&type=order', '_blank')" style="padding:4px; margin:0; color:#3b82f6;"><i class="fas fa-file-invoice"></i></button>
+                                </div>
+                            ` : `
+                                <button class="btn-toolbar" onclick="shipOrder(${item.id}, ${clientId})" style="padding:4px; margin:0;" title="Ship Order"><i class="fas fa-truck"></i></button>
+                            `}
                         </td>
                     `;
                 }
