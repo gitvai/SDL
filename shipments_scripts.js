@@ -147,18 +147,9 @@
         }
 
         function formatProductDisplay(type, name) {
-            const pType = (type || '').trim();
             const pName = (name || '').trim();
-            if (pType && pName) {
-                if (pType.toLowerCase() === pName.toLowerCase()) {
-                    return pName;
-                } else if (pType.toLowerCase().includes(pName.toLowerCase()) || pName.toLowerCase().includes(pType.toLowerCase())) {
-                    return pType.length >= pName.length ? pType : pName;
-                } else {
-                    return `${pType} - ${pName}`;
-                }
-            }
-            return pType || pName || '';
+            if (pName) return pName;
+            return (type || '').trim();
         }
 
         async function loadClients() {
