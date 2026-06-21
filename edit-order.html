@@ -297,7 +297,9 @@
                         <th></th>
                     </tr>
                 </thead>
-                <tbody id="client-table-body"></tbody>
+                <tbody id="client-table-body">
+                    <tr><td colspan="6" style="text-align:center; padding: 20px; color: #666; font-weight: 500;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>
+                </tbody>
             </table>
         </div>
 
@@ -959,7 +961,8 @@
     </div>
 
     <script>
-        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         const JOB_COLORS = ['#ec4899', '#9f1239', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316'];
         let allClients = [];
         let selectedClientId = null;
@@ -969,12 +972,21 @@
         let selectedProductType = 'General';
 
         async function loadClients() {
+            const tbody = document.getElementById('client-table-body');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #666; font-weight: 500;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>`;
+            }
             try {
                 const res = await fetch(`${API_BASE}/clients` + ( `clients`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
                 allClients = await res.json();
                 renderClients(allClients);
                 populateDoctors();
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err); 
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #dc2626; font-weight: 500;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Failed to load clients. Server is offline or not responding. Please retry.</td></tr>`;
+                }
+            }
         }
 
         function renderClients(clients) {
@@ -1431,6 +1443,14 @@
 
             if (selectedTeeth.length > 0 || unitCount > 0) {
                 document.getElementById('teeth-grid-container').style.display = 'block';
+            }
+        }
+
+        function confirmTeeth() {
+            // Auto-fill patient name in the detailed form if it was entered earlier
+            const topPatientName = document.getElementById('patient-name').value;
+            if (topPatientName && !document.getElementById('patient-name-detail').value) {
+                document.getElementById('patient-name-detail').value = topPatientName;
             }
             document.getElementById('order-details-area').style.display = 'block';
         }

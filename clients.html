@@ -249,7 +249,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading clients...</td></tr>
+                        <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -617,7 +617,8 @@
     </div>
 
     <script>
-        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let allClients = [];
         let editingClientId = null;
 
@@ -984,11 +985,20 @@
         }
 
         async function loadClients() {
+            const tableBody = document.querySelector('#clients-table tbody');
+            if (tableBody) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>';
+            }
             try {
                 const response = await fetch(`${API_BASE}/clients`);
                 allClients = await response.json();
                 renderClients(allClients);
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err); 
+                if (tableBody) {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #dc2626; padding: 40px;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Failed to load clients. Server is offline or not responding. Please retry.</td></tr>';
+                }
+            }
         }
 
         document.getElementById('add-client-form').onsubmit = async (e) => {

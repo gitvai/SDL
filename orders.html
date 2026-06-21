@@ -2280,7 +2280,8 @@
     </div>
 
     <script>
-        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let allClients = [];
         let currentClientId = null;
         let currentClientEmail = '';
@@ -2328,15 +2329,24 @@
         }
 
         async function loadClients() {
+            const selects = [
+                document.getElementById('filter-client'),
+                document.getElementById('edit-clientId'),
+                document.getElementById('pickup-filter-client'),
+                document.getElementById('new-pickup-client')
+            ];
+            
+            // Set loading state in selects
+            selects.forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="">Loading clients... (Connecting to server)</option>';
+                }
+            });
+
             try {
                 const response = await fetch(`${API_BASE}/clients`);
                 allClients = await response.json();
-                const selects = [
-                    document.getElementById('filter-client'),
-                    document.getElementById('edit-clientId'),
-                    document.getElementById('pickup-filter-client'),
-                    document.getElementById('new-pickup-client')
-                ];
+                
                 selects.forEach(select => {
                     if (!select) return;
                     const defaultText = select.id.includes('new') ? 'Select a client' : 'Ignore';
@@ -2349,7 +2359,14 @@
                     });
                 });
                 populateDoctors();
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error('Error loading clients:', err);
+                selects.forEach(select => {
+                    if (select) {
+                        select.innerHTML = '<option value="">Failed to load clients (Offline/Error)</option>';
+                    }
+                });
+            }
         }
 
         function populateDoctors() {
