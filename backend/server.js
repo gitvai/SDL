@@ -795,7 +795,7 @@ app.get('/api/overview/stats', async (req, res) => {
 // --- PICKUP & RETURNS ---
 app.get('/api/pickup-returns', async (req, res) => {
   try {
-    const items = await prisma.pickupReturn.findMany({ include: { order: { include: { client: true } } } });
+    const items = await prisma.pickupReturn.findMany({ include: { order: { include: { client: true, jobs: true } } } });
     res.json(items);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -1463,7 +1463,7 @@ app.get('/api/pickup-returns', async (req, res) => {
     }
     const returns = await prisma.pickupReturn.findMany({
       where,
-      include: { order: { include: { client: true } } },
+      include: { order: { include: { client: true, jobs: true } } },
       orderBy: { createdAt: 'desc' }
     });
     res.json(returns);
