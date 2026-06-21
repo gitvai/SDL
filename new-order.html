@@ -653,6 +653,7 @@
             const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
             const productName = (p.name || '').toUpperCase();
             const isSlabProduct = slabProducts.some(sp => productName.includes(sp));
+            const isSpecialRpd = productName === 'RPD' || productName.includes('FLEXIBLE RPD') || productName.includes('PARTIAL RPD');
             
             if (slabsContainer) {
                 slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
@@ -665,18 +666,22 @@
             
             if (isSlabProduct) {
                 const s1 = document.getElementById('slab1-rate');
-                if (s1) s1.value = p.charge || 0;
+                if (s1) {
+                    s1.value = isSpecialRpd ? 17 : (p.charge || 0);
+                }
                 const s2 = document.getElementById('slab2-rate');
                 if (s2) s2.value = 2;
             }
 
             const nameDisplay = document.getElementById('selected-product-name');
-
             const rateInput = document.getElementById('unit-rate');
+            const footerRateContainer = document.getElementById('footer-unit-rate-container');
             
-            
-              if (nameDisplay) nameDisplay.textContent = p.name;
-              if (rateInput) rateInput.value = p.charge || 0;
+            if (nameDisplay) nameDisplay.textContent = p.name;
+            if (rateInput) rateInput.value = p.charge || 0;
+            if (footerRateContainer) {
+                footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
+            }
               
               updateTeethUI(true);
               /* Disable client-specific rate overrides to enforce global rate usage
@@ -972,9 +977,15 @@
             const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
             const productNameUpper = (j.product || '').toUpperCase();
             const isSlabProduct = slabProducts.some(sp => productNameUpper.includes(sp));
+            const isSpecialRpd = productNameUpper === 'RPD' || productNameUpper.includes('FLEXIBLE RPD') || productNameUpper.includes('PARTIAL RPD');
             
             if (slabsContainer) {
                 slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
+            }
+            
+            const footerRateContainer = document.getElementById('footer-unit-rate-container');
+            if (footerRateContainer) {
+                footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
             }
             
             const customUnitContainer = document.getElementById('custom-unit-text-container');
@@ -990,7 +1001,7 @@
             }
             
             const s1 = document.getElementById('slab1-rate');
-            if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : j.rate;
+            if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : (isSpecialRpd ? 17 : j.rate);
             const s2 = document.getElementById('slab2-rate');
             if (s2) s2.value = (j.slab2Rate !== null && j.slab2Rate !== undefined) ? j.slab2Rate : 2;
             
