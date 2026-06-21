@@ -339,7 +339,7 @@
 
     <script>
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000' && window.location.port !== '5001')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         window.currentReportType = 'orders';
 
         async function fetchData(endpoint) {
@@ -391,6 +391,7 @@
 
         let currentCalendarDate = new Date();
         let calendarEvents = [];
+        let allClients = [];
 
         async function loadDashboard() {
             const metricEls = document.querySelectorAll('.perf-value, #order-status-table td[id^="os-"], .alert-title span, .alert-content[id]');
@@ -788,21 +789,41 @@
             try {
                 const res = await fetch(`${API_BASE}/receipts/next-number`);
                 const data = await res.json();
-                document.getElementById('p-number').value = data.nextNumber;
-            } catch (e) { console.error(e); }
-
-            if (allClients.length === 0) {
-                const res = await fetch(`${API_BASE}/clients`);
-                allClients = await res.json();
+                document.getElementById('p-number').value = data.receiptNumber || '';
+            } catch (e) {
+                console.error('Error fetching next receipt number:', e);
+                document.getElementById('p-number').value = '';
             }
+
             const clientSelect = document.getElementById('p-client');
-            clientSelect.innerHTML = '<option value="">-- Select Client --</option>';
-            allClients.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.name;
-                clientSelect.appendChild(opt);
-            });
+            if (clientSelect) {
+                clientSelect.innerHTML = '<option value="">-- Select Client --</option>';
+            }
+
+            try {
+                if (allClients.length === 0) {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    if (!res.ok) {
+                        throw new Error(`Failed to fetch clients: status ${res.status}`);
+                    }
+                    const data = await res.json();
+                    if (Array.isArray(data)) {
+                        allClients = data;
+                    } else {
+                        console.error('Expected clients array but got:', data);
+                    }
+                }
+                if (clientSelect && Array.isArray(allClients)) {
+                    allClients.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.name;
+                        clientSelect.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error('Error fetching or populating clients:', e);
+            }
         }
 
         async function openExpenseModal() {
