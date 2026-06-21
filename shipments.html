@@ -197,7 +197,7 @@
                     <table id="shipments-table">
                         <thead>
                             <tr style="background:#f3f4f6;">
-                                <th style="width:30px;"><input type="checkbox"></th>
+                                <th style="width:30px;"><input type="checkbox" onclick="toggleSelectAllShipments(this)"></th>
                                 <th>#</th>
                                 <th id="th-id">Shipment #</th>
                                 <th id="th-order">Order #</th>
@@ -449,6 +449,11 @@
         const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let currentMode = 'notes';
 
+        function toggleSelectAllShipments(source) {
+            const checkboxes = document.querySelectorAll('#shipments-table tbody input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
         function formatLocalDate(date) {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -541,7 +546,7 @@
             }
             
             const thead = document.querySelector('#shipments-table thead');
-            thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox"></th><th>#</th><th>Shipment #</th><th>Order #</th><th>Shipment Date</th><th>Client</th><th>Amount</th><th>Actions</th></tr>';
+            thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAllShipments(this)"></th><th>#</th><th>Shipment #</th><th>Order #</th><th>Shipment Date</th><th>Client</th><th>Amount</th><th>Actions</th></tr>';
             
             document.getElementById('btn-generate-shipment').style.display = 'none';
             
@@ -569,7 +574,7 @@
             currentMode = 'orders';
             document.getElementById('page-title').textContent = title;
             const thead = document.querySelector('#shipments-table thead');
-            thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox"></th><th>#</th><th>Order #</th><th>Order Date</th><th>Client</th><th>Patient</th><th>Products</th><th>Model #</th><th>Status</th><th>Due Date</th><th>Order Amount</th><th></th></tr>';
+            thead.innerHTML = '<tr style="background:#f3f4f6;"><th style="width:30px;"><input type="checkbox" onclick="toggleSelectAllShipments(this)"></th><th>#</th><th>Order #</th><th>Order Date</th><th>Client</th><th>Patient</th><th>Products</th><th>Model #</th><th>Status</th><th>Due Date</th><th>Order Amount</th><th></th></tr>';
 
             document.getElementById('btn-generate-shipment').style.display = (filter === 'ready') ? 'block' : 'none';
 

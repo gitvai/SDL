@@ -188,7 +188,7 @@
 
             <!-- Toolbar -->
             <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <button class="btn-toolbar"><i class="fas fa-print"></i> Print</button>
+                <button class="btn-toolbar" onclick="bulkPrintAccounts()"><i class="fas fa-print"></i> Print</button>
                 <button class="btn-toolbar"><i class="fas fa-envelope"></i> Email</button>
                 <button id="btn-bulk-generate-invoice" class="btn-toolbar" style="display:none; background: #10b981; color: #fff; border-color: #059669;" onclick="openConfirmInvoiceModal()"><i class="fas fa-file-invoice-dollar"></i> Generate Invoice</button>
                 <button id="btn-new-adjustment" class="btn-toolbar" style="display:none; background: #ec4899; color: #fff; border-color: #db2777;" onclick="openNewAdjustmentModal()"><i class="fas fa-plus"></i> New Adjustment</button>
@@ -202,7 +202,7 @@
                 <table id="accounts-table">
                     <thead>
                         <tr style="background:#f3f4f6;">
-                            <th style="width:30px;"><input type="checkbox"></th>
+                            <th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th>
                             <th>#</th>
                             <th id="th-id">Invoice #</th>
                             <th id="th-order">Order #</th>
@@ -407,7 +407,7 @@
             const cols = gridSettingsAccounts[currentMode].columns.filter(c => c.visible);
             const thead = document.querySelector('#accounts-table thead');
             if (!thead) return;
-            let ths = '<tr style="background:#f3f4f6;"><th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCb" onclick="toggleSelectAll()"></th><th style="width: 40px;">#</th>';
+            let ths = '<tr style="background:#f3f4f6;"><th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCb" onclick="toggleSelectAll(this)"></th><th style="width: 40px;">#</th>';
             cols.forEach(c => {
                 ths += `<th>${c.caption}</th>`;
             });
@@ -978,6 +978,31 @@
 
         function downloadInvoicePDF(id) {
             window.open(`invoice.html?id=${id}&download=true`, '_blank');
+        }
+
+        function bulkPrintAccounts() {
+            const checkboxes = document.querySelectorAll('#accounts-table tbody input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one item.');
+                return;
+            }
+            if (currentMode === 'invoices') {
+                checkboxes.forEach(cb => {
+                    const tr = cb.closest('tr');
+                    const id = tr.dataset.invoiceId;
+                    if (id) window.open(`invoice.html?id=${id}&download=true`, '_blank');
+                });
+            } else if (currentMode === 'payments') {
+                checkboxes.forEach(cb => {
+                    const tr = cb.closest('tr');
+                    const id = tr.dataset.receiptId;
+                    if (id) window.open(`invoice.html?id=${id}&type=receipt`, '_blank');
+                });
+            } else if (currentMode === 'generate') {
+                alert('Please generate invoices first, then print from the Invoices section.');
+            } else {
+                alert('Print is not available for this section.');
+            }
         }
 
         function viewInvoice(id) {
