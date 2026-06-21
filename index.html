@@ -785,6 +785,8 @@
         async function openPaymentModal() {
             document.getElementById('payment-modal').style.display = 'flex';
             document.getElementById('p-date').valueAsDate = new Date();
+            document.getElementById('p-mode').value = 'Cash';
+            handlePaymentModeChange();
             
             try {
                 const res = await fetch(`${API_BASE}/receipts/next-number`);
@@ -826,6 +828,20 @@
             }
         }
 
+        function handlePaymentModeChange() {
+            const mode = document.getElementById('p-mode').value;
+            const paidToWrapper = document.getElementById('p-paid-to-wrapper');
+            const modeRow = document.getElementById('p-mode-row');
+            
+            if (mode === 'NetBanking' || mode === 'Cheque') {
+                paidToWrapper.style.display = 'block';
+                modeRow.style.gridTemplateColumns = '1fr 1fr 1fr';
+            } else {
+                paidToWrapper.style.display = 'none';
+                modeRow.style.gridTemplateColumns = '1fr 1fr';
+            }
+        }
+
         async function openExpenseModal() {
             document.getElementById('expense-modal').style.display = 'flex';
             document.getElementById('e-date').valueAsDate = new Date();
@@ -843,14 +859,24 @@
 
         document.getElementById('payment-form').onsubmit = async (e) => {
             e.preventDefault();
+            
+            let notesValue = document.getElementById('p-notes').value;
+            const modeValue = document.getElementById('p-mode').value;
+            if (modeValue === 'NetBanking' || modeValue === 'Cheque') {
+                const paidToValue = document.getElementById('p-paid-to').value;
+                if (paidToValue) {
+                    notesValue = `Paid to: ${paidToValue}. ${notesValue}`.trim();
+                }
+            }
+
             const data = {
                 clientId: document.getElementById('p-client').value,
                 amount: document.getElementById('p-amount').value,
                 receiptDate: document.getElementById('p-date').value,
                 receiptNumber: document.getElementById('p-number').value,
-                paymentMode: document.getElementById('p-mode').value,
+                paymentMode: modeValue,
                 reference: document.getElementById('p-ref').value,
-                notes: document.getElementById('p-notes').value,
+                notes: notesValue,
                 appliedAmount: document.getElementById('p-amount').value
             };
 
@@ -925,17 +951,23 @@
                         <input type="text" id="p-number" readonly style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px; background:#f9fafb;">
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;" id="p-mode-row">
                     <div>
                         <label style="display:block; margin-bottom:5px; font-weight:600; font-size:13px;">Payment Mode</label>
-                        <select id="p-mode" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                        <select id="p-mode" onchange="handlePaymentModeChange()" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;">
                             <option>Cash</option>
-                            <option>Bank Transfer</option>
                             <option>Cheque</option>
+                            <option>NetBanking</option>
                             <option>GPay/PhonePe</option>
                         </select>
                     </div>
-                    <div>
+                    <div id="p-paid-to-wrapper" style="display:none;">
+                        <label style="display:block; margin-bottom:5px; font-weight:600; font-size:13px;">Paid to a/c</label>
+                        <select id="p-paid-to" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                            <option>Bank a/c</option>
+                        </select>
+                    </div>
+                    <div id="p-ref-wrapper">
                         <label style="display:block; margin-bottom:5px; font-weight:600; font-size:13px;">Cheque/Ref #</label>
                         <input type="text" id="p-ref" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;">
                     </div>
