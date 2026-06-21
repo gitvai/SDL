@@ -791,10 +791,10 @@
             try {
                 const res = await fetch(`${API_BASE}/receipts/next-number`);
                 const data = await res.json();
-                document.getElementById('p-number').value = data.receiptNumber || '';
+                document.getElementById('p-number').value = data.receiptNumber || ('RCT-' + Date.now().toString().slice(-6));
             } catch (e) {
                 console.error('Error fetching next receipt number:', e);
-                document.getElementById('p-number').value = '';
+                document.getElementById('p-number').value = 'RCT-' + Date.now().toString().slice(-6);
             }
 
             const clientSelect = document.getElementById('p-client');
