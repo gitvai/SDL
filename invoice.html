@@ -52,17 +52,36 @@
 
         /* Header Layout */
         .header-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
             border-bottom: 3px solid #000;
             padding-bottom: 5px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .header-logo {
+            flex-shrink: 0;
+        }
+
+        .header-logo img {
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .header-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .lab-name {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
+            text-align: left;
+            font-size: 26px;
+            font-weight: bold;
             margin: 0 0 5px 0;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .header-columns {
@@ -71,38 +90,18 @@
             align-items: flex-start;
         }
 
-        .header-left {
-            display: flex;
-            gap: 15px;
-            width: 55%;
-        }
-
-        .logo-box {
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
         .lab-info {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: normal;
             line-height: 1.4;
         }
 
         .header-right {
-            width: 40%;
-            text-align: right;
-            font-size: 13px;
-            font-weight: 600;
+            text-align: left;
+            font-size: 15px;
+            font-weight: normal;
             line-height: 1.4;
+            padding-right: 20px;
         }
 
         .invoice-title {
@@ -415,9 +414,9 @@
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(1) { width: 3% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(2) { width: 7% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(3) { width: 14% !important; }
-        .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(4) { width: 10% !important; }
+        .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(4) { width: 13% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(5) { width: 14% !important; }
-        .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(6) { width: 24% !important; }
+        .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(6) { width: 21% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(7) { width: 5% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(8) { width: 11% !important; }
         .invoice-container.html2pdf-printing-container .invoice-table th:nth-child(9) { width: 12% !important; }
@@ -466,12 +465,12 @@
     <div id="invoice-content" class="invoice-container fade-in">
         <!-- Header -->
         <header class="header-section">
-            <h1 class="lab-name">SOHAR DENTAL LABORATORY</h1>
-            <div class="header-columns">
-                <div class="header-left">
-                    <div class="logo-box">
-                        <img src="logo.jpeg" alt="Logo">
-                    </div>
+            <div class="header-logo">
+                <img src="logo.jpeg" alt="Logo">
+            </div>
+            <div class="header-content">
+                <h1 class="lab-name">SOHAR DENTAL LABORATORY</h1>
+                <div class="header-columns">
                     <div class="lab-info">
                         <div>AL HAMBAR</div>
                         <div>C.R.NO.3203549</div>
@@ -479,10 +478,10 @@
                         <div>SOHAR</div>
                         <div>SULTANATE OF OMAN</div>
                     </div>
-                </div>
-                <div class="header-right">
-                    <div>Phone : 99622728, 92501576</div>
-                    <div>email : sohardentallab@gmail.com</div>
+                    <div class="header-right">
+                        <div>Phone : 99622728, 92501576</div>
+                        <div>email : sohardentallab@gmail.com</div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -517,9 +516,9 @@
                     <th style="width: 3%;">#</th>
                     <th style="width: 7%;">Order #</th>
                     <th style="width: 14%;" class="nowrap">Patient</th>
-                    <th style="width: 10%;" class="nowrap">Delivery Date</th>
+                    <th style="width: 13%;" class="nowrap">Delivery Date</th>
                     <th style="width: 14%;">Product</th>
-                    <th style="width: 24%;">Teeth #</th>
+                    <th style="width: 21%;">Teeth #</th>
                     <th style="width: 5%;" class="nowrap">Units</th>
                     <th style="width: 11%;" class="nowrap">Rate /unit</th>
                     <th style="width: 12%;" class="nowrap">Total Amount</th>
