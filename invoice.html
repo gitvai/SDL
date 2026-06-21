@@ -740,7 +740,7 @@
                                         ${job.productName || job.productType}
                                         ${(job.shade1 || job.shade2 || job.shade3) ? `<br/><small style="font-size:10px; color:#444;">Shade: ${[job.shade1, job.shade2, job.shade3].filter(s => s).join(' / ')}</small>` : ''}
                                     </td>
-                                    <td style="padding: 0 !important;">${createTeethGrid(job.teethSelection)}</td>
+                                    <td style="padding: 5px 10px !important;">${createTeethGrid(job.teethSelection)}</td>
                                     <td style="text-align:center;">${units}</td>
                                     <td style="text-align:right;" class="nowrap">${rate.toFixed(2)}</td>
                                     <td style="text-align:right;" class="nowrap">${price.toFixed(2)}</td>
