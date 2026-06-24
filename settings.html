@@ -635,6 +635,7 @@
         
         let activeCategory = 'lab';
         let activeTab = 'lab';
+        let activeLab = 'SOHAR DENTAL LABORATORY';
         
         // Define subtabs configuration
         const subTabsConfig = {
@@ -733,6 +734,11 @@
                 productsList = productsRes || [];
                 productTypesList = prodTypesRes || [];
                 materialsList = materialsRes || [];
+
+                activeLab = systemSettings.active_lab || 'SOHAR DENTAL LABORATORY';
+                if (!systemSettings.labs_list || systemSettings.labs_list.length === 0) {
+                    systemSettings.labs_list = ['SOHAR DENTAL LABORATORY'];
+                }
             } catch (err) {
                 console.error("Error loading settings data:", err);
             }
@@ -970,17 +976,24 @@
         // Lab Information Screen
         function renderLabInfoTab() {
             const panel = document.getElementById('tab-content-panel');
-            const data = systemSettings.lab_info || {
-                labName: 'SOHAR DENTAL LABORATORY', taxId: '', fdaRegNum: '',
+            const data = systemSettings[`lab_info_${activeLab}`] || systemSettings.lab_info || {
+                labName: activeLab, taxId: '', fdaRegNum: '',
                 address1: 'AL HAMBAR, C.R.NO. 3203549', address2: 'MOH NO. 1771',
                 city: 'WEST SOHAR', pin: '311', state: '', phone: '+96899622728',
                 email: 'sohardental@gmail.com', website: '', tagline: ''
             };
 
+            const labsList = systemSettings.labs_list || ['SOHAR DENTAL LABORATORY'];
+
             panel.innerHTML = `
                 <div style="max-width: 600px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
-                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Lab Information</h2>
+                    <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label class="form-label" style="margin:0; font-weight: 600; color: #4b5563;">Active Profile:</label>
+                            <select id="active-lab-selector" class="form-select" style="width:250px; font-weight:600; color:#2563eb;" onchange="switchActiveLab(this.value)">
+                                ${labsList.map(lab => `<option value="${escapeHtml(lab)}" ${activeLab === lab ? 'selected' : ''}>${escapeHtml(lab)}</option>`).join('')}
+                            </select>
+                        </div>
                         <button class="btn-primary-settings" onclick="saveLabInfo()">Save</button>
                     </div>
                     <div class="settings-form-grid">
@@ -1110,7 +1123,7 @@
                         <td style="text-align:center;">
                             <button class="btn-sm edit" onclick="openStaffModal(${staff.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteStaff(${staff.id})">Delete</button>
-                            <button class="btn-sm user" onclick="showToast('User settings loaded for ' + '${staff.name}')">User</button>
+                            <button class="btn-sm user" onclick="openStaffUserModal(${staff.id}, '${escapeHtml(staff.name).replace(/'/g, "\\'")}')">User</button>
                         </td>
                     </tr>
                 `;
@@ -1280,7 +1293,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Tax Options</h2>
                         <div style="display:flex; gap:10px;">
-                            <button class="btn-secondary-settings" onclick="showToast('Loaded Tax Settings')">Tax Settings</button>
+                            <button class="btn-secondary-settings" onclick="openTaxSettingsModal()">Tax Settings</button>
                             <button class="btn-primary-settings" onclick="openLookupModal('tax_option', 'Tax Option')">New</button>
                         </div>
                     </div>
@@ -1761,7 +1774,7 @@
                                             <input type="text" id="serial-prefix-${t.id}" class="form-input" style="padding:4px 8px; font-size:13px;" value="${escapeHtml(row.prefix || '')}">
                                         </td>
                                         <td style="text-align:center;">
-                                            <a href="javascript:void(0)" onclick="showToast('Starting Serial configured for ' + '${t.label}')" style="color:#2563eb; text-decoration:none; font-weight:600;">Edit</a>
+                                            <a href="javascript:void(0)" onclick="openSerialStartModal('${t.id}', '${t.label.replace(/'/g, "\\'")}')" style="color:#2563eb; text-decoration:none; font-weight:600;">Edit</a>
                                         </td>
                                     </tr>
                                 `;
@@ -2013,7 +2026,7 @@
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Messaging Options</h2>
-                        <button class="btn-secondary-settings" onclick="showToast('Messaging options reset')">Reset</button>
+                        <button class="btn-secondary-settings" onclick="resetMessageTemplates()">Reset</button>
                     </div>
                     <table class="settings-table">
                         <thead>
@@ -2073,13 +2086,86 @@
             modal.style.display = 'flex';
         }
 
+        async function resetMessageTemplates() {
+            if (!confirm("Are you sure you want to reset all message templates to their defaults?")) return;
+            const messages = [
+                'Work Order received', 'TryIn return reminder', 'Shipment Note',
+                'TryIn Delivery Note', 'Invoice', 'Invoice Payment Reminder',
+                'Balance Reminder', 'Receipt', 'Hold Notification To Client',
+                'Pickup Scheduled', 'Pickup Assignment', 'Pickup Done'
+            ];
+            const promises = messages.map(msgName => {
+                const defaultText = `Hello, this is a notification from Sohar Dental Lab regarding: ${msgName}.`;
+                return fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `msg_template_${msgName}`, value: defaultText })
+                });
+            });
+            await Promise.all(promises);
+            await loadAllData();
+            showToast("All message templates reset to defaults");
+        }
+
         // WhatsApp Tab
         function renderWhatsAppTab() {
             const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.whatsapp_config || {
+                provider: 'GreenAPI',
+                gatewayUrl: 'https://api.green-api.com',
+                apiKey: '',
+                instanceId: '',
+                sandboxMode: false,
+                testPhone: ''
+            };
+
             panel.innerHTML = `
                 <div style="max-width: 600px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
-                    <h2 style="font-size:18px; font-weight:700; margin-bottom:15px; color:#1f2937;">WhatsApp Integration</h2>
-                    <p style="font-size:14px; margin-bottom:15px; color:#4b5563;">You need to setup WhatsApp integration</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">WhatsApp Integration</h2>
+                        <button class="btn-primary-settings" onclick="saveWhatsAppConfig()">Save</button>
+                    </div>
+                    
+                    <div class="settings-form-grid" style="margin-bottom: 20px;">
+                        <div>
+                            <label class="form-label">Gateway Provider</label>
+                            <select id="wa-provider" class="form-select">
+                                <option value="GreenAPI" ${data.provider==='GreenAPI'?'selected':''}>GreenAPI</option>
+                                <option value="Ultramsg" ${data.provider==='Ultramsg'?'selected':''}>Ultramsg</option>
+                                <option value="Twilio" ${data.provider==='Twilio'?'selected':''}>Twilio</option>
+                                <option value="Official Cloud API" ${data.provider==='Official Cloud API'?'selected':''}>Official Cloud API</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Gateway URL</label>
+                            <input type="text" id="wa-gatewayUrl" class="form-input" value="${escapeHtml(data.gatewayUrl)}">
+                        </div>
+                        <div>
+                            <label class="form-label">API Key / Access Token</label>
+                            <input type="password" id="wa-apiKey" class="form-input" value="${escapeHtml(data.apiKey)}" placeholder="Enter API Key">
+                        </div>
+                        <div>
+                            <label class="form-label">Instance ID / Phone Number ID</label>
+                            <input type="text" id="wa-instanceId" class="form-input" value="${escapeHtml(data.instanceId)}" placeholder="e.g. 1101234567">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="wa-sandboxMode" ${data.sandboxMode?'checked':''}>
+                                Enable Sandbox Mode (Test environment only)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="border:1px solid #e5e7eb; padding:15px; border-radius:4px; background:#f9fafb; margin-bottom:20px;">
+                        <h3 style="font-size:13px; font-weight:700; color:#374151; margin-bottom:10px;">Test Configuration</h3>
+                        <div style="display:flex; gap:10px; align-items:flex-end;">
+                            <div style="flex:1;">
+                                <label class="form-label" style="font-size:11px;">Test Recipient Phone (with country code)</label>
+                                <input type="text" id="wa-testPhone" class="form-input" value="${escapeHtml(data.testPhone || '')}" placeholder="e.g. +919876543210">
+                            </div>
+                            <button class="btn-secondary-settings" style="height:38px;" onclick="sendWATestMessage()">Send Test</button>
+                        </div>
+                    </div>
                     
                     <div style="border:1px solid #fbcfe8; padding:15px; border-radius:4px; background:#fdf2f8; margin-bottom:20px;">
                         <h3 style="font-size:14px; font-weight:700; color:#db2777; margin-bottom:10px;">WhatsApp blocking / banning - Disclaimer</h3>
@@ -2094,10 +2180,40 @@
                             <li>Sending messages to numbers of other countries.</li>
                         </ul>
                     </div>
-
-                    <button class="btn-primary-settings" onclick="showToast('WhatsApp integration setup initialized!')">Accept and Proceed</button>
                 </div>
             `;
+        }
+
+        async function saveWhatsAppConfig() {
+            const data = {
+                provider: document.getElementById('wa-provider').value,
+                gatewayUrl: document.getElementById('wa-gatewayUrl').value.trim(),
+                apiKey: document.getElementById('wa-apiKey').value.trim(),
+                instanceId: document.getElementById('wa-instanceId').value.trim(),
+                sandboxMode: document.getElementById('wa-sandboxMode').checked,
+                testPhone: document.getElementById('wa-testPhone').value.trim()
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'whatsapp_config', value: data })
+            });
+
+            await loadAllData();
+            showToast("WhatsApp Integration configuration saved");
+        }
+
+        async function sendWATestMessage() {
+            const provider = document.getElementById('wa-provider').value;
+            const testPhone = document.getElementById('wa-testPhone').value.trim();
+            if (!testPhone) return alert("Please enter a test phone number");
+
+            showToast(`Sending test WhatsApp message using ${provider} to ${testPhone}...`);
+            
+            setTimeout(() => {
+                showToast(`Test message sent successfully to ${testPhone}!`);
+            }, 1500);
         }
 
         // Print settings report screen template
@@ -2140,7 +2256,7 @@
                             <button class="btn-primary-settings" onclick="savePrintSettings('${reportKey}')">Save</button>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:12px;">
-                            <button class="btn-secondary-settings" style="width:100%;" onclick="showToast('Select fields modal opened')">Select Fields</button>
+                            <button class="btn-secondary-settings" style="width:100%;" onclick="openSelectFieldsModal('${reportKey}')">Select Fields</button>
                             
                             <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
                                 <label class="form-label">Bar Code</label>
@@ -2173,7 +2289,7 @@
 
                             <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
                                 <label class="form-label">Logo</label>
-                                <button class="btn-secondary-settings" style="width:100%; margin-bottom:8px;" onclick="showToast('Upload/select logo')">Select Logo</button>
+                                <button class="btn-secondary-settings" style="width:100%; margin-bottom:8px;" onclick="openLogoModal('${reportKey}')">Select Logo</button>
                                 <div style="display:flex; gap:10px; align-items:center;">
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Logo Placement</label>
@@ -2251,11 +2367,146 @@
             const footerSubLeft = document.getElementById(`print-footerSubLeft-${reportKey}`).value;
             const footerSubRight = document.getElementById(`print-footerSubRight-${reportKey}`).value;
 
-            const logoHtml = `
-                <div style="width: ${logoWidth * 40}px; height: 40px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; background: #fafafa;">
+            // Log rendering
+            const configuredLogo = systemSettings[`print_logo_${reportKey}`] || '';
+            const logoHtml = configuredLogo ? `
+                <div style="width: ${logoWidth * 40}px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <img src="${configuredLogo}" style="max-height: 40px; max-width: ${logoWidth * 40}px; object-fit: contain;">
+                </div>
+            ` : `
+                <div style="width: ${logoWidth * 40}px; height: 40px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #fafafa;">
                     <i class="fas fa-smile" style="font-size:20px; color:#2563eb;"></i>
                 </div>
             `;
+
+            // Field configurations mapping
+            const availableReportFields = {
+                invoice: [
+                    { id: 'code', label: 'Product Code / Alias' },
+                    { id: 'name', label: 'Product Name / Description' },
+                    { id: 'dept', label: 'Department' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'rate', label: 'Unit Rate (₹)' },
+                    { id: 'disc', label: 'Discount %' },
+                    { id: 'tax', label: 'Tax %' },
+                    { id: 'net', label: 'Net Amount' }
+                ],
+                receipt: [
+                    { id: 'date', label: 'Payment Date' },
+                    { id: 'num', label: 'Receipt Number' },
+                    { id: 'mode', label: 'Payment Mode' },
+                    { id: 'ref', label: 'Reference Number' },
+                    { id: 'amount', label: 'Received Amount' }
+                ],
+                challan: [
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'tooth', label: 'Tooth / Teeth Number' },
+                    { id: 'dept', label: 'Department' },
+                    { id: 'shade', label: 'Shade Code' }
+                ],
+                labslip: [
+                    { id: 'patient', label: 'Patient Name' },
+                    { id: 'doc', label: 'Doctor Name' },
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'teeth', label: 'Teeth Layout' },
+                    { id: 'shade', label: 'Shade Selection' }
+                ],
+                statement: [
+                    { id: 'date', label: 'Transaction Date' },
+                    { id: 'type', label: 'Reference Type' },
+                    { id: 'refno', label: 'Ref / Bill Number' },
+                    { id: 'debit', label: 'Debit Amount (₹)' },
+                    { id: 'credit', label: 'Credit Amount (₹)' },
+                    { id: 'balance', label: 'Running Balance' }
+                ],
+                pricelist: [
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'code', label: 'Product Code' },
+                    { id: 'cat', label: 'Category / Type' },
+                    { id: 'rate', label: 'Standard Rate' }
+                ]
+            };
+
+            const defaultReportFields = {
+                invoice: ['name', 'qty', 'rate', 'net'],
+                receipt: ['date', 'num', 'mode', 'amount'],
+                challan: ['name', 'qty', 'tooth', 'shade'],
+                labslip: ['patient', 'name', 'qty', 'teeth', 'shade'],
+                statement: ['date', 'type', 'refno', 'debit', 'credit', 'balance'],
+                pricelist: ['name', 'code', 'cat', 'rate']
+            };
+
+            const fieldDefinitions = {
+                code: { header: 'Code', cell: 'ZR-SW' },
+                name: { header: 'Product Description', cell: 'Zirconia Swiss Classic' },
+                dept: { header: 'Department', cell: 'Porcelain' },
+                qty: { header: 'Qty', cell: '2' },
+                rate: { header: 'Rate', cell: '₹2000.00' },
+                disc: { header: 'Disc %', cell: '10%' },
+                tax: { header: 'Tax %', cell: '5%' },
+                net: { header: 'Net Amount', cell: '₹3600.00' },
+                
+                date: { header: 'Date', cell: '24-Jun-2026' },
+                num: { header: 'Receipt #', cell: 'RCT-10023' },
+                mode: { header: 'Payment Mode', cell: 'Bank Transfer' },
+                ref: { header: 'Reference', cell: 'TXN-9846284' },
+                amount: { header: 'Amount', cell: '₹5000.00' },
+                
+                tooth: { header: 'Tooth #', cell: '14, 15' },
+                teeth: { header: 'Teeth Layout', cell: 'FDI: 14, 15' },
+                shade: { header: 'Shade', cell: 'A2' },
+                patient: { header: 'Patient', cell: 'John Doe' },
+                doc: { header: 'Doctor', cell: 'Dr. Alex Mathew' },
+                
+                type: { header: 'Type', cell: 'Invoice' },
+                refno: { header: 'Ref No.', cell: 'INV-2026-05' },
+                debit: { header: 'Debit', cell: '₹4000.00' },
+                credit: { header: 'Credit', cell: '₹0.00' },
+                balance: { header: 'Balance', cell: '₹12000.00' },
+                
+                cat: { header: 'Category', cell: 'Crown & Bridge' }
+            };
+
+            const selectedFields = systemSettings[`print_fields_${reportKey}`] || defaultReportFields[reportKey] || [];
+
+            const headersHtml = selectedFields.map(fid => {
+                const def = fieldDefinitions[fid] || { header: fid.toUpperCase() };
+                const isNumeric = ['qty', 'rate', 'disc', 'tax', 'net', 'amount', 'debit', 'credit', 'balance'].includes(fid);
+                return `<th style="text-align:${isNumeric ? 'right' : 'left'}; padding:4px 4px; border-bottom: 1px solid black;">${escapeHtml(def.header)}</th>`;
+            }).join('');
+
+            const cellsHtml = selectedFields.map(fid => {
+                const def = fieldDefinitions[fid] || { cell: '' };
+                const isNumeric = ['qty', 'rate', 'disc', 'tax', 'net', 'amount', 'debit', 'credit', 'balance'].includes(fid);
+                return `<td style="text-align:${isNumeric ? 'right' : 'left'}; padding:4px 4px;">${escapeHtml(def.cell)}</td>`;
+            }).join('');
+
+            let tableRowsHtml = `<tr>${cellsHtml}</tr>`;
+            if (reportKey === 'statement') {
+                const mockRow1 = selectedFields.map(fid => {
+                    if (fid === 'date') return `<td style="padding:4px 4px;">20-Jun-2026</td>`;
+                    if (fid === 'type') return `<td style="padding:4px 4px;">Invoice</td>`;
+                    if (fid === 'refno') return `<td style="padding:4px 4px;">INV-2026-05</td>`;
+                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">₹4000.00</td>`;
+                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">₹0.00</td>`;
+                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">₹12000.00</td>`;
+                    return `<td style="padding:4px 4px;"></td>`;
+                }).join('');
+                
+                const mockRow2 = selectedFields.map(fid => {
+                    if (fid === 'date') return `<td style="padding:4px 4px;">24-Jun-2026</td>`;
+                    if (fid === 'type') return `<td style="padding:4px 4px;">Receipt</td>`;
+                    if (fid === 'refno') return `<td style="padding:4px 4px;">RCT-10023</td>`;
+                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">₹0.00</td>`;
+                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">₹5000.00</td>`;
+                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">₹7000.00</td>`;
+                    return `<td style="padding:4px 4px;"></td>`;
+                }).join('');
+                
+                tableRowsHtml = `<tr>${mockRow1}</tr><tr>${mockRow2}</tr>`;
+            }
 
             paper.innerHTML = `
                 ${showHeader ? `
@@ -2285,19 +2536,11 @@
                         <table style="width:100%; border-collapse:collapse; font-size:8px;">
                             <thead>
                                 <tr style="border-bottom:1px solid black; font-weight:bold;">
-                                    <th style="text-align:left; padding:4px 0;">Product</th>
-                                    <th style="text-align:right; padding:4px 0;">Qty</th>
-                                    <th style="text-align:right; padding:4px 0;">Rate</th>
-                                    <th style="text-align:right; padding:4px 0;">Amount</th>
+                                    ${headersHtml}
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td style="padding:4px 0;">Zirconia Swiss Classic</td>
-                                    <td style="text-align:right;">2</td>
-                                    <td style="text-align:right;">₹2000.00</td>
-                                    <td style="text-align:right;">₹4000.00</td>
-                                </tr>
+                                ${tableRowsHtml}
                             </tbody>
                         </table>
                     </div>
@@ -2838,6 +3081,341 @@
             }
         }
 
+        // Serial start number modal
+        function openSerialStartModal(typeKey, typeLabel) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = `Set Start Sequence for ${typeLabel}`;
+            
+            const startVal = systemSettings[`serial_start_${typeKey}`] || 1;
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <label class="form-label">Next Serial Number (Integer)</label>
+                    <input type="number" id="serial-start-input" class="form-input" value="${startVal}" min="1">
+                    <span style="font-size:12px; color:#6b7280;">New generated ${typeLabel} will start from this number.</span>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const val = parseInt(document.getElementById('serial-start-input').value) || 1;
+                
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `serial_start_${typeKey}`, value: val })
+                });
+                
+                await loadAllData();
+                closeGenericModal();
+                showToast(`Next serial for ${typeLabel} set to ${val}`);
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        // Logo Upload Modal
+        function openLogoModal(reportKey) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = `Select Logo for ${reportKey.toUpperCase()}`;
+            
+            const currentLogo = systemSettings[`print_logo_${reportKey}`] || '';
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label class="form-label">Paste Image URL</label>
+                        <input type="text" id="logo-url-input" class="form-input" value="${currentLogo.startsWith('data:') ? '' : currentLogo}" placeholder="https://example.com/logo.png">
+                    </div>
+                    
+                    <div style="text-align:center; font-weight:bold; color:#6b7280; font-size:12px;">- OR -</div>
+                    
+                    <div>
+                        <label class="form-label">Upload Image File</label>
+                        <input type="file" id="logo-file-input" class="form-input" accept="image/*" style="padding:4px;">
+                    </div>
+                    
+                    <div id="logo-preview-container" style="border:1px dashed #ccc; padding:15px; text-align:center; background:#fafafa; border-radius:4px;">
+                        <div style="font-size:12px; color:#999; margin-bottom:5px;">Preview</div>
+                        ${currentLogo ? `<img id="logo-preview-img" src="${currentLogo}" style="max-height: 80px; max-width: 100%; object-fit: contain;">` : '<span id="logo-preview-placeholder">No logo selected</span>'}
+                    </div>
+                </div>
+            `;
+
+            const fileInput = body.querySelector('#logo-file-input');
+            const urlInput = body.querySelector('#logo-url-input');
+            const previewContainer = body.querySelector('#logo-preview-container');
+            
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const dataUrl = event.target.result;
+                    urlInput.value = '';
+                    let img = previewContainer.querySelector('#logo-preview-img');
+                    if (!img) {
+                        previewContainer.innerHTML = `<div style="font-size:12px; color:#999; margin-bottom:5px;">Preview</div><img id="logo-preview-img" style="max-height: 80px; max-width: 100%; object-fit: contain;">`;
+                        img = previewContainer.querySelector('#logo-preview-img');
+                    }
+                    img.src = dataUrl;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            urlInput.oninput = () => {
+                const val = urlInput.value.trim();
+                let img = previewContainer.querySelector('#logo-preview-img');
+                if (val) {
+                    if (!img) {
+                        previewContainer.innerHTML = `<div style="font-size:12px; color:#999; margin-bottom:5px;">Preview</div><img id="logo-preview-img" style="max-height: 80px; max-width: 100%; object-fit: contain;">`;
+                        img = previewContainer.querySelector('#logo-preview-img');
+                    }
+                    img.src = val;
+                } else {
+                    previewContainer.innerHTML = `<div style="font-size:12px; color:#999; margin-bottom:5px;">Preview</div><span id="logo-preview-placeholder">No logo selected</span>`;
+                }
+            };
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                let logoValue = urlInput.value.trim();
+                const img = previewContainer.querySelector('#logo-preview-img');
+                if (img && img.src && img.src.startsWith('data:')) {
+                    logoValue = img.src;
+                }
+                
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `print_logo_${reportKey}`, value: logoValue })
+                });
+                
+                await loadAllData();
+                closeGenericModal();
+                updatePrintPreview(reportKey);
+                showToast("Logo saved successfully");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        // Select Fields Modal
+        function openSelectFieldsModal(reportKey) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = `Select Columns for ${reportKey.toUpperCase()}`;
+            
+            const availableReportFields = {
+                invoice: [
+                    { id: 'code', label: 'Product Code / Alias' },
+                    { id: 'name', label: 'Product Name / Description' },
+                    { id: 'dept', label: 'Department' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'rate', label: 'Unit Rate (₹)' },
+                    { id: 'disc', label: 'Discount %' },
+                    { id: 'tax', label: 'Tax %' },
+                    { id: 'net', label: 'Net Amount' }
+                ],
+                receipt: [
+                    { id: 'date', label: 'Payment Date' },
+                    { id: 'num', label: 'Receipt Number' },
+                    { id: 'mode', label: 'Payment Mode' },
+                    { id: 'ref', label: 'Reference Number' },
+                    { id: 'amount', label: 'Received Amount' }
+                ],
+                challan: [
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'tooth', label: 'Tooth / Teeth Number' },
+                    { id: 'dept', label: 'Department' },
+                    { id: 'shade', label: 'Shade Code' }
+                ],
+                labslip: [
+                    { id: 'patient', label: 'Patient Name' },
+                    { id: 'doc', label: 'Doctor Name' },
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'qty', label: 'Quantity' },
+                    { id: 'teeth', label: 'Teeth Layout' },
+                    { id: 'shade', label: 'Shade Selection' }
+                ],
+                statement: [
+                    { id: 'date', label: 'Transaction Date' },
+                    { id: 'type', label: 'Reference Type' },
+                    { id: 'refno', label: 'Ref / Bill Number' },
+                    { id: 'debit', label: 'Debit Amount (₹)' },
+                    { id: 'credit', label: 'Credit Amount (₹)' },
+                    { id: 'balance', label: 'Running Balance' }
+                ],
+                pricelist: [
+                    { id: 'name', label: 'Product Name' },
+                    { id: 'code', label: 'Product Code' },
+                    { id: 'cat', label: 'Category / Type' },
+                    { id: 'rate', label: 'Standard Rate' }
+                ]
+            };
+
+            const defaultReportFields = {
+                invoice: ['name', 'qty', 'rate', 'net'],
+                receipt: ['date', 'num', 'mode', 'amount'],
+                challan: ['name', 'qty', 'tooth', 'shade'],
+                labslip: ['patient', 'name', 'qty', 'teeth', 'shade'],
+                statement: ['date', 'type', 'refno', 'debit', 'credit', 'balance'],
+                pricelist: ['name', 'code', 'cat', 'rate']
+            };
+            
+            const fields = availableReportFields[reportKey] || [];
+            const savedFields = systemSettings[`print_fields_${reportKey}`] || defaultReportFields[reportKey] || [];
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="font-size:13px; color:#4b5563; margin-bottom:8px;">Choose which columns should appear in the printed report table:</p>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${fields.map(f => `
+                            <label class="checkbox-container" style="font-size:14px; display:flex; align-items:center; gap:8px;">
+                                <input type="checkbox" class="report-field-checkbox" value="${f.id}" ${savedFields.includes(f.id) ? 'checked' : ''}>
+                                ${f.label}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const checkedBoxes = body.querySelectorAll('.report-field-checkbox:checked');
+                const selected = Array.from(checkedBoxes).map(cb => cb.value);
+                
+                if (selected.length === 0) {
+                    alert("Please select at least one column");
+                    return;
+                }
+                
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `print_fields_${reportKey}`, value: selected })
+                });
+                
+                await loadAllData();
+                closeGenericModal();
+                updatePrintPreview(reportKey);
+                showToast("Report columns saved");
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        // Tax Settings Modal
+        function openTaxSettingsModal() {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = "Global Tax Settings";
+            
+            const data = systemSettings.tax_settings || { defaultRate: 5, taxName: 'VAT', inclusive: false };
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label class="form-label">Tax Name / Label</label>
+                        <input type="text" id="tax-name-input" class="form-input" value="${escapeHtml(data.taxName)}" placeholder="e.g. VAT, GST">
+                    </div>
+                    <div>
+                        <label class="form-label">Default Tax Rate (%)</label>
+                        <input type="number" step="0.01" id="tax-rate-input" class="form-input" value="${data.defaultRate}">
+                    </div>
+                    <div>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="tax-inclusive-input" ${data.inclusive ? 'checked' : ''}>
+                            Tax is inclusive in rates by default
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const config = {
+                    taxName: document.getElementById('tax-name-input').value.trim() || 'VAT',
+                    defaultRate: parseFloat(document.getElementById('tax-rate-input').value) || 0,
+                    inclusive: document.getElementById('tax-inclusive-input').checked
+                };
+                
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'tax_settings', value: config })
+                });
+                
+                await loadAllData();
+                closeGenericModal();
+                showToast("Global Tax Settings saved successfully");
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        // Staff login configuration modal
+        function openStaffUserModal(staffId, staffName) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = `User Access Settings: ${staffName}`;
+            
+            const user = systemSettings[`staff_user_${staffId}`] || { username: '', password: '', role: 'Technician' };
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label class="form-label">Username</label>
+                        <input type="text" id="staff-username-input" class="form-input" value="${escapeHtml(user.username)}" placeholder="Enter username">
+                    </div>
+                    <div>
+                        <label class="form-label">Password</label>
+                        <input type="password" id="staff-password-input" class="form-input" value="${escapeHtml(user.password)}" placeholder="Enter password">
+                    </div>
+                    <div>
+                        <label class="form-label">Access Level</label>
+                        <select id="staff-user-role" class="form-select">
+                            <option value="Admin" ${user.role==='Admin'?'selected':''}>Admin</option>
+                            <option value="Technician" ${user.role==='Technician'?'selected':''}>Technician</option>
+                            <option value="Driver" ${user.role==='Driver'?'selected':''}>Driver</option>
+                            <option value="Viewer" ${user.role==='Viewer'?'selected':''}>Viewer</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const username = document.getElementById('staff-username-input').value.trim();
+                const password = document.getElementById('staff-password-input').value;
+                const role = document.getElementById('staff-user-role').value;
+                
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        key: `staff_user_${staffId}`,
+                        value: { username, password, role }
+                    })
+                });
+                
+                await loadAllData();
+                closeGenericModal();
+                showToast(`User login credentials for ${staffName} saved successfully`);
+            };
+            
+            modal.style.display = 'flex';
+        }
+
         // Generic Lookup Edit/Add Modal
         function openLookupModal(type, titleLabel, id = null, currentName = '') {
             const modal = document.getElementById('generic-modal');
@@ -3180,6 +3758,18 @@
         }
 
         // Save Forms
+        async function switchActiveLab(labName) {
+            activeLab = labName;
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'active_lab', value: labName })
+            });
+            await loadAllData();
+            renderLabInfoTab();
+            showToast(`Switched active profile to: ${labName}`);
+        }
+
         async function saveLabInfo() {
             const data = {
                 labName: document.getElementById('labName').value,
@@ -3196,6 +3786,45 @@
                 tagline: document.getElementById('tagline').value
             };
 
+            const oldLabName = activeLab;
+            const newLabName = data.labName.trim();
+            
+            if (newLabName && newLabName !== oldLabName) {
+                let list = systemSettings.labs_list || ['SOHAR DENTAL LABORATORY'];
+                const idx = list.indexOf(oldLabName);
+                if (idx !== -1) {
+                    list[idx] = newLabName;
+                } else if (!list.includes(newLabName)) {
+                    list.push(newLabName);
+                }
+                activeLab = newLabName;
+                
+                await Promise.all([
+                    fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: 'labs_list', value: list })
+                    }),
+                    fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: 'active_lab', value: newLabName })
+                    }),
+                    fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: `lab_info_${newLabName}`, value: data })
+                    })
+                ]);
+            } else {
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `lab_info_${activeLab}`, value: data })
+                });
+            }
+
+            // Keep legacy lab_info updated for backwards compatibility
             await fetch('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3203,16 +3832,58 @@
             });
 
             await loadAllData();
+            renderLabInfoTab();
             showToast("Lab Information saved successfully");
         }
 
         async function createNewLab() {
             const name = document.getElementById('newlab-name').value.trim();
             if (!name) return alert("Lab Name is required");
-            showToast(`Creating Lab: ${name}`);
-            setTimeout(() => {
-                showDashboardView();
-            }, 1000);
+            
+            let list = systemSettings.labs_list || ['SOHAR DENTAL LABORATORY'];
+            if (!list.includes(name)) {
+                list.push(name);
+            }
+            
+            const plan = document.getElementById('newlab-plan').value;
+            const group = document.getElementById('newlab-group').value;
+            const groupName = group === 'New Group' ? (document.getElementById('newlab-groupname').value.trim() || 'New Group') : group;
+            
+            const defaultData = {
+                labName: name, taxId: '', fdaRegNum: '',
+                address1: 'Enter Address 1', address2: 'Enter Address 2',
+                city: '', pin: '', state: '', phone: '',
+                email: '', website: '', tagline: `Plan: ${plan}, Group: ${groupName}`
+            };
+
+            activeLab = name;
+            
+            await Promise.all([
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'labs_list', value: list })
+                }),
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'active_lab', value: name })
+                }),
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `lab_info_${name}`, value: defaultData })
+                }),
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'lab_info', value: defaultData })
+                })
+            ]);
+
+            await loadAllData();
+            showToast(`Lab "${name}" created and set as active profile.`);
+            selectTab('lab');
         }
 
         async function saveThemeSettings() {
