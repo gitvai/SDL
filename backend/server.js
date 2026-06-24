@@ -2100,7 +2100,405 @@ app.get('/api/clients/:id/financial-summary', async (req, res) => {
   }
 });
 
+// --- SYSTEM SETTINGS ---
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await prisma.systemSetting.findMany();
+    const result = {};
+    settings.forEach(s => {
+      try {
+        result[s.key] = JSON.parse(s.value);
+      } catch (e) {
+        result[s.key] = s.value;
+      }
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
+app.get('/api/settings/:key', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: req.params.key }
+    });
+    if (!setting) return res.json(null);
+    try {
+      res.json(JSON.parse(setting.value));
+    } catch (e) {
+      res.json(setting.value);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/settings', async (req, res) => {
+  try {
+    const { key, value } = req.body;
+    if (!key) return res.status(400).json({ error: 'Key is required' });
+    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const setting = await prisma.systemSetting.upsert({
+      where: { key },
+      update: { value: stringValue },
+      create: { key, value: stringValue }
+    });
+    res.json(setting);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- SETTING LOOKUPS ---
+app.get('/api/lookups', async (req, res) => {
+  try {
+    const { type } = req.query;
+    const where = type ? { type } : {};
+    const lookups = await prisma.settingLookup.findMany({
+      where,
+      orderBy: { name: 'asc' }
+    });
+    res.json(lookups);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/lookups', async (req, res) => {
+  try {
+    const { type, name } = req.body;
+    if (!type || !name) return res.status(400).json({ error: 'Type and name are required' });
+    const lookup = await prisma.settingLookup.create({
+      data: { type, name }
+    });
+    res.status(201).json(lookup);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/lookups/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name is required' });
+    const lookup = await prisma.settingLookup.update({
+      where: { id },
+      data: { name }
+    });
+    res.json(lookup);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/lookups/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.settingLookup.delete({
+      where: { id }
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- STAFF CRUD ---
+app.get('/api/staff', async (req, res) => {
+  try {
+    const staff = await prisma.staff.findMany({
+      orderBy: { name: 'asc' }
+    });
+    res.json(staff);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/staff', async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (data.salary !== undefined) data.salary = toNum(data.salary);
+    const staff = await prisma.staff.create({ data });
+    res.status(201).json(staff);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/staff/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const data = { ...req.body };
+    if (data.salary !== undefined) data.salary = toNum(data.salary);
+    // Remove relation field if any
+    delete data.deliveryPlans;
+    const staff = await prisma.staff.update({
+      where: { id },
+      data
+    });
+    res.json(staff);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/staff/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.staff.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- PRODUCT TYPES CRUD ---
+app.get('/api/product-types', async (req, res) => {
+  try {
+    const types = await prisma.productType.findMany({
+      orderBy: { name: 'asc' }
+    });
+    res.json(types);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/product-types', async (req, res) => {
+  try {
+    const data = { ...req.body };
+    const type = await prisma.productType.create({ data });
+    res.status(201).json(type);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/product-types/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const data = { ...req.body };
+    const type = await prisma.productType.update({
+      where: { id },
+      data
+    });
+    res.json(type);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/product-types/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.productType.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- PRODUCTS CRUD ---
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { name: 'asc' }
+    });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/products', async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (data.charge !== undefined) data.charge = toNum(data.charge);
+    const product = await prisma.product.create({ data });
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const data = { ...req.body };
+    if (data.charge !== undefined) data.charge = toNum(data.charge);
+    const product = await prisma.product.update({
+      where: { id },
+      data
+    });
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.product.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- MATERIALS CRUD (INVENTORY ITEMS) ---
+app.get('/api/materials', async (req, res) => {
+  try {
+    const materials = await prisma.material.findMany({
+      orderBy: { name: 'asc' }
+    });
+    res.json(materials);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/materials', async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (data.stock !== undefined) data.stock = toNum(data.stock);
+    if (data.minStock !== undefined) data.minStock = toNum(data.minStock);
+    const material = await prisma.material.create({ data });
+    res.status(201).json(material);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/materials/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const data = { ...req.body };
+    if (data.stock !== undefined) data.stock = toNum(data.stock);
+    if (data.minStock !== undefined) data.minStock = toNum(data.minStock);
+    const material = await prisma.material.update({
+      where: { id },
+      data
+    });
+    res.json(material);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/materials/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.material.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- SYSTEM SETTINGS CRUD ---
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await prisma.systemSetting.findMany();
+    const settingsObj = {};
+    for (const s of settings) {
+      try {
+        settingsObj[s.key] = JSON.parse(s.value);
+      } catch (e) {
+        settingsObj[s.key] = s.value;
+      }
+    }
+    res.json(settingsObj);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/settings/:key', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: req.params.key }
+    });
+    if (!setting) return res.status(404).json({ error: 'Setting not found' });
+    try {
+      res.json({ key: setting.key, value: JSON.parse(setting.value) });
+    } catch (e) {
+      res.json({ key: setting.key, value: setting.value });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/settings', async (req, res) => {
+  try {
+    const { key, value } = req.body;
+    const valStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const setting = await prisma.systemSetting.upsert({
+      where: { key },
+      update: { value: valStr },
+      create: { key, value: valStr }
+    });
+    res.json(setting);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- SETTING LOOKUPS CRUD ---
+app.get('/api/lookups', async (req, res) => {
+  try {
+    const { type } = req.query;
+    const where = type ? { type } : {};
+    const lookups = await prisma.settingLookup.findMany({
+      where,
+      orderBy: { name: 'asc' }
+    });
+    res.json(lookups);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/lookups', async (req, res) => {
+  try {
+    const { type, name } = req.body;
+    if (!type || !name) return res.status(400).json({ error: 'Missing type or name' });
+    const lookup = await prisma.settingLookup.create({
+      data: { type, name }
+    });
+    res.status(201).json(lookup);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/lookups/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name } = req.body;
+    const lookup = await prisma.settingLookup.update({
+      where: { id },
+      data: { name }
+    });
+    res.json(lookup);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/lookups/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.settingLookup.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 const server = app.listen(PORT, () => {
   console.log(`[${new Date().toLocaleTimeString()}] Server is successfully running on port ${PORT}`);

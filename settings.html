@@ -1,0 +1,3402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Command | Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="transitions.js"></script>
+    <style>
+        .settings-grid-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 15px;
+        }
+        .settings-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .category-label-box {
+            width: 160px;
+            min-width: 160px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-weight: 700;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .category-label-box:hover {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .settings-buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .settings-sub-btn {
+            background: white;
+            border: 1px solid #3b82f6;
+            color: #2563eb;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .settings-sub-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+        
+        /* INNER PAGE STYLE */
+        .inner-settings-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+        }
+        .settings-sidebar {
+            width: 200px;
+            min-width: 200px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .settings-sidebar-item {
+            padding: 12px 18px;
+            color: #2563eb;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .settings-sidebar-item:hover, .settings-sidebar-item.active {
+            background: #f0f9ff;
+            border-left-color: #2563eb;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+        .settings-content-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .tab-row-container {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 2px;
+            margin-bottom: 15px;
+        }
+        .tab-item-btn {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2563eb;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+        .tab-item-btn:hover {
+            color: #1d4ed8;
+        }
+        .tab-item-btn.active {
+            border-bottom-color: #ec4899;
+            color: #ec4899;
+        }
+        
+        /* GENERAL UTILS */
+        .settings-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group-full {
+            grid-column: span 2;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+        .checkbox-container input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .lookup-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .settings-table th, .settings-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        .settings-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .settings-table tr:hover {
+            background: #fbfbfb;
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .btn-sm.edit {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #2563eb;
+        }
+        .btn-sm.delete {
+            background: #fdf2f8;
+            border-color: #fbcfe8;
+            color: #db2777;
+        }
+        .btn-sm.user {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #059669;
+        }
+        .btn-primary-settings {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary-settings:hover {
+            background: #1d4ed8;
+        }
+        .btn-secondary-settings {
+            background: white;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-secondary-settings:hover {
+            background: #f3f4f6;
+        }
+
+        /* PRINT PREVIEW */
+        .print-layout-container {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+        }
+        .print-sidebar-form {
+            width: 45%;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .print-preview-pane {
+            width: 55%;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            background: #525659;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+        .paper-sheet {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            min-height: 600px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            font-size: 10px;
+            color: black;
+        }
+
+        /* CARD/THEME STYLING */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .theme-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+        .theme-card:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .theme-card.active {
+            border-color: #ec4899;
+            background: #fdf2f8;
+            outline: 2px solid #ec4899;
+        }
+        .theme-card img {
+            width: 100%;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .theme-card span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* LABEL PREVIEW */
+        .labels-grid-preview {
+            display: grid;
+            gap: 8px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            background: #fafafa;
+        }
+        .label-cell-mock {
+            border: 1px solid #ddd;
+            background: white;
+            padding: 8px;
+            font-size: 9px;
+            font-family: monospace;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* MODAL */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .settings-modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .settings-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .settings-modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .settings-modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-section" style="text-decoration: none;">
+            <img src="logo.jpeg" alt="SOHAR DENTAL LAB" style="height: 45px; object-fit: contain;">
+            <span>SOHAR DENTAL LAB</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">HOME</a>
+            <a href="clients.html">CLIENTS</a>
+            <a href="orders.html">ORDERS</a>
+            <a href="shipments.html">SHIPMENTS</a>
+            <a href="accounts.html">ACCOUNTS</a>
+            <a href="office.html">OFFICE</a>
+            <a href="reports.html">REPORTS</a>
+            <a href="settings.html" class="active">SETTINGS</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Main Scrollable Main Block -->
+        <main style="padding: 24px;">
+            <div class="page-header" style="margin-bottom: 15px;">
+                <div class="page-title" style="display: flex; align-items: center; gap: 15px;">
+                    <h1 id="page-title-text" style="font-size: 24px; font-weight: 700; margin: 0;">Settings</h1>
+                    <a href="javascript:void(0)" id="main-menu-link" onclick="showDashboardView()" style="font-size: 14px; font-weight: 600; color: #2563eb; text-decoration: underline; display: none;">Main Menu</a>
+                </div>
+            </div>
+
+            <!-- DASHBOARD GRID VIEW (Start/Home View of settings) -->
+            <div id="settings-dashboard-view">
+                <div class="settings-grid-layout">
+                    <!-- Row 1: Lab -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('lab', 'lab')">
+                            <i class="fas fa-flask" style="color: #ec4899;"></i> Lab
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('lab', 'lab')">Lab</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('lab', 'staff')">Staff</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('lab', 'departments')">Departments</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('lab', 'theme')">Theme</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('lab', 'newlab')">New Lab</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Orders -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('orders', 'enclosures')">
+                            <i class="fas fa-calendar-check" style="color: #3b82f6;"></i> Orders
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('orders', 'enclosures')">Enclosures</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('orders', 'priorities')">Priorities</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('orders', 'taxoptions')">Tax Options</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('orders', 'manulabs')">Manufacturer Labs</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Clients -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('clients', 'categories')">
+                            <i class="fas fa-users" style="color: #10b981;"></i> Clients
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('clients', 'categories')">Categories</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('clients', 'pricebands')">Price Bands</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('clients', 'paymentmodes')">Payment Modes</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('clients', 'collcentres')">Collection Centres</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Production -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('production', 'prodtypes')">
+                            <i class="fas fa-palette" style="color: #8b5cf6;"></i> Production
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('production', 'prodtypes')">Product Types</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('production', 'products')">Products</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('production', 'shadeguides')">Shade Guides</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Operations -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('operations', 'delivmethods')">
+                            <i class="fas fa-truck" style="color: #06b6d4;"></i> Operations
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('operations', 'delivmethods')">Delivery Methods</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('operations', 'routes')">Routes</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('operations', 'holdreasons')">Hold Reasons</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('operations', 'timeslots')">TimeSlots</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('operations', 'logistics')">Logistics</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 6: Application -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('application', 'appoptions')">
+                            <i class="fas fa-cogs" style="color: #f59e0b;"></i> Application
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('application', 'appoptions')">App Options</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('application', 'serials')">Serials</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('application', 'ordersettings')">Order Settings</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('application', 'statuscolors')">Status Colors</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 7: Messaging -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('messaging', 'messages')">
+                            <i class="fas fa-envelope" style="color: #3b82f6;"></i> Messaging
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('messaging', 'messages')">Messages</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('messaging', 'whatsapp')">WhatsApp</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 8: Print Settings -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('printsettings', 'invoice')">
+                            <i class="fas fa-print" style="color: #6366f1;"></i> Print Settings
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'invoice')">Invoice</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'receipt')">Receipt</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'challan')">Challan</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'labslip')">Lab Slip</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'statement')">Statement</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('printsettings', 'pricelist')">Price List</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 9: Labels -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('labels', 'modellabel')">
+                            <i class="fas fa-tags" style="color: #db2777;"></i> Labels
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'modellabel')">Model Label</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'warrantycard')">Warranty Card</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'mailinglabel')">Mailing Labels</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'dispatchlabel')">Dispatch Labels</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'ordersticker')">Order Sticker</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('labels', 'jobsticker')">Job Sticker</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 10: Accounts -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('accounts', 'expheads')">
+                            <i class="fas fa-wallet" style="color: #10b981;"></i> Accounts
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('accounts', 'expheads')">Expense Heads</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('accounts', 'bankac')">Bank A/Cs</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('accounts', 'creditadj')">Credit Adjustment Types</button>
+                        </div>
+                    </div>
+
+                    <!-- Row 11: Inventory -->
+                    <div class="settings-row">
+                        <div class="category-label-box" onclick="switchToCategory('inventory', 'suppliers')">
+                            <i class="fas fa-dolly-flatbed" style="color: #3b82f6;"></i> Inventory
+                        </div>
+                        <div class="settings-buttons-container">
+                            <button class="settings-sub-btn" onclick="switchToCategory('inventory', 'suppliers')">Suppliers</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('inventory', 'stockcat')">Stock Categories</button>
+                            <button class="settings-sub-btn" onclick="switchToCategory('inventory', 'items')">Items</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETAIL PAGE INNER CONTAINER -->
+            <div id="settings-inner-view" class="inner-settings-container" style="display: none;">
+                <!-- Category Sidebar -->
+                <div class="settings-sidebar">
+                    <div class="settings-sidebar-item" id="sidebar-lab" onclick="selectCategory('lab')"><i class="fas fa-flask"></i> Lab</div>
+                    <div class="settings-sidebar-item" id="sidebar-orders" onclick="selectCategory('orders')"><i class="fas fa-calendar-check"></i> Orders</div>
+                    <div class="settings-sidebar-item" id="sidebar-clients" onclick="selectCategory('clients')"><i class="fas fa-users"></i> Clients</div>
+                    <div class="settings-sidebar-item" id="sidebar-production" onclick="selectCategory('production')"><i class="fas fa-palette"></i> Production</div>
+                    <div class="settings-sidebar-item" id="sidebar-operations" onclick="selectCategory('operations')"><i class="fas fa-truck"></i> Operations</div>
+                    <div class="settings-sidebar-item" id="sidebar-application" onclick="selectCategory('application')"><i class="fas fa-cogs"></i> Application</div>
+                    <div class="settings-sidebar-item" id="sidebar-messaging" onclick="selectCategory('messaging')"><i class="fas fa-envelope"></i> Messaging</div>
+                    <div class="settings-sidebar-item" id="sidebar-printsettings" onclick="selectCategory('printsettings')"><i class="fas fa-print"></i> Print Settings</div>
+                    <div class="settings-sidebar-item" id="sidebar-labels" onclick="selectCategory('labels')"><i class="fas fa-tags"></i> Labels</div>
+                    <div class="settings-sidebar-item" id="sidebar-accounts" onclick="selectCategory('accounts')"><i class="fas fa-wallet"></i> Accounts</div>
+                    <div class="settings-sidebar-item" id="sidebar-inventory" onclick="selectCategory('inventory')"><i class="fas fa-dolly-flatbed"></i> Inventory</div>
+                </div>
+
+                <!-- Settings Content Pane -->
+                <div class="settings-content-pane">
+                    <!-- Dynamic Sub-Tab Row -->
+                    <div class="tab-row-container" id="category-tabs-container">
+                        <!-- Sub tabs loaded dynamically -->
+                    </div>
+
+                    <!-- Inner settings content based on active category & sub tab -->
+                    <div id="tab-content-panel">
+                        <!-- Form or table or view goes here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- GENERIC EDIT / ADD MODAL -->
+    <div id="generic-modal" class="settings-modal">
+        <div class="settings-modal-content">
+            <div class="settings-modal-header">
+                <h3 id="modal-title">New Entry</h3>
+                <button class="settings-modal-close" onclick="closeGenericModal()">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- Loaded dynamically -->
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+                <button class="btn-secondary-settings" onclick="closeGenericModal()">Cancel</button>
+                <button class="btn-primary-settings" id="modal-save-btn" onclick="saveGenericModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-notif" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 6px; z-index: 11000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 600;">
+        Settings saved successfully!
+    </div>
+
+    <script>
+        // Global Data Cache
+        let systemSettings = {};
+        let lookupsList = [];
+        let staffList = [];
+        let productsList = [];
+        let productTypesList = [];
+        let materialsList = [];
+        
+        let activeCategory = 'lab';
+        let activeTab = 'lab';
+        
+        // Define subtabs configuration
+        const subTabsConfig = {
+            lab: [
+                { id: 'lab', label: 'Lab' },
+                { id: 'staff', label: 'Staff' },
+                { id: 'departments', label: 'Departments' },
+                { id: 'theme', label: 'Theme' },
+                { id: 'newlab', label: 'New Lab' }
+            ],
+            orders: [
+                { id: 'enclosures', label: 'Enclosures' },
+                { id: 'priorities', label: 'Priorities' },
+                { id: 'taxoptions', label: 'Tax Options' },
+                { id: 'manulabs', label: 'Manufacturer Labs' }
+            ],
+            clients: [
+                { id: 'categories', label: 'Categories' },
+                { id: 'pricebands', label: 'Price Bands' },
+                { id: 'paymentmodes', label: 'Payment Modes' },
+                { id: 'collcentres', label: 'Collection Centres' }
+            ],
+            production: [
+                { id: 'prodtypes', label: 'Product Types' },
+                { id: 'products', label: 'Products' },
+                { id: 'shadeguides', label: 'Shade Guides' }
+            ],
+            operations: [
+                { id: 'delivmethods', label: 'Delivery Methods' },
+                { id: 'routes', label: 'Routes' },
+                { id: 'holdreasons', label: 'Hold Reasons' },
+                { id: 'timeslots', label: 'TimeSlots' },
+                { id: 'logistics', label: 'Logistics' }
+            ],
+            application: [
+                { id: 'appoptions', label: 'App Options' },
+                { id: 'serials', label: 'Serials' },
+                { id: 'ordersettings', label: 'Order Settings' },
+                { id: 'statuscolors', label: 'Status Colors' }
+            ],
+            messaging: [
+                { id: 'messages', label: 'Messages' },
+                { id: 'whatsapp', label: 'WhatsApp' }
+            ],
+            printsettings: [
+                { id: 'invoice', label: 'Invoice' },
+                { id: 'receipt', label: 'Receipt' },
+                { id: 'challan', label: 'Challan' },
+                { id: 'labslip', label: 'Lab Slip' },
+                { id: 'statement', label: 'Statement' },
+                { id: 'pricelist', label: 'Price List' }
+            ],
+            labels: [
+                { id: 'modellabel', label: 'Model Label' },
+                { id: 'warrantycard', label: 'Warranty Card' },
+                { id: 'mailinglabel', label: 'Mailing Labels' },
+                { id: 'dispatchlabel', label: 'Dispatch Labels' },
+                { id: 'ordersticker', label: 'Order Sticker' },
+                { id: 'jobsticker', label: 'Job Sticker' }
+            ],
+            accounts: [
+                { id: 'expheads', label: 'Expense Heads' },
+                { id: 'bankac', label: 'Bank A/Cs' },
+                { id: 'creditadj', label: 'Credit Adjustment Types' }
+            ],
+            inventory: [
+                { id: 'suppliers', label: 'Suppliers' },
+                { id: 'stockcat', label: 'Stock Categories' },
+                { id: 'items', label: 'Items' }
+            ]
+        };
+
+        // On Load initialization
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadAllData();
+            // Show main grid initially
+            showDashboardView();
+        });
+
+        // Load all data from API endpoints
+        async function loadAllData() {
+            try {
+                // Fetch basic entities and configs
+                const [settingsRes, lookupsRes, staffRes, productsRes, prodTypesRes, materialsRes] = await Promise.all([
+                    fetch('/api/settings').then(r => r.json()),
+                    fetch('/api/lookups').then(r => r.json()),
+                    fetch('/api/staff').then(r => r.json()),
+                    fetch('/api/products').then(r => r.json()),
+                    fetch('/api/product-types').then(r => r.json()),
+                    fetch('/api/materials').then(r => r.json())
+                ]);
+                
+                systemSettings = settingsRes || {};
+                lookupsList = lookupsRes || [];
+                staffList = staffRes || [];
+                productsList = productsRes || [];
+                productTypesList = prodTypesRes || [];
+                materialsList = materialsRes || [];
+            } catch (err) {
+                console.error("Error loading settings data:", err);
+            }
+        }
+
+        function showToast(msg = "Settings saved successfully!") {
+            const toast = document.getElementById('toast-notif');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Navigation Controllers
+        function showDashboardView() {
+            document.getElementById('settings-dashboard-view').style.display = 'block';
+            document.getElementById('settings-inner-view').style.display = 'none';
+            document.getElementById('main-menu-link').style.display = 'none';
+            document.getElementById('page-title-text').textContent = 'Settings';
+        }
+
+        function switchToCategory(categoryKey, subTabKey) {
+            document.getElementById('settings-dashboard-view').style.display = 'none';
+            document.getElementById('settings-inner-view').style.display = 'flex';
+            document.getElementById('main-menu-link').style.display = 'inline-block';
+            
+            selectCategory(categoryKey, subTabKey);
+        }
+
+        function selectCategory(categoryKey, subTabKey = null) {
+            activeCategory = categoryKey;
+            
+            // Highlight sidebar item
+            document.querySelectorAll('.settings-sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeSidebarItem = document.getElementById('sidebar-' + categoryKey);
+            if (activeSidebarItem) activeSidebarItem.classList.add('active');
+
+            // Render horizontal tabs
+            const tabsContainer = document.getElementById('category-tabs-container');
+            tabsContainer.innerHTML = '';
+            
+            const tabs = subTabsConfig[categoryKey] || [];
+            tabs.forEach(tab => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-item-btn';
+                btn.id = 'tab-btn-' + tab.id;
+                btn.textContent = tab.label;
+                btn.onclick = () => selectTab(tab.id);
+                tabsContainer.appendChild(btn);
+            });
+
+            // Set active page title
+            const categoryName = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+            document.getElementById('page-title-text').textContent = `Settings > ${categoryName}`;
+
+            // Select subtab
+            const defaultTab = subTabKey || (tabs[0] ? tabs[0].id : null);
+            if (defaultTab) {
+                selectTab(defaultTab);
+            }
+        }
+
+        function selectTab(tabKey) {
+            activeTab = tabKey;
+            
+            // Highlight active horizontal tab
+            document.querySelectorAll('.tab-item-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById('tab-btn-' + tabKey);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Render sub-tab content pane
+            renderTabContent(tabKey);
+        }
+
+        // Render tab layout based on active sub tab
+        function renderTabContent(tabKey) {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = '';
+
+            // Handle lookups tables
+            const lookupsMapping = {
+                departments: { type: 'department', title: 'Departments', placeholder: 'Acrylic, Metal, Porcelain...' },
+                enclosures: { type: 'enclosure', title: 'Enclosures', placeholder: 'Bite, Impression, Photos...' },
+                priorities: { type: 'priority', title: 'Priorities', placeholder: 'Normal, Urgent, ASAP...' },
+                categories: { type: 'category', title: 'Categories', placeholder: 'VIP, Regular, Favorite...' },
+                pricebands: { type: 'price_band', title: 'Price Bands', placeholder: 'Standard, International...' },
+                holdreasons: { type: 'hold_reason', title: 'Hold Reasons', placeholder: 'Design not clear, Improper Impression...' },
+                timeslots: { type: 'time_slot', title: 'TimeSlots', placeholder: 'Morning, Afternoon, Evening...' },
+                creditadj: { type: 'credit_adjustment_type', title: 'Credit Adjustment Types', placeholder: 'Discount, Write Off...' },
+                stockcat: { type: 'stock_category', title: 'Stock Categories', placeholder: 'Acrylic, Alginate, Buffs...' },
+                delivmethods: { type: 'delivery_method', title: 'Delivery Methods', placeholder: 'Courier, Delivery Boy...' },
+                routes: { type: 'route', title: 'Delivery Routes', placeholder: 'Default, Route A, Route B...' },
+                collcentres: { type: 'collection_centre', title: 'Collection Centres', placeholder: 'Main Office, Branch...' },
+                shadeguides: { type: 'shade_guide', title: 'Shade Guides', placeholder: 'Vita Classic, VITA 3D-MASTER...' },
+                manulabs: { type: 'manufacturer_lab', title: 'Manufacturer Labs', placeholder: 'Lab A, Lab B...' }
+            };
+
+            if (lookupsMapping[tabKey]) {
+                renderLookupTab(lookupsMapping[tabKey].type, lookupsMapping[tabKey].title, lookupsMapping[tabKey].placeholder);
+                return;
+            }
+
+            // Route to specific screen rendering
+            switch (tabKey) {
+                case 'lab':
+                    renderLabInfoTab();
+                    break;
+                case 'staff':
+                    renderStaffTab();
+                    break;
+                case 'theme':
+                    renderThemeTab();
+                    break;
+                case 'newlab':
+                    renderNewLabTab();
+                    break;
+                case 'taxoptions':
+                    renderTaxOptionsTab();
+                    break;
+                case 'paymentmodes':
+                    renderPaymentModesTab();
+                    break;
+                case 'prodtypes':
+                    renderProductTypesTab();
+                    break;
+                case 'products':
+                    renderProductsTab();
+                    break;
+                case 'logistics':
+                    renderLogisticsTab();
+                    break;
+                case 'appoptions':
+                    renderAppOptionsTab();
+                    break;
+                case 'serials':
+                    renderSerialsTab();
+                    break;
+                case 'ordersettings':
+                    renderOrderSettingsTab();
+                    break;
+                case 'statuscolors':
+                    renderStatusColorsTab();
+                    break;
+                case 'messages':
+                    renderMessagesTab();
+                    break;
+                case 'whatsapp':
+                    renderWhatsAppTab();
+                    break;
+                
+                // Print Settings
+                case 'invoice':
+                case 'receipt':
+                case 'challan':
+                case 'labslip':
+                case 'statement':
+                case 'pricelist':
+                    renderPrintReportTab(tabKey);
+                    break;
+
+                // Label Settings
+                case 'modellabel':
+                case 'warrantycard':
+                case 'mailinglabel':
+                case 'dispatchlabel':
+                case 'ordersticker':
+                case 'jobsticker':
+                    renderLabelTab(tabKey);
+                    break;
+
+                case 'expheads':
+                    renderExpenseHeadsTab();
+                    break;
+                case 'bankac':
+                    renderBankACsTab();
+                    break;
+                case 'suppliers':
+                    renderSuppliersTab();
+                    break;
+                case 'items':
+                    renderInventoryItemsTab();
+                    break;
+                default:
+                    panel.innerHTML = `<h3>Tab ${tabKey} is under construction</h3>`;
+            }
+        }
+
+        // ==========================================
+        // SCREEN RENDERERS
+        // ==========================================
+
+        // Generic Lookup Manager Rendering
+        function renderLookupTab(type, title, placeholder) {
+            const panel = document.getElementById('tab-content-panel');
+            const filteredLookups = lookupsList.filter(l => l.type === type);
+            
+            panel.innerHTML = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size:18px; font-weight:700; margin-bottom:15px; color:#1f2937;">${title}</h2>
+                    <div class="lookup-controls">
+                        <input type="text" id="new-lookup-name" class="form-input" style="flex: 1;" placeholder="${placeholder}" onkeydown="if(event.key==='Enter') addLookupItem('${type}')">
+                        <button class="btn-primary-settings" onclick="addLookupItem('${type}')">Add</button>
+                    </div>
+                    <div style="font-weight: 600; color: #4b5563; margin-bottom: 8px;">Available entries:</div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width: 80px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredLookups.length === 0 ? `<tr><td colspan="3" style="text-align:center; color:#999;">No entries found. Type new entry above to add.</td></tr>` : ''}
+                            ${filteredLookups.map((item, idx) => `
+                                <tr>
+                                    <td>${idx + 1}</td>
+                                    <td id="lookup-name-td-${item.id}">${escapeHtml(item.name)}</td>
+                                    <td style="text-align: center;">
+                                        <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Lab Information Screen
+        function renderLabInfoTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.lab_info || {
+                labName: 'SOHAR DENTAL LABORATORY', taxId: '', fdaRegNum: '',
+                address1: 'AL HAMBAR, C.R.NO. 3203549', address2: 'MOH NO. 1771',
+                city: 'WEST SOHAR', pin: '311', state: '', phone: '+96899622728',
+                email: 'sohardental@gmail.com', website: '', tagline: ''
+            };
+
+            panel.innerHTML = `
+                <div style="max-width: 600px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Lab Information</h2>
+                        <button class="btn-primary-settings" onclick="saveLabInfo()">Save</button>
+                    </div>
+                    <div class="settings-form-grid">
+                        <div class="form-group-full">
+                            <label class="form-label">Lab Name</label>
+                            <input type="text" id="labName" class="form-input" value="${escapeHtml(data.labName)}">
+                        </div>
+                        <div>
+                            <label class="form-label">Tax ID</label>
+                            <input type="text" id="taxId" class="form-input" value="${escapeHtml(data.taxId)}">
+                        </div>
+                        <div>
+                            <label class="form-label">FDA Registration No.</label>
+                            <input type="text" id="fdaRegNum" class="form-input" value="${escapeHtml(data.fdaRegNum)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">Address</label>
+                            <input type="text" id="address1" class="form-input" style="margin-bottom:8px;" value="${escapeHtml(data.address1)}">
+                            <input type="text" id="address2" class="form-input" value="${escapeHtml(data.address2)}">
+                        </div>
+                        <div>
+                            <label class="form-label">City</label>
+                            <input type="text" id="city" class="form-input" value="${escapeHtml(data.city)}">
+                        </div>
+                        <div>
+                            <label class="form-label">Pin</label>
+                            <input type="text" id="pin" class="form-input" value="${escapeHtml(data.pin)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">Province / State</label>
+                            <input type="text" id="state" class="form-input" value="${escapeHtml(data.state)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="phone" class="form-input" value="${escapeHtml(data.phone)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">email</label>
+                            <input type="email" id="email" class="form-input" value="${escapeHtml(data.email)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">Web Site</label>
+                            <input type="text" id="website" class="form-input" value="${escapeHtml(data.website)}">
+                        </div>
+                        <div class="form-group-full">
+                            <label class="form-label">Tag line</label>
+                            <input type="text" id="tagline" class="form-input" value="${escapeHtml(data.tagline)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Staff Screen
+        function renderStaffTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937;">Staff</h2>
+                        <button class="btn-primary-settings" onclick="openStaffModal()">New</button>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Search</label>
+                            <input type="text" id="staff-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterStaffTable()">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Staff Type</label>
+                            <select id="staff-type-filter" class="form-select" style="width:150px;" onchange="filterStaffTable()">
+                                <option value="All">All</option>
+                                <option value="Lab Administrator">Lab Administrator</option>
+                                <option value="Technician">Technician</option>
+                                <option value="Driver">Driver</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th>User Group</th>
+                                <th>Department</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th style="width:220px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body">
+                            <!-- Populated in loadStaffTable -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadStaffTable();
+        }
+
+        function loadStaffTable() {
+            const tbody = document.getElementById('staff-table-body');
+            const search = document.getElementById('staff-search').value.toLowerCase();
+            const filterType = document.getElementById('staff-type-filter').value;
+            tbody.innerHTML = '';
+
+            let filtered = staffList;
+            if (search) {
+                filtered = filtered.filter(s => s.name.toLowerCase().includes(search));
+            }
+            if (filterType !== 'All') {
+                filtered = filtered.filter(s => s.role === filterType);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999;">No staff members found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((staff, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(staff.name)}</td>
+                        <td>${escapeHtml(staff.role || '')}</td>
+                        <td>${escapeHtml(staff.department || '')}</td>
+                        <td>${escapeHtml(staff.contact || '')}</td>
+                        <td><span style="color:${staff.status === 'Active' ? '#10b981' : '#ef4444'}; font-weight:600;">${staff.status}</span></td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openStaffModal(${staff.id})">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteStaff(${staff.id})">Delete</button>
+                            <button class="btn-sm user" onclick="showToast('User settings loaded for ' + '${staff.name}')">User</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterStaffTable() {
+            loadStaffTable();
+        }
+
+        // Theme selection Screen
+        function renderThemeTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const activeTheme = systemSettings.theme || 'Flick';
+            const transitions = systemSettings.transitions || { page: 'None', list: 'Grow', subview: 'Rotate Top Left', readonly: 'Wave' };
+
+            const themes = ['DrKlick', 'Blitzer', 'Flick', 'Humanity', 'Overcast', 'Redmond', 'Smoothness', 'Start', 'Sunny', 'UI Lightness', 'Pepper Grinder', 'Absolution'];
+            
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Theme Management</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="renderThemeTab()">Reset</button>
+                            <button class="btn-primary-settings" onclick="saveThemeSettings()">Save</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:30px;">
+                        <!-- Left Side -->
+                        <div style="width: 250px; display:flex; flex-direction:column; gap:15px;">
+                            <div style="border:1px solid #ccc; border-radius:6px; padding:15px; text-align:center;">
+                                <h3 style="font-size:14px; margin-bottom:10px;">Current theme</h3>
+                                <div style="border:1px solid #ddd; padding:10px; background:white; font-weight:bold; color:#ec4899; font-size:16px;">
+                                    ${activeTheme}
+                                </div>
+                            </div>
+                            <div style="border:1px solid #ccc; border-radius:6px; padding:15px;">
+                                <h3 style="font-size:14px; margin-bottom:12px;">Transitions</h3>
+                                <div style="display:flex; flex-direction:column; gap:10px;">
+                                    <div>
+                                        <label class="form-label">Page</label>
+                                        <select id="theme-trans-page" class="form-select">
+                                            <option ${transitions.page==='None'?'selected':''}>None</option>
+                                            <option ${transitions.page==='Fade'?'selected':''}>Fade</option>
+                                            <option ${transitions.page==='Slide'?'selected':''}>Slide</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Editable List</label>
+                                        <select id="theme-trans-list" class="form-select">
+                                            <option ${transitions.list==='Grow'?'selected':''}>Grow</option>
+                                            <option ${transitions.list==='Fade'?'selected':''}>Fade</option>
+                                            <option ${transitions.list==='None'?'selected':''}>None</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Sub View</label>
+                                        <select id="theme-trans-subview" class="form-select">
+                                            <option ${transitions.subview==='Rotate Top Left'?'selected':''}>Rotate Top Left</option>
+                                            <option ${transitions.subview==='Slide'?'selected':''}>Slide</option>
+                                            <option ${transitions.subview==='None'?'selected':''}>None</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Read Only List</label>
+                                        <select id="theme-trans-readonly" class="form-select">
+                                            <option ${transitions.readonly==='Wave'?'selected':''}>Wave</option>
+                                            <option ${transitions.readonly==='Fade'?'selected':''}>Fade</option>
+                                            <option ${transitions.readonly==='None'?'selected':''}>None</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Grid -->
+                        <div style="flex:1;">
+                            <h3 style="font-size:14px; font-weight:600; margin-bottom:10px;">Select Theme</h3>
+                            <div class="theme-grid">
+                                ${themes.map(t => `
+                                    <div class="theme-card ${activeTheme===t?'active':''}" onclick="setLocalTheme('${t}')">
+                                        <div style="height:50px; background:#ddd; margin-bottom:8px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#6b7280;">
+                                            <i class="far fa-calendar"></i>
+                                        </div>
+                                        <span>${t}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let tempSelectedTheme = 'Flick';
+        function setLocalTheme(themeName) {
+            tempSelectedTheme = themeName;
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.querySelector('span').textContent === themeName) {
+                    card.classList.add('active');
+                }
+            });
+        }
+
+        // New Lab Tab
+        function renderNewLabTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div style="max-width: 500px; border: 1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <h2 style="font-size:18px; font-weight:700; margin-bottom:15px; color:#1f2937;">Create Lab</h2>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div>
+                            <label class="form-label">Lab Name</label>
+                            <input type="text" id="newlab-name" class="form-input" placeholder="Enter new lab name">
+                        </div>
+                        <div>
+                            <label class="form-label">Group</label>
+                            <select id="newlab-group" class="form-select" onchange="toggleNewGroupInput()">
+                                <option value="New Group">New Group</option>
+                                <option value="Existing Group A">Existing Group A</option>
+                            </select>
+                        </div>
+                        <div id="new-group-name-container">
+                            <label class="form-label">New Group Name</label>
+                            <input type="text" id="newlab-groupname" class="form-input" placeholder="New Group Name">
+                        </div>
+                        <div>
+                            <label class="form-label">Plan</label>
+                            <select id="newlab-plan" class="form-select">
+                                <option>Lab Inventory Plus</option>
+                                <option>Lab Professional</option>
+                                <option>Basic Plan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Authorization Code</label>
+                            <input type="text" id="newlab-code" class="form-input">
+                            <span style="font-size:12px; color:#ef4444; margin-top:4px; display:inline-block;">Please call 9867468494 to get your Authorization Code</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="btn-primary-settings" onclick="createNewLab()">Create Lab</button>
+                            <button class="btn-secondary-settings" onclick="showDashboardView()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleNewGroupInput() {
+            const select = document.getElementById('newlab-group');
+            const container = document.getElementById('new-group-name-container');
+            if (select.value === 'New Group') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Tax Options Tab
+        function renderTaxOptionsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const taxOptions = lookupsList.filter(l => l.type === 'tax_option');
+            
+            panel.innerHTML = `
+                <div style="max-width: 600px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Tax Options</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="showToast('Loaded Tax Settings')">Tax Settings</button>
+                            <button class="btn-primary-settings" onclick="openLookupModal('tax_option', 'Tax Option')">New</button>
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${taxOptions.length === 0 ? `<tr><td colspan="3" style="text-align:center; color:#999;">No tax options defined. Click New to add.</td></tr>` : ''}
+                            ${taxOptions.map((item, idx) => `
+                                <tr>
+                                    <td>${idx + 1}</td>
+                                    <td>${escapeHtml(item.name)}</td>
+                                    <td style="text-align:center;">
+                                        <button class="btn-sm edit" onclick="openLookupModal('tax_option', 'Tax Option', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                                        <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Payment Modes Tab
+        function renderPaymentModesTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const modes = lookupsList.filter(l => l.type === 'payment_mode');
+
+            panel.innerHTML = `
+                <div style="max-width: 600px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Payment Modes</h2>
+                        <button class="btn-primary-settings" onclick="openLookupModal('payment_mode', 'Payment Mode')">New</button>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <input type="text" id="paymentmode-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterPaymentModesTable()">
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentmodes-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadPaymentModesTable();
+        }
+
+        function loadPaymentModesTable() {
+            const tbody = document.getElementById('paymentmodes-tbody');
+            const search = document.getElementById('paymentmode-search').value.toLowerCase();
+            tbody.innerHTML = '';
+            
+            let filtered = lookupsList.filter(l => l.type === 'payment_mode');
+            if (search) {
+                filtered = filtered.filter(l => l.name.toLowerCase().includes(search));
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No payment modes found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openLookupModal('payment_mode', 'Payment Mode', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterPaymentModesTable() {
+            loadPaymentModesTable();
+        }
+
+        // Product Types Tab
+        function renderProductTypesTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Product Types</h2>
+                        <button class="btn-primary-settings" onclick="openProductTypeModal()">New</button>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Category</label>
+                            <select id="prodtype-cat-filter" class="form-select" style="width:150px;" onchange="filterProductTypesTable()">
+                                <option value="All">-- All --</option>
+                                <option value="Acrylic">Acrylic</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Porcelain">Porcelain</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Search</label>
+                            <input type="text" id="prodtype-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterProductTypesTable()">
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prodtypes-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadProductTypesTable();
+        }
+
+        function loadProductTypesTable() {
+            const tbody = document.getElementById('prodtypes-tbody');
+            const search = document.getElementById('prodtype-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let filtered = productTypesList;
+            if (search) {
+                filtered = filtered.filter(t => t.name.toLowerCase().includes(search));
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No product types found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openProductTypeModal(${item.id})">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteProductType(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterProductTypesTable() {
+            loadProductTypesTable();
+        }
+
+        // Products Tab
+        function renderProductsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Products</h2>
+                        <button class="btn-primary-settings" onclick="openProductModal()">New</button>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Type</label>
+                            <select id="product-type-filter" class="form-select" style="width:150px;" onchange="filterProductsTable()">
+                                <option value="All">-- All --</option>
+                                ${productTypesList.map(t => `<option value="${escapeHtml(t.name)}">${escapeHtml(t.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Search</label>
+                            <input type="text" id="product-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterProductsTable()">
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th>Type / Category</th>
+                                <th>Charge (₹)</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadProductsTable();
+        }
+
+        function loadProductsTable() {
+            const tbody = document.getElementById('products-tbody');
+            const search = document.getElementById('product-search').value.toLowerCase();
+            const filterType = document.getElementById('product-type-filter').value;
+            tbody.innerHTML = '';
+
+            let filtered = productsList;
+            if (search) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
+            }
+            if (filterType !== 'All') {
+                filtered = filtered.filter(p => p.type === filterType);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">No products found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.type || '')}</td>
+                        <td>₹${item.charge || 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openProductModal(${item.id})">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteProduct(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterProductsTable() {
+            loadProductsTable();
+        }
+
+        // Logistics Options
+        function renderLogisticsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.logistics || {
+                scanFinal: 'Not Required',
+                scanTryin: 'Not Required',
+                photoFail: false,
+                sigSuccess: false,
+                locStop: false,
+                allUpdates: false
+            };
+
+            panel.innerHTML = `
+                <div style="max-width: 600px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Logistics Options</h2>
+                        <button class="btn-primary-settings" onclick="saveLogisticsSettings()">Save</button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div>
+                            <label class="form-label">Scan Final Delivery</label>
+                            <select id="logistics-scanFinal" class="form-select">
+                                <option ${data.scanFinal==='Not Required'?'selected':''}>Not Required</option>
+                                <option ${data.scanFinal==='Barcode Required'?'selected':''}>Barcode Required</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Scan TryIn Delivery</label>
+                            <select id="logistics-scanTryin" class="form-select">
+                                <option ${data.scanTryin==='Not Required'?'selected':''}>Not Required</option>
+                                <option ${data.scanTryin==='Barcode Required'?'selected':''}>Barcode Required</option>
+                            </select>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="logistics-photoFail" ${data.photoFail?'checked':''}>
+                                Photo Required On Failure
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="logistics-sigSuccess" ${data.sigSuccess?'checked':''}>
+                                Signature Required On Success
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="logistics-locStop" ${data.locStop?'checked':''}>
+                                Location Mandatory For Stop Status Update
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="logistics-allUpdates" ${data.allUpdates?'checked':''}>
+                                All status updates within Start/Stop Task times
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // App Options Tab
+        function renderAppOptionsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.app_options || {
+                dateRange: 'Month To Date',
+                weeklyHoliday: 'Friday',
+                upPeriod: 1, upPeriodStart: 'Today',
+                recentPeriod: 1, recentPeriodStart: 'Yesterday',
+                pageSize: 50,
+                dateFormat: '24/06/26',
+                roundOff: '2 decimals',
+                defaultSlots: { due: '', datein: 'Morning' }
+            };
+
+            panel.innerHTML = `
+                <div style="max-width: 650px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">App Options</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="renderAppOptionsTab()">Reset</button>
+                            <button class="btn-primary-settings" onclick="saveAppOptions()">Save</button>
+                        </div>
+                    </div>
+                    <div class="settings-form-grid">
+                        <div>
+                            <label class="form-label">Default Date Range</label>
+                            <select id="app-dateRange" class="form-select">
+                                <option ${data.dateRange==='Month To Date'?'selected':''}>Month To Date</option>
+                                <option ${data.dateRange==='Year To Date'?'selected':''}>Year To Date</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Weekly Holiday</label>
+                            <select id="app-weeklyHoliday" class="form-select">
+                                <option ${data.weeklyHoliday==='Friday'?'selected':''}>Friday</option>
+                                <option ${data.weeklyHoliday==='Sunday'?'selected':''}>Sunday</option>
+                            </select>
+                        </div>
+                        <div class="form-group-full" style="display:flex; gap:15px; align-items:center;">
+                            <div style="flex:1;">
+                                <label class="form-label">Upcoming Period</label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="number" id="app-upPeriod" class="form-input" style="width:70px;" value="${data.upPeriod}">
+                                    <span>days starting</span>
+                                    <select id="app-upPeriodStart" class="form-select" style="flex:1;">
+                                        <option ${data.upPeriodStart==='Today'?'selected':''}>Today</option>
+                                        <option ${data.upPeriodStart==='Tomorrow'?'selected':''}>Tomorrow</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="flex:1;">
+                                <label class="form-label">Recent Period</label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="number" id="app-recentPeriod" class="form-input" style="width:70px;" value="${data.recentPeriod}">
+                                    <span>days starting</span>
+                                    <select id="app-recentPeriodStart" class="form-select" style="flex:1;">
+                                        <option ${data.recentPeriodStart==='Yesterday'?'selected':''}>Yesterday</option>
+                                        <option ${data.recentPeriodStart==='Today'?'selected':''}>Today</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Client List - Page Size</label>
+                            <select id="app-pageSize" class="form-select">
+                                <option ${data.pageSize==50?'selected':''}>50</option>
+                                <option ${data.pageSize==100?'selected':''}>100</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Date Format</label>
+                            <select id="app-dateFormat" class="form-select">
+                                <option ${data.dateFormat==='24/06/26'?'selected':''}>24/06/26</option>
+                                <option ${data.dateFormat==='26-06-2024'?'selected':''}>26-06-2024</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Round Off</label>
+                            <select id="app-roundOff" class="form-select">
+                                <option ${data.roundOff==='2 decimals'?'selected':''}>2 decimals</option>
+                                <option ${data.roundOff==='No decimals'?'selected':''}>No decimals</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group-full" style="border:1px solid #ddd; padding:15px; border-radius:4px; background:#fafafa;">
+                            <h3 style="font-size:13px; font-weight:700; margin-bottom:10px;">Default time Slots</h3>
+                            <div style="display:flex; gap:15px;">
+                                <div style="flex:1;">
+                                    <label class="form-label">Due Date</label>
+                                    <select id="app-defaultSlots-due" class="form-select">
+                                        <option value="" ${data.defaultSlots.due===''?'selected':''}></option>
+                                        <option value="Evening" ${data.defaultSlots.due==='Evening'?'selected':''}>Evening</option>
+                                    </select>
+                                </div>
+                                <div style="flex:1;">
+                                    <label class="form-label">DateIn</label>
+                                    <select id="app-defaultSlots-datein" class="form-select">
+                                        <option value="Morning" ${data.defaultSlots.datein==='Morning'?'selected':''}>Morning</option>
+                                        <option value="Afternoon" ${data.defaultSlots.datein==='Afternoon'?'selected':''}>Afternoon</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Serials Settings Tab
+        function renderSerialsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.serials || {
+                clientCode: { gen: 'Serial Number', prefix: '' },
+                receipt: { gen: 'Serial Number', prefix: '' },
+                bill: { gen: 'Serial Number', prefix: '' },
+                order: { gen: 'Serial Number', prefix: '' },
+                voucher: { gen: 'Serial Number', prefix: '' },
+                goodsIn: { gen: 'Serial Number', prefix: '' },
+                goodsOut: { gen: 'Serial Number', prefix: '' },
+                shipment: { gen: 'Serial Number', prefix: '' },
+                creditAdj: { gen: 'Serial Number', prefix: '' },
+                pickup: { gen: 'Serial Number', prefix: '' },
+                model: { gen: 'Serial Number', prefix: '' },
+                pudPlan: { gen: 'Serial Number', prefix: '' },
+                tryin: { gen: 'Serial Number', prefix: '' }
+            };
+
+            const serialTypes = [
+                { id: 'clientCode', label: 'Client Code' },
+                { id: 'receipt', label: 'Receipt #' },
+                { id: 'bill', label: 'Bill #' },
+                { id: 'order', label: 'Order #' },
+                { id: 'voucher', label: 'Exp. Voucher' },
+                { id: 'goodsIn', label: 'Goods In' },
+                { id: 'goodsOut', label: 'Goods Out' },
+                { id: 'shipment', label: 'Shipment Note' },
+                { id: 'creditAdj', label: 'Credit Adjustment' },
+                { id: 'pickup', label: 'Pickup Request' },
+                { id: 'model', label: 'Model #' },
+                { id: 'pudPlan', label: 'PUD Plan #' },
+                { id: 'tryin', label: 'TryIn Dlvry #' }
+            ];
+
+            panel.innerHTML = `
+                <div style="max-width: 750px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Serials Settings</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="renderSerialsTab()">Reset</button>
+                            <button class="btn-primary-settings" onclick="saveSerialsSettings()">Save</button>
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Generate</th>
+                                <th>Prefix</th>
+                                <th style="width:100px; text-align:center;">Start From</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${serialTypes.map(t => {
+                                const row = data[t.id] || { gen: 'Serial Number', prefix: '' };
+                                return `
+                                    <tr>
+                                        <td style="font-weight:600; color:#374151;">${t.label}</td>
+                                        <td>
+                                            <select id="serial-gen-${t.id}" class="form-select" style="padding:4px 8px; font-size:13px;">
+                                                <option ${row.gen==='Serial Number'?'selected':''}>Serial Number</option>
+                                                <option ${row.gen==='Manual'?'selected':''}>Manual</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="serial-prefix-${t.id}" class="form-input" style="padding:4px 8px; font-size:13px;" value="${escapeHtml(row.prefix || '')}">
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <a href="javascript:void(0)" onclick="showToast('Starting Serial configured for ' + '${t.label}')" style="color:#2563eb; text-decoration:none; font-weight:600;">Edit</a>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Order Settings Tab
+        function renderOrderSettingsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.order_settings || {
+                dupCell: false,
+                mandFields: { cell: false, email: false, addr1: false, addr2: false, addr3: false, city: false, pin: false },
+                waitTryIn: 2,
+                waitHold: 1,
+                scanInput: 'Order #',
+                warrantyStart: 'Invoice Date',
+                allowManualDeliv: false,
+                allowInvoiceDelivOnly: false,
+                shadeSelect: '3 shades',
+                productSelect: '1 Level',
+                singleDigitTeeth: true,
+                enableTryIn: true,
+                patientMand: false,
+                modelMand: false,
+                calcDue: false,
+                multiScan: false,
+                allowTaxChange: false,
+                sepInvoiceSeq: false
+            };
+
+            panel.innerHTML = `
+                <div style="max-width: 700px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Order Settings</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="renderOrderSettingsTab()">Reset</button>
+                            <button class="btn-primary-settings" onclick="saveOrderSettings()">Save</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <!-- Duplication -->
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="order-dupCell" ${data.dupCell?'checked':''}>
+                            Prevent Duplicate Client Cell Numbers
+                        </label>
+
+                        <!-- Mandatory Fields -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px; background:#fafafa;">
+                            <h3 style="font-size:13px; font-weight:700; margin-bottom:8px;">Mandatory Client Fields</h3>
+                            <div style="display:flex; flex-wrap:wrap; gap:15px;">
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-cell" ${data.mandFields.cell?'checked':''}> Cell Number</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-email" ${data.mandFields.email?'checked':''}> Email</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-addr1" ${data.mandFields.addr1?'checked':''}> Address1</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-addr2" ${data.mandFields.addr2?'checked':''}> Address2</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-addr3" ${data.mandFields.addr3?'checked':''}> Address3</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-city" ${data.mandFields.city?'checked':''}> City</label>
+                                <label class="checkbox-container"><input type="checkbox" id="order-mand-pin" ${data.mandFields.pin?'checked':''}> Pin Code</label>
+                            </div>
+                        </div>
+
+                        <!-- Reminders Wait -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px; display:flex; gap:20px;">
+                            <div style="flex:1;">
+                                <label class="form-label">Wait Period before lab reminders (Try In)</label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="number" id="order-waitTryIn" class="form-input" style="width:70px;" value="${data.waitTryIn}">
+                                    <span>days</span>
+                                </div>
+                            </div>
+                            <div style="flex:1;">
+                                <label class="form-label">Wait Period (On Hold)</label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="number" id="order-waitHold" class="form-input" style="width:70px;" value="${data.waitHold}">
+                                    <span>days</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scan Input -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px;">
+                            <label class="form-label" style="margin-bottom:8px;">Order Scan Input</label>
+                            <label style="margin-right:20px;"><input type="radio" name="order-scanInput" value="Model #" ${data.scanInput==='Model #'?'checked':''}> Model #</label>
+                            <label><input type="radio" name="order-scanInput" value="Order #" ${data.scanInput==='Order #'?'checked':''}> Order #</label>
+                        </div>
+
+                        <!-- Warranty -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px;">
+                            <label class="form-label" style="margin-bottom:8px;">Warranty Start Date</label>
+                            <label style="margin-right:20px;"><input type="radio" name="order-warrantyStart" value="Invoice Date" ${data.warrantyStart==='Invoice Date'?'checked':''}> Invoice Date</label>
+                            <label><input type="radio" name="order-warrantyStart" value="Shipment Date" ${data.warrantyStart==='Shipment Date'?'checked':''}> Shipment Date</label>
+                        </div>
+
+                        <!-- General Checklist -->
+                        <div>
+                            <label class="checkbox-container"><input type="checkbox" id="order-allowManualDeliv" ${data.allowManualDeliv?'checked':''}> Allow Manual Status change to Delivered</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-allowInvoiceDelivOnly" ${data.allowInvoiceDelivOnly?'checked':''}> Allow Invoice to be generated for Delivered Orders only</label>
+                        </div>
+
+                        <!-- Selection Level -->
+                        <div style="display:flex; gap:20px;">
+                            <div style="flex:1;">
+                                <label class="form-label">Shade Selection</label>
+                                <select id="order-shadeSelect" class="form-select">
+                                    <option ${data.shadeSelect==='3 shades'?'selected':''}>3 shades</option>
+                                    <option ${data.shadeSelect==='1 shade'?'selected':''}>1 shade</option>
+                                </select>
+                            </div>
+                            <div style="flex:1;">
+                                <label class="form-label">Product Selection</label>
+                                <select id="order-productSelect" class="form-select">
+                                    <option ${data.productSelect==='1 Level'?'selected':''}>1 Level</option>
+                                    <option ${data.productSelect==='2 Levels'?'selected':''}>2 Levels</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Checklist Bottom -->
+                        <div>
+                            <label class="checkbox-container"><input type="checkbox" id="order-singleDigitTeeth" ${data.singleDigitTeeth?'checked':''}> Single Digit Teeth Names</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-enableTryIn" ${data.enableTryIn?'checked':''}> Enable TryIn Management</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-patientMand" ${data.patientMand?'checked':''}> Patient Name is mandatory</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-modelMand" ${data.modelMand?'checked':''}> Model Number is mandatory</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-calcDue" ${data.calcDue?'checked':''}> Calculate Order Due Date Based On DateIn</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-multiScan" ${data.multiScan?'checked':''}> Allow Multiple Scans at a time in Work Flow</label>
+                        </div>
+
+                        <!-- Billing Box -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px; background:#fafafa;">
+                            <h3 style="font-size:13px; font-weight:700; margin-bottom:8px;">Billing</h3>
+                            <label class="checkbox-container"><input type="checkbox" id="order-allowTaxChange" ${data.allowTaxChange?'checked':''}> Allow Tax Change</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-sepInvoiceSeq" ${data.sepInvoiceSeq?'checked':''}> Separate Sequence for Invoice without Tax</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Color Settings Tab (Status colors & Due date colors)
+        function renderStatusColorsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings.colors || {
+                dueColors: { todayDeliv: '#10b981', todayNotDeliv: '#f59e0b', pastNotDeliv: '#ef4444', future: '#1f2937' },
+                statusColors: {
+                    new: '#2563eb',
+                    production: '#8b5cf6',
+                    complete: '#10b981',
+                    delivered: '#1e3a8a',
+                    hold: '#7c3aed',
+                    tryin: '#ec4899',
+                    cancelled: '#ef4444'
+                }
+            };
+
+            panel.innerHTML = `
+                <div style="max-width: 600px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                        <h2 style="font-size:18px; font-weight:700; margin:0; color:#1f2937;">Color Settings</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary-settings" onclick="renderStatusColorsTab()">Reset</button>
+                            <button class="btn-primary-settings" onclick="saveColorSettings()">Save</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <!-- Due Date Colors -->
+                        <div style="border:1px solid #ddd; padding:15px; border-radius:4px; background:#fafafa;">
+                            <h3 style="font-size:14px; font-weight:700; margin-bottom:12px;">Delivery, Due date based color codes</h3>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span>Due Date Today and Delivered</span>
+                                    <input type="color" id="color-due-todayDeliv" value="${data.dueColors.todayDeliv}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span>Due Date Today and not Delivered</span>
+                                    <input type="color" id="color-due-todayNotDeliv" value="${data.dueColors.todayNotDeliv}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span>Past Due Date and not Delivered</span>
+                                    <input type="color" id="color-due-pastNotDeliv" value="${data.dueColors.pastNotDeliv}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span>Due Date in the future</span>
+                                    <input type="color" id="color-due-future" value="${data.dueColors.future}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Colors -->
+                        <div style="border:1px solid #ddd; padding:15px; border-radius:4px;">
+                            <h3 style="font-size:14px; font-weight:700; margin-bottom:12px;">Order status colors</h3>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">1. New</span>
+                                    <input type="color" id="color-status-new" value="${data.statusColors.new}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">2. In Production</span>
+                                    <input type="color" id="color-status-production" value="${data.statusColors.production}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">3. Complete</span>
+                                    <input type="color" id="color-status-complete" value="${data.statusColors.complete}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">4. Delivered</span>
+                                    <input type="color" id="color-status-delivered" value="${data.statusColors.delivered}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">5. Hold</span>
+                                    <input type="color" id="color-status-hold" value="${data.statusColors.hold}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">6. Try In</span>
+                                    <input type="color" id="color-status-tryin" value="${data.statusColors.tryin}">
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-weight:600;">7. Cancelled</span>
+                                    <input type="color" id="color-status-cancelled" value="${data.statusColors.cancelled}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Messages Settings Screen
+        function renderMessagesTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const messages = [
+                { id: 1, name: 'Work Order received', to: 'Client' },
+                { id: 2, name: 'TryIn return reminder', to: 'Client' },
+                { id: 3, name: 'Shipment Note', to: 'Client' },
+                { id: 4, name: 'TryIn Delivery Note', to: 'Client' },
+                { id: 5, name: 'Invoice', to: 'Client' },
+                { id: 6, name: 'Invoice Payment Reminder', to: 'Client' },
+                { id: 7, name: 'Balance Reminder', to: 'Client' },
+                { id: 8, name: 'Receipt', to: 'Client' },
+                { id: 9, name: 'Hold Notification To Client', to: 'Client' },
+                { id: 10, name: 'Pickup Scheduled', to: 'Client' },
+                { id: 11, name: 'Pickup Assignment', to: 'Staff' },
+                { id: 12, name: 'Pickup Done', to: 'Client' }
+            ];
+
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Messaging Options</h2>
+                        <button class="btn-secondary-settings" onclick="showToast('Messaging options reset')">Reset</button>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Message</th>
+                                <th>To</th>
+                                <th style="width:100px; text-align:center;">Template</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${messages.map(m => `
+                                <tr>
+                                    <td>${m.id}</td>
+                                    <td style="font-weight:600; color:#374151;">${m.name}</td>
+                                    <td>${m.to}</td>
+                                    <td style="text-align:center;">
+                                        <a href="javascript:void(0)" onclick="openMessageTemplateModal('${m.name}')" style="color:#2563eb; text-decoration:none; font-weight:600;">Edit</a>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function openMessageTemplateModal(msgName) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = `Edit Template: ${msgName}`;
+            
+            const savedTemplate = systemSettings[`msg_template_${msgName}`] || `Hello, this is a notification from Sohar Dental Lab regarding: ${msgName}.`;
+
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <label class="form-label">Template Content</label>
+                    <textarea id="template-text" class="form-textarea" rows="8">${escapeHtml(savedTemplate)}</textarea>
+                    <span style="font-size:11px; color:#6b7280;">Variables: {ClientName}, {OrderNumber}, {Amount}, {Date}</span>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const text = document.getElementById('template-text').value;
+                await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: `msg_template_${msgName}`, value: text })
+                });
+                await loadAllData();
+                closeGenericModal();
+                showToast("Template updated successfully");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        // WhatsApp Tab
+        function renderWhatsAppTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div style="max-width: 600px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
+                    <h2 style="font-size:18px; font-weight:700; margin-bottom:15px; color:#1f2937;">WhatsApp Integration</h2>
+                    <p style="font-size:14px; margin-bottom:15px; color:#4b5563;">You need to setup WhatsApp integration</p>
+                    
+                    <div style="border:1px solid #fbcfe8; padding:15px; border-radius:4px; background:#fdf2f8; margin-bottom:20px;">
+                        <h3 style="font-size:14px; font-weight:700; color:#db2777; margin-bottom:10px;">WhatsApp blocking / banning - Disclaimer</h3>
+                        <p style="font-size:13px; line-height:1.5; color:#9d174d; margin-bottom:10px;">
+                            WhatsApp monitors closely the type of message you send. Sending unsolicited messages (SPAM) that your recipients are not expecting or want to receive, can result in WhatsApp permanently banning your number or IP. This is an action that WhatsApp takes, and our system has no control or responsibility over it.
+                        </p>
+                        <h4 style="font-size:13px; font-weight:700; color:#9d174d; margin-bottom:5px;">Some cases where we are certain that your number will be banned are:</h4>
+                        <ul style="font-size:13px; color:#9d174d; padding-left:20px; line-height:1.5; display:flex; flex-direction:column; gap:4px;">
+                            <li>Sending messages to people that haven't agreed to receive messages from you or that have no connection to you or your clinic.</li>
+                            <li>Sending messages to numbers that don't exist or that don't have WhatsApp installed.</li>
+                            <li>Sending messages for debt recovery (people will report it as SPAM).</li>
+                            <li>Sending messages to numbers of other countries.</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn-primary-settings" onclick="showToast('WhatsApp integration setup initialized!')">Accept and Proceed</button>
+                </div>
+            `;
+        }
+
+        // Print settings report screen template
+        function renderPrintReportTab(reportKey) {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings[`print_${reportKey}`] || {
+                barcode: 'None',
+                barcodeSize: 100,
+                showBarcodeText: false,
+                orientation: 'Potrait',
+                logoPlacement: 'Left of Header',
+                logoWidth: 1,
+                showHeader: true,
+                title: 'SOHAR DENTAL LABORATORY',
+                subLeft: 'AL HAMBAR,\nC.R.NO. 3203549,\nMOH NO. 1771,',
+                subRight: 'Phone :\n+96899622728\nemail :',
+                reportHeader: reportKey.charAt(0).toUpperCase() + reportKey.slice(1),
+                footerSubLeft: '',
+                footerSubRight: 'Authorized Signatory',
+                margins: 0.5,
+                spacings: 0.5,
+                font: 'Lucida Console'
+            };
+
+            const headerLabel = {
+                invoice: 'Invoice Report Settings',
+                receipt: 'Receipt Report Settings',
+                challan: 'Shipment Note Report Settings',
+                labslip: 'Lab Slip Report Settings',
+                statement: 'Statement Report Settings',
+                pricelist: 'Price List Report Settings'
+            }[reportKey];
+
+            panel.innerHTML = `
+                <div class="print-layout-container">
+                    <!-- Form Controls -->
+                    <div class="print-sidebar-form">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                            <h2 style="font-size:16px; font-weight:700; margin:0; color:#1f2937;">${headerLabel}</h2>
+                            <button class="btn-primary-settings" onclick="savePrintSettings('${reportKey}')">Save</button>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <button class="btn-secondary-settings" style="width:100%;" onclick="showToast('Select fields modal opened')">Select Fields</button>
+                            
+                            <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
+                                <label class="form-label">Bar Code</label>
+                                <select id="print-barcode-${reportKey}" class="form-select" onchange="updatePrintPreview('${reportKey}')">
+                                    <option ${data.barcode==='None'?'selected':''}>None</option>
+                                    <option ${data.barcode==='Code 39'?'selected':''}>Code 39</option>
+                                    <option ${data.barcode==='QR Code'?'selected':''}>QR Code</option>
+                                </select>
+                                <div style="display:flex; gap:10px; margin-top:8px; align-items:center;">
+                                    <span>Size</span>
+                                    <input type="number" id="print-barcodeSize-${reportKey}" class="form-input" style="width:70px;" value="${data.barcodeSize}" oninput="updatePrintPreview('${reportKey}')">
+                                    <span>%</span>
+                                    <label style="display:flex; align-items:center; gap:4px; margin-left:10px;">
+                                        <input type="checkbox" id="print-showBarcodeText-${reportKey}" ${data.showBarcodeText?'checked':''} onchange="updatePrintPreview('${reportKey}')"> Show text
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Page Size Orientation</label>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <select id="print-size-${reportKey}" class="form-select" style="width:100px;">
+                                        <option>A4</option>
+                                        <option>A5</option>
+                                    </select>
+                                    <label><input type="radio" name="print-orient-${reportKey}" value="Potrait" ${data.orientation==='Potrait'?'checked':''} onchange="updatePrintPreview('${reportKey}')"> Potrait</label>
+                                    <label><input type="radio" name="print-orient-${reportKey}" value="Landscape" ${data.orientation==='Landscape'?'checked':''} onchange="updatePrintPreview('${reportKey}')"> Landscape</label>
+                                </div>
+                            </div>
+
+                            <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
+                                <label class="form-label">Logo</label>
+                                <button class="btn-secondary-settings" style="width:100%; margin-bottom:8px;" onclick="showToast('Upload/select logo')">Select Logo</button>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Logo Placement</label>
+                                        <select id="print-logoPlacement-${reportKey}" class="form-select" onchange="updatePrintPreview('${reportKey}')">
+                                            <option ${data.logoPlacement==='Left of Header'?'selected':''}>Left of Header</option>
+                                            <option ${data.logoPlacement==='Right of Header'?'selected':''}>Right of Header</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Logo Width (inches)</label>
+                                        <input type="number" step="0.1" id="print-logoWidth-${reportKey}" class="form-input" style="width:80px;" value="${data.logoWidth}" oninput="updatePrintPreview('${reportKey}')">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="print-showHeader-${reportKey}" ${data.showHeader?'checked':''} onchange="updatePrintPreview('${reportKey}')"> Page Header Show
+                                </label>
+                                <input type="text" id="print-title-${reportKey}" class="form-input" placeholder="Title" value="${escapeHtml(data.title)}" oninput="updatePrintPreview('${reportKey}')">
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div>
+                                    <label class="form-label">Sub Left</label>
+                                    <textarea id="print-subLeft-${reportKey}" class="form-textarea" rows="3" oninput="updatePrintPreview('${reportKey}')">${escapeHtml(data.subLeft)}</textarea>
+                                </div>
+                                <div>
+                                    <label class="form-label">Sub Right</label>
+                                    <textarea id="print-subRight-${reportKey}" class="form-textarea" rows="3" oninput="updatePrintPreview('${reportKey}')">${escapeHtml(data.subRight)}</textarea>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Report Header</label>
+                                <input type="text" id="print-reportHeader-${reportKey}" class="form-input" value="${escapeHtml(data.reportHeader)}" oninput="updatePrintPreview('${reportKey}')">
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div>
+                                    <label class="form-label">Footer Sub Left</label>
+                                    <input type="text" id="print-footerSubLeft-${reportKey}" class="form-input" value="${escapeHtml(data.footerSubLeft || '')}" oninput="updatePrintPreview('${reportKey}')">
+                                </div>
+                                <div>
+                                    <label class="form-label">Footer Sub Right</label>
+                                    <input type="text" id="print-footerSubRight-${reportKey}" class="form-input" value="${escapeHtml(data.footerSubRight)}" oninput="updatePrintPreview('${reportKey}')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PDF Preview Column -->
+                    <div class="print-preview-pane">
+                        <div class="paper-sheet" id="print-paper-sheet-${reportKey}">
+                            <!-- Preview Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            updatePrintPreview(reportKey);
+        }
+
+        function updatePrintPreview(reportKey) {
+            const paper = document.getElementById(`print-paper-sheet-${reportKey}`);
+            if (!paper) return;
+
+            const title = document.getElementById(`print-title-${reportKey}`).value;
+            const subLeft = document.getElementById(`print-subLeft-${reportKey}`).value.replace(/\n/g, '<br>');
+            const subRight = document.getElementById(`print-subRight-${reportKey}`).value.replace(/\n/g, '<br>');
+            const showHeader = document.getElementById(`print-showHeader-${reportKey}`).checked;
+            const logoPlacement = document.getElementById(`print-logoPlacement-${reportKey}`).value;
+            const logoWidth = document.getElementById(`print-logoWidth-${reportKey}`).value;
+            const reportHeader = document.getElementById(`print-reportHeader-${reportKey}`).value;
+            const barcode = document.getElementById(`print-barcode-${reportKey}`).value;
+            const footerSubLeft = document.getElementById(`print-footerSubLeft-${reportKey}`).value;
+            const footerSubRight = document.getElementById(`print-footerSubRight-${reportKey}`).value;
+
+            const logoHtml = `
+                <div style="width: ${logoWidth * 40}px; height: 40px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; background: #fafafa;">
+                    <i class="fas fa-smile" style="font-size:20px; color:#2563eb;"></i>
+                </div>
+            `;
+
+            paper.innerHTML = `
+                ${showHeader ? `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px;">
+                        ${logoPlacement === 'Left of Header' ? logoHtml : ''}
+                        <div style="flex: 1; margin: 0 15px;">
+                            <h2 style="font-size: 14px; font-weight: bold; margin: 0; text-align: center;">${escapeHtml(title)}</h2>
+                            <div style="display: flex; justify-content: space-between; font-size: 8px; margin-top: 5px;">
+                                <div>${subLeft}</div>
+                                <div style="text-align: right;">${subRight}</div>
+                            </div>
+                        </div>
+                        ${logoPlacement === 'Right of Header' ? logoHtml : ''}
+                    </div>
+                ` : ''}
+                
+                <h3 style="text-align: center; text-transform: uppercase; font-size: 12px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">${escapeHtml(reportHeader)}</h3>
+
+                <div style="flex: 1; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <!-- Body mockup -->
+                    <div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:9px;">
+                            <div><strong>To:</strong> Dr. Alex Mathew<br>Smile Dental Clinic</div>
+                            <div style="text-align:right;"><strong>Doc #:</strong> 00012<br><strong>Date:</strong> 24-Jun-2026</div>
+                        </div>
+                        
+                        <table style="width:100%; border-collapse:collapse; font-size:8px;">
+                            <thead>
+                                <tr style="border-bottom:1px solid black; font-weight:bold;">
+                                    <th style="text-align:left; padding:4px 0;">Product</th>
+                                    <th style="text-align:right; padding:4px 0;">Qty</th>
+                                    <th style="text-align:right; padding:4px 0;">Rate</th>
+                                    <th style="text-align:right; padding:4px 0;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding:4px 0;">Zirconia Swiss Classic</td>
+                                    <td style="text-align:right;">2</td>
+                                    <td style="text-align:right;">₹2000.00</td>
+                                    <td style="text-align:right;">₹4000.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Barcode display -->
+                    ${barcode !== 'None' ? `
+                        <div style="display:flex; flex-direction:column; align-items:center; margin-top:15px;">
+                            <div style="width:150px; height:30px; background:#ddd; display:flex; align-items:center; justify-content:center; border:1px solid #aaa;">
+                                <i class="fas fa-barcode" style="font-size:24px;"></i>
+                            </div>
+                            <span style="font-size:7px; margin-top:2px;">*00012*</span>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Footer Signatures -->
+                <div style="display:flex; justify-content:space-between; font-size:9px; border-top:1px dashed #ccc; padding-top:10px;">
+                    <div>${escapeHtml(footerSubLeft)}</div>
+                    <div style="text-align:right; border-top:1px solid black; padding-top:4px; width:150px;">
+                        ${escapeHtml(footerSubRight)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Label Specification Screen Template
+        function renderLabelTab(labelKey) {
+            const panel = document.getElementById('tab-content-panel');
+            const data = systemSettings[`label_${labelKey}`] || {
+                format: 'A4 Sheet of 99.1 x 38.1mm labels',
+                width: 210, height: 297,
+                rows: 7, cols: 2,
+                lblWidth: 99.1, lblHeight: 38.1,
+                topMargin: 15.1, leftMargin: 4.7,
+                vPitch: 38.1, hPitch: 101.6,
+                padTop: 5, padLeft: 8, padRight: 0, padBottom: 0,
+                font: 'Lucida Console', fontSize: 100,
+                bcWidth: 70
+            };
+
+            const headerLabel = {
+                modellabel: 'Model Label Print Settings',
+                warrantycard: 'Warranty Card Print Settings',
+                mailinglabel: 'Mailing Labels Print Settings',
+                dispatchlabel: 'Dispatch Labels Print Settings',
+                ordersticker: 'Order Sticker Print Settings',
+                jobsticker: 'Job Sticker Print Settings'
+            }[labelKey];
+
+            panel.innerHTML = `
+                <div class="print-layout-container">
+                    <!-- Setup form -->
+                    <div class="print-sidebar-form">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                            <h2 style="font-size:16px; font-weight:700; margin:0; color:#1f2937;">${headerLabel}</h2>
+                            <button class="btn-primary-settings" onclick="saveLabelSettings('${labelKey}')">Save</button>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div>
+                                <label class="form-label">Label Format</label>
+                                <select id="label-format-${labelKey}" class="form-select">
+                                    <option ${data.format==='A4 Sheet of 99.1 x 38.1mm labels'?'selected':''}>A4 Sheet of 99.1 x 38.1mm labels</option>
+                                    <option ${data.format==='A4 Sheet of 105 x 37mm labels'?'selected':''}>A4 Sheet of 105 x 37mm labels</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div>
+                                    <label class="form-label">Page Width (mm)</label>
+                                    <input type="number" id="label-width-${labelKey}" class="form-input" value="${data.width}">
+                                </div>
+                                <div>
+                                    <label class="form-label">Page Height (mm)</label>
+                                    <input type="number" id="label-height-${labelKey}" class="form-input" value="${data.height}">
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div>
+                                    <label class="form-label">Rows</label>
+                                    <input type="number" id="label-rows-${labelKey}" class="form-input" value="${data.rows}" oninput="updateLabelPreview('${labelKey}')">
+                                </div>
+                                <div>
+                                    <label class="form-label">Columns</label>
+                                    <input type="number" id="label-cols-${labelKey}" class="form-input" value="${data.cols}" oninput="updateLabelPreview('${labelKey}')">
+                                </div>
+                            </div>
+
+                            <div style="border:1px solid #eee; padding:10px; border-radius:4px; display:flex; flex-direction:column; gap:10px;">
+                                <h3 style="font-size:12px; font-weight:700;">Specifications (mm)</h3>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Label Width</label>
+                                        <input type="number" step="0.1" id="label-lblWidth-${labelKey}" class="form-input" value="${data.lblWidth}">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Label Height</label>
+                                        <input type="number" step="0.1" id="label-lblHeight-${labelKey}" class="form-input" value="${data.lblHeight}">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Top Margin</label>
+                                        <input type="number" step="0.1" id="label-topMargin-${labelKey}" class="form-input" value="${data.topMargin}">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Left Margin</label>
+                                        <input type="number" step="0.1" id="label-leftMargin-${labelKey}" class="form-input" value="${data.leftMargin}">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Vertical Pitch</label>
+                                        <input type="number" step="0.1" id="label-vPitch-${labelKey}" class="form-input" value="${data.vPitch}">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" style="font-size:11px;">Horizontal Pitch</label>
+                                        <input type="number" step="0.1" id="label-hPitch-${labelKey}" class="form-input" value="${data.hPitch}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
+                                <label class="form-label">Font & Size</label>
+                                <div style="display:flex; gap:10px;">
+                                    <select id="label-font-${labelKey}" class="form-select" style="flex:1;">
+                                        <option>Lucida Console</option>
+                                        <option>Courier New</option>
+                                    </select>
+                                    <select id="label-fontSize-${labelKey}" class="form-select" style="width:90px;">
+                                        <option value="100">100 %</option>
+                                        <option value="80">80 %</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Labels preview -->
+                    <div class="print-preview-pane">
+                        <div class="paper-sheet" style="background:#fff; display:block;">
+                            <div class="labels-grid-preview" id="labels-grid-preview-${labelKey}">
+                                <!-- Grid loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            updateLabelPreview(labelKey);
+        }
+
+        function updateLabelPreview(labelKey) {
+            const grid = document.getElementById(`labels-grid-preview-${labelKey}`);
+            if (!grid) return;
+
+            const rows = parseInt(document.getElementById(`label-rows-${labelKey}`).value) || 4;
+            const cols = parseInt(document.getElementById(`label-cols-${labelKey}`).value) || 2;
+            
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            grid.innerHTML = '';
+            
+            const totalLabels = rows * cols;
+            for (let i = 0; i < Math.min(totalLabels, 12); i++) {
+                grid.innerHTML += `
+                    <div class="label-cell-mock">
+                        <div style="font-weight:bold; border-bottom:1px solid #eee; padding-bottom:2px; margin-bottom:4px; display:flex; justify-content:space-between;">
+                            <span>MODEL #${1000 + i}</span>
+                            <span>24-JUN</span>
+                        </div>
+                        Dr. Alex Mathew<br>
+                        Zirconia Swiss Classic<br>
+                        <div style="font-size:7px; background:#eee; padding:2px; text-align:center; border:1px solid #ddd; margin-top:4px;">
+                            ||||| BARCODE |||||
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Expense Heads
+        function renderExpenseHeadsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const items = lookupsList.filter(l => l.type === 'expense_head');
+            
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Expense Heads</h2>
+                        <button class="btn-primary-settings" onclick="openLookupModal('expense_head', 'Expense Head')">New</button>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <input type="text" id="expense-head-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterExpenseHeadsTable()">
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseheads-tbody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadExpenseHeadsTable();
+        }
+
+        function loadExpenseHeadsTable() {
+            const tbody = document.getElementById('expenseheads-tbody');
+            const search = document.getElementById('expense-head-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let filtered = lookupsList.filter(l => l.type === 'expense_head');
+            if (search) {
+                filtered = filtered.filter(l => l.name.toLowerCase().includes(search));
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No expense heads found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openLookupModal('expense_head', 'Expense Head', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterExpenseHeadsTable() {
+            loadExpenseHeadsTable();
+        }
+
+        // Bank A/Cs
+        function renderBankACsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Bank Accounts</h2>
+                        <button class="btn-primary-settings" onclick="openLookupModal('bank_account', 'Bank Account')">New</button>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <input type="text" id="bankac-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterBankACsTable()">
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bankacs-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadBankACsTable();
+        }
+
+        function loadBankACsTable() {
+            const tbody = document.getElementById('bankacs-tbody');
+            const search = document.getElementById('bankac-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let filtered = lookupsList.filter(l => l.type === 'bank_account');
+            if (search) {
+                filtered = filtered.filter(l => l.name.toLowerCase().includes(search));
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No bank accounts found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openLookupModal('bank_account', 'Bank Account', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterBankACsTable() {
+            loadBankACsTable();
+        }
+
+        // Suppliers
+        function renderSuppliersTab() {
+            const panel = document.getElementById('tab-content-panel');
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Suppliers</h2>
+                        <button class="btn-primary-settings" onclick="openLookupModal('supplier', 'Supplier')">New</button>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <input type="text" id="supplier-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterSuppliersTable()">
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliers-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadSuppliersTable();
+        }
+
+        function loadSuppliersTable() {
+            const tbody = document.getElementById('suppliers-tbody');
+            const search = document.getElementById('supplier-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let filtered = lookupsList.filter(l => l.type === 'supplier');
+            if (search) {
+                filtered = filtered.filter(l => l.name.toLowerCase().includes(search));
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No suppliers found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openLookupModal('supplier', 'Supplier', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterSuppliersTable() {
+            loadSuppliersTable();
+        }
+
+        // Inventory Items Tab
+        function renderInventoryItemsTab() {
+            const panel = document.getElementById('tab-content-panel');
+            const stockcats = lookupsList.filter(l => l.type === 'stock_category');
+            
+            panel.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Inventory Items</h2>
+                        <button class="btn-primary-settings" onclick="openMaterialModal()">New</button>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Category</label>
+                            <select id="item-cat-filter" class="form-select" style="width:150px;" onchange="filterInventoryTable()">
+                                <option value="All">-- All --</option>
+                                ${stockcats.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#6b7280;">Search</label>
+                            <input type="text" id="item-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterInventoryTable()">
+                        </div>
+                    </div>
+                    <table class="settings-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sr</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Min. Stock</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-tbody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadInventoryItemsTable();
+        }
+
+        function loadInventoryItemsTable() {
+            const tbody = document.getElementById('items-tbody');
+            const search = document.getElementById('item-search').value.toLowerCase();
+            const filterCat = document.getElementById('item-cat-filter').value;
+            tbody.innerHTML = '';
+
+            let filtered = materialsList;
+            if (search) {
+                filtered = filtered.filter(m => m.name.toLowerCase().includes(search));
+            }
+            if (filterCat !== 'All') {
+                filtered = filtered.filter(m => m.category === filterCat);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">No inventory items found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.category || '')}</td>
+                        <td>${item.stock} ${escapeHtml(item.unit || '')}</td>
+                        <td>${item.minStock || 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-sm edit" onclick="openMaterialModal(${item.id})">Edit</button>
+                            <button class="btn-sm delete" onclick="deleteMaterial(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterInventoryTable() {
+            loadInventoryItemsTable();
+        }
+
+
+        // ==========================================
+        // API WRITE / SAVE HANDLERS
+        // ==========================================
+
+        // Generic Lookup adding & deleting
+        async function addLookupItem(type) {
+            const input = document.getElementById('new-lookup-name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            try {
+                const res = await fetch('/api/lookups', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, name })
+                });
+                
+                if (res.ok) {
+                    input.value = '';
+                    await loadAllData();
+                    renderTabContent(activeTab);
+                    showToast("Lookup entry added successfully");
+                }
+            } catch (err) {
+                console.error("Error adding lookup:", err);
+            }
+        }
+
+        async function deleteLookupItem(id) {
+            if (!confirm("Are you sure you want to delete this entry?")) return;
+
+            try {
+                const res = await fetch(`/api/lookups/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (res.ok) {
+                    await loadAllData();
+                    renderTabContent(activeTab);
+                    showToast("Lookup entry deleted successfully");
+                }
+            } catch (err) {
+                console.error("Error deleting lookup:", err);
+            }
+        }
+
+        // Generic Lookup Edit/Add Modal
+        function openLookupModal(type, titleLabel, id = null, currentName = '') {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = id ? `Edit ${titleLabel}` : `New ${titleLabel}`;
+            
+            body.innerHTML = `
+                <div>
+                    <label class="form-label">${titleLabel} Name</label>
+                    <input type="text" id="modal-lookup-name" class="form-input" value="${escapeHtml(currentName)}">
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const name = document.getElementById('modal-lookup-name').value.trim();
+                if (!name) return;
+
+                if (id) {
+                    // Update
+                    await fetch(`/api/lookups/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                } else {
+                    // Create
+                    await fetch('/api/lookups', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type, name })
+                    });
+                }
+                await loadAllData();
+                closeGenericModal();
+                renderTabContent(activeTab);
+                showToast("Lookup saved successfully");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        // Staff Modal Form
+        function openStaffModal(id = null) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            const staff = id ? staffList.find(s => s.id === id) : { name: '', role: 'Technician', contact: '', salary: 0, department: 'Acrylic', status: 'Active' };
+            
+            title.textContent = id ? 'Edit Staff Member' : 'New Staff Member';
+            
+            body.innerHTML = `
+                <div class="settings-form-grid">
+                    <div class="form-group-full">
+                        <label class="form-label">Staff Name</label>
+                        <input type="text" id="staff-name" class="form-input" value="${escapeHtml(staff.name)}">
+                    </div>
+                    <div>
+                        <label class="form-label">Staff Role / Group</label>
+                        <select id="staff-role" class="form-select">
+                            <option value="Lab Administrator" ${staff.role==='Lab Administrator'?'selected':''}>Lab Administrator</option>
+                            <option value="Technician" ${staff.role==='Technician'?'selected':''}>Technician</option>
+                            <option value="Driver" ${staff.role==='Driver'?'selected':''}>Driver</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Department</label>
+                        <select id="staff-department" class="form-select">
+                            ${lookupsList.filter(l => l.type==='department').map(d => `<option value="${escapeHtml(d.name)}" ${staff.department===d.name?'selected':''}>${escapeHtml(d.name)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Contact #</label>
+                        <input type="text" id="staff-contact" class="form-input" value="${escapeHtml(staff.contact || '')}">
+                    </div>
+                    <div>
+                        <label class="form-label">Salary (₹)</label>
+                        <input type="number" id="staff-salary" class="form-input" value="${staff.salary || 0}">
+                    </div>
+                    <div class="form-group-full">
+                        <label class="form-label">Status</label>
+                        <select id="staff-status" class="form-select">
+                            <option ${staff.status==='Active'?'selected':''}>Active</option>
+                            <option ${staff.status==='Inactive'?'selected':''}>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const data = {
+                    name: document.getElementById('staff-name').value.trim(),
+                    role: document.getElementById('staff-role').value,
+                    department: document.getElementById('staff-department').value,
+                    contact: document.getElementById('staff-contact').value.trim(),
+                    salary: parseFloat(document.getElementById('staff-salary').value) || 0,
+                    status: document.getElementById('staff-status').value
+                };
+
+                if (!data.name) return alert("Name is required");
+
+                if (id) {
+                    await fetch(`/api/staff/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await fetch('/api/staff', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                await loadAllData();
+                closeGenericModal();
+                loadStaffTable();
+                showToast("Staff record saved");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        async function deleteStaff(id) {
+            if (!confirm("Are you sure you want to delete this staff record?")) return;
+            await fetch(`/api/staff/${id}`, { method: 'DELETE' });
+            await loadAllData();
+            loadStaffTable();
+            showToast("Staff record deleted");
+        }
+
+        // Product Types Modal Form
+        function openProductTypeModal(id = null) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            const type = id ? productTypesList.find(t => t.id === id) : { name: '' };
+            title.textContent = id ? 'Edit Product Type' : 'New Product Type';
+            
+            body.innerHTML = `
+                <div>
+                    <label class="form-label">Product Type Name</label>
+                    <input type="text" id="prodtype-name" class="form-input" value="${escapeHtml(type.name)}">
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const name = document.getElementById('prodtype-name').value.trim();
+                if (!name) return;
+
+                if (id) {
+                    await fetch(`/api/product-types/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                } else {
+                    await fetch('/api/product-types', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                }
+                
+                await loadAllData();
+                closeGenericModal();
+                loadProductTypesTable();
+                showToast("Product type saved");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        async function deleteProductType(id) {
+            if (!confirm("Are you sure you want to delete this product type?")) return;
+            await fetch(`/api/product-types/${id}`, { method: 'DELETE' });
+            await loadAllData();
+            loadProductTypesTable();
+            showToast("Product type deleted");
+        }
+
+        // Products Modal Form
+        function openProductModal(id = null) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            const prod = id ? productsList.find(p => p.id === id) : { name: '', code: '', type: '', charge: 0 };
+            title.textContent = id ? 'Edit Product' : 'New Product';
+            
+            body.innerHTML = `
+                <div class="settings-form-grid">
+                    <div class="form-group-full">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" id="prod-name" class="form-input" value="${escapeHtml(prod.name)}">
+                    </div>
+                    <div>
+                        <label class="form-label">Code / Alias</label>
+                        <input type="text" id="prod-code" class="form-input" value="${escapeHtml(prod.code || '')}">
+                    </div>
+                    <div>
+                        <label class="form-label">Product Type</label>
+                        <select id="prod-type" class="form-select">
+                            ${productTypesList.map(t => `<option value="${escapeHtml(t.name)}" ${prod.type===t.name?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group-full">
+                        <label class="form-label">Rate / Charge (₹)</label>
+                        <input type="number" id="prod-charge" class="form-input" value="${prod.charge || 0}">
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const data = {
+                    name: document.getElementById('prod-name').value.trim(),
+                    code: document.getElementById('prod-code').value.trim(),
+                    type: document.getElementById('prod-type').value,
+                    charge: parseFloat(document.getElementById('prod-charge').value) || 0
+                };
+
+                if (!data.name) return;
+
+                if (id) {
+                    await fetch(`/api/products/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await fetch('/api/products', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                await loadAllData();
+                closeGenericModal();
+                loadProductsTable();
+                showToast("Product saved");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm("Are you sure you want to delete this product?")) return;
+            await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            await loadAllData();
+            loadProductsTable();
+            showToast("Product deleted");
+        }
+
+        // Inventory Material Modal Form
+        function openMaterialModal(id = null) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            const item = id ? materialsList.find(m => m.id === id) : { name: '', category: '', stock: 0, unit: 'pcs', minStock: 0 };
+            title.textContent = id ? 'Edit Inventory Item' : 'New Inventory Item';
+            
+            body.innerHTML = `
+                <div class="settings-form-grid">
+                    <div class="form-group-full">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" id="mat-name" class="form-input" value="${escapeHtml(item.name)}">
+                    </div>
+                    <div>
+                        <label class="form-label">Category</label>
+                        <select id="mat-cat" class="form-select">
+                            ${lookupsList.filter(l => l.type==='stock_category').map(c => `<option value="${escapeHtml(c.name)}" ${item.category===c.name?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Stock Unit</label>
+                        <input type="text" id="mat-unit" class="form-input" placeholder="e.g. pcs, kg, box" value="${escapeHtml(item.unit || 'pcs')}">
+                    </div>
+                    <div>
+                        <label class="form-label">Opening Stock</label>
+                        <input type="number" id="mat-stock" class="form-input" value="${item.stock || 0}">
+                    </div>
+                    <div>
+                        <label class="form-label">Min. Stock Alert Limit</label>
+                        <input type="number" id="mat-minStock" class="form-input" value="${item.minStock || 0}">
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const data = {
+                    name: document.getElementById('mat-name').value.trim(),
+                    category: document.getElementById('mat-cat').value,
+                    unit: document.getElementById('mat-unit').value.trim(),
+                    stock: parseFloat(document.getElementById('mat-stock').value) || 0,
+                    minStock: parseFloat(document.getElementById('mat-minStock').value) || 0
+                };
+
+                if (!data.name) return;
+
+                if (id) {
+                    await fetch(`/api/materials/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await fetch('/api/materials', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                await loadAllData();
+                closeGenericModal();
+                loadInventoryItemsTable();
+                showToast("Inventory item saved");
+            };
+
+            modal.style.display = 'flex';
+        }
+
+        async function deleteMaterial(id) {
+            if (!confirm("Are you sure you want to delete this item?")) return;
+            await fetch(`/api/materials/${id}`, { method: 'DELETE' });
+            await loadAllData();
+            loadInventoryItemsTable();
+            showToast("Inventory item deleted");
+        }
+
+        // Closing modal generic
+        function closeGenericModal() {
+            document.getElementById('generic-modal').style.display = 'none';
+        }
+
+        // Save Forms
+        async function saveLabInfo() {
+            const data = {
+                labName: document.getElementById('labName').value,
+                taxId: document.getElementById('taxId').value,
+                fdaRegNum: document.getElementById('fdaRegNum').value,
+                address1: document.getElementById('address1').value,
+                address2: document.getElementById('address2').value,
+                city: document.getElementById('city').value,
+                pin: document.getElementById('pin').value,
+                state: document.getElementById('state').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                website: document.getElementById('website').value,
+                tagline: document.getElementById('tagline').value
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'lab_info', value: data })
+            });
+
+            await loadAllData();
+            showToast("Lab Information saved successfully");
+        }
+
+        async function createNewLab() {
+            const name = document.getElementById('newlab-name').value.trim();
+            if (!name) return alert("Lab Name is required");
+            showToast(`Creating Lab: ${name}`);
+            setTimeout(() => {
+                showDashboardView();
+            }, 1000);
+        }
+
+        async function saveThemeSettings() {
+            const transitions = {
+                page: document.getElementById('theme-trans-page').value,
+                list: document.getElementById('theme-trans-list').value,
+                subview: document.getElementById('theme-trans-subview').value,
+                readonly: document.getElementById('theme-trans-readonly').value
+            };
+
+            await Promise.all([
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'theme', value: tempSelectedTheme })
+                }),
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'transitions', value: transitions })
+                })
+            ]);
+
+            await loadAllData();
+            showToast("Theme preferences saved");
+        }
+
+        async function saveLogisticsSettings() {
+            const data = {
+                scanFinal: document.getElementById('logistics-scanFinal').value,
+                scanTryin: document.getElementById('logistics-scanTryin').value,
+                photoFail: document.getElementById('logistics-photoFail').checked,
+                sigSuccess: document.getElementById('logistics-sigSuccess').checked,
+                locStop: document.getElementById('logistics-locStop').checked,
+                allUpdates: document.getElementById('logistics-allUpdates').checked
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'logistics', value: data })
+            });
+
+            await loadAllData();
+            showToast("Logistics options updated");
+        }
+
+        async function saveAppOptions() {
+            const data = {
+                dateRange: document.getElementById('app-dateRange').value,
+                weeklyHoliday: document.getElementById('app-weeklyHoliday').value,
+                upPeriod: parseInt(document.getElementById('app-upPeriod').value) || 1,
+                upPeriodStart: document.getElementById('app-upPeriodStart').value,
+                recentPeriod: parseInt(document.getElementById('app-recentPeriod').value) || 1,
+                recentPeriodStart: document.getElementById('app-recentPeriodStart').value,
+                pageSize: parseInt(document.getElementById('app-pageSize').value) || 50,
+                dateFormat: document.getElementById('app-dateFormat').value,
+                roundOff: document.getElementById('app-roundOff').value,
+                defaultSlots: {
+                    due: document.getElementById('app-defaultSlots-due').value,
+                    datein: document.getElementById('app-defaultSlots-datein').value
+                }
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'app_options', value: data })
+            });
+
+            await loadAllData();
+            showToast("App Options saved");
+        }
+
+        async function saveSerialsSettings() {
+            const keys = ['clientCode', 'receipt', 'bill', 'order', 'voucher', 'goodsIn', 'goodsOut', 'shipment', 'creditAdj', 'pickup', 'model', 'pudPlan', 'tryin'];
+            const data = {};
+            keys.forEach(k => {
+                data[k] = {
+                    gen: document.getElementById(`serial-gen-${k}`).value,
+                    prefix: document.getElementById(`serial-prefix-${k}`).value
+                };
+            });
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'serials', value: data })
+            });
+
+            await loadAllData();
+            showToast("Serials sequences saved");
+        }
+
+        async function saveOrderSettings() {
+            const data = {
+                dupCell: document.getElementById('order-dupCell').checked,
+                mandFields: {
+                    cell: document.getElementById('order-mand-cell').checked,
+                    email: document.getElementById('order-mand-email').checked,
+                    addr1: document.getElementById('order-mand-addr1').checked,
+                    addr2: document.getElementById('order-mand-addr2').checked,
+                    addr3: document.getElementById('order-mand-addr3').checked,
+                    city: document.getElementById('order-mand-city').checked,
+                    pin: document.getElementById('order-mand-pin').checked
+                },
+                waitTryIn: parseInt(document.getElementById('order-waitTryIn').value) || 2,
+                waitHold: parseInt(document.getElementById('order-waitHold').value) || 1,
+                scanInput: document.querySelector('input[name="order-scanInput"]:checked').value,
+                warrantyStart: document.querySelector('input[name="order-warrantyStart"]:checked').value,
+                allowManualDeliv: document.getElementById('order-allowManualDeliv').checked,
+                allowInvoiceDelivOnly: document.getElementById('order-allowInvoiceDelivOnly').checked,
+                shadeSelect: document.getElementById('order-shadeSelect').value,
+                productSelect: document.getElementById('order-productSelect').value,
+                singleDigitTeeth: document.getElementById('order-singleDigitTeeth').checked,
+                enableTryIn: document.getElementById('order-enableTryIn').checked,
+                patientMand: document.getElementById('order-patientMand').checked,
+                modelMand: document.getElementById('order-modelMand').checked,
+                calcDue: document.getElementById('order-calcDue').checked,
+                multiScan: document.getElementById('order-multiScan').checked,
+                allowTaxChange: document.getElementById('order-allowTaxChange').checked,
+                sepInvoiceSeq: document.getElementById('order-sepInvoiceSeq').checked
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'order_settings', value: data })
+            });
+
+            await loadAllData();
+            showToast("Order Settings saved successfully");
+        }
+
+        async function saveColorSettings() {
+            const data = {
+                dueColors: {
+                    todayDeliv: document.getElementById('color-due-todayDeliv').value,
+                    todayNotDeliv: document.getElementById('color-due-todayNotDeliv').value,
+                    pastNotDeliv: document.getElementById('color-due-pastNotDeliv').value,
+                    future: document.getElementById('color-due-future').value
+                },
+                statusColors: {
+                    new: document.getElementById('color-status-new').value,
+                    production: document.getElementById('color-status-production').value,
+                    complete: document.getElementById('color-status-complete').value,
+                    delivered: document.getElementById('color-status-delivered').value,
+                    hold: document.getElementById('color-status-hold').value,
+                    tryin: document.getElementById('color-status-tryin').value,
+                    cancelled: document.getElementById('color-status-cancelled').value
+                }
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'colors', value: data })
+            });
+
+            await loadAllData();
+            showToast("Color preferences saved");
+        }
+
+        // Print settings save
+        async function savePrintSettings(reportKey) {
+            const data = {
+                barcode: document.getElementById(`print-barcode-${reportKey}`).value,
+                barcodeSize: parseInt(document.getElementById(`print-barcodeSize-${reportKey}`).value) || 100,
+                showBarcodeText: document.getElementById(`print-showBarcodeText-${reportKey}`).checked,
+                orientation: document.querySelector(`input[name="print-orient-${reportKey}"]:checked`).value,
+                logoPlacement: document.getElementById(`print-logoPlacement-${reportKey}`).value,
+                logoWidth: parseFloat(document.getElementById(`print-logoWidth-${reportKey}`).value) || 1,
+                showHeader: document.getElementById(`print-showHeader-${reportKey}`).checked,
+                title: document.getElementById(`print-title-${reportKey}`).value,
+                subLeft: document.getElementById(`print-subLeft-${reportKey}`).value,
+                subRight: document.getElementById(`print-subRight-${reportKey}`).value,
+                reportHeader: document.getElementById(`print-reportHeader-${reportKey}`).value,
+                footerSubLeft: document.getElementById(`print-footerSubLeft-${reportKey}`).value,
+                footerSubRight: document.getElementById(`print-footerSubRight-${reportKey}`).value
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: `print_${reportKey}`, value: data })
+            });
+
+            await loadAllData();
+            showToast(`${reportKey.charAt(0).toUpperCase() + reportKey.slice(1)} print template updated`);
+        }
+
+        // Label settings save
+        async function saveLabelSettings(labelKey) {
+            const data = {
+                format: document.getElementById(`label-format-${labelKey}`).value,
+                width: parseFloat(document.getElementById(`label-width-${labelKey}`).value) || 210,
+                height: parseFloat(document.getElementById(`label-height-${labelKey}`).value) || 297,
+                rows: parseInt(document.getElementById(`label-rows-${labelKey}`).value) || 4,
+                cols: parseInt(document.getElementById(`label-cols-${labelKey}`).value) || 2,
+                lblWidth: parseFloat(document.getElementById(`label-lblWidth-${labelKey}`).value) || 90,
+                lblHeight: parseFloat(document.getElementById(`label-lblHeight-${labelKey}`).value) || 30,
+                topMargin: parseFloat(document.getElementById(`label-topMargin-${labelKey}`).value) || 10,
+                leftMargin: parseFloat(document.getElementById(`label-leftMargin-${labelKey}`).value) || 10,
+                vPitch: parseFloat(document.getElementById(`label-vPitch-${labelKey}`).value) || 30,
+                hPitch: parseFloat(document.getElementById(`label-hPitch-${labelKey}`).value) || 100,
+                font: document.getElementById(`label-font-${labelKey}`).value,
+                fontSize: parseInt(document.getElementById(`label-fontSize-${labelKey}`).value) || 100
+            };
+
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: `label_${labelKey}`, value: data })
+            });
+
+            await loadAllData();
+            showToast(`${labelKey.charAt(0).toUpperCase() + labelKey.slice(1)} specifications saved`);
+        }
+
+        // Utils helper functions
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
