@@ -2359,7 +2359,7 @@
                         <div style="display:flex; flex-direction:column; gap:12px;">
                             <div>
                                 <label class="form-label">Label Format</label>
-                                <select id="label-format-${labelKey}" class="form-select">
+                                <select id="label-format-${labelKey}" class="form-select" onchange="updateLabelPreview('${labelKey}')">
                                     <option ${data.format==='A4 Sheet of 99.1 x 38.1mm labels'?'selected':''}>A4 Sheet of 99.1 x 38.1mm labels</option>
                                     <option ${data.format==='A4 Sheet of 105 x 37mm labels'?'selected':''}>A4 Sheet of 105 x 37mm labels</option>
                                 </select>
@@ -2368,11 +2368,11 @@
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                                 <div>
                                     <label class="form-label">Page Width (mm)</label>
-                                    <input type="number" id="label-width-${labelKey}" class="form-input" value="${data.width}">
+                                    <input type="number" id="label-width-${labelKey}" class="form-input" value="${data.width}" oninput="updateLabelPreview('${labelKey}')">
                                 </div>
                                 <div>
                                     <label class="form-label">Page Height (mm)</label>
-                                    <input type="number" id="label-height-${labelKey}" class="form-input" value="${data.height}">
+                                    <input type="number" id="label-height-${labelKey}" class="form-input" value="${data.height}" oninput="updateLabelPreview('${labelKey}')">
                                 </div>
                             </div>
 
@@ -2392,27 +2392,27 @@
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Label Width</label>
-                                        <input type="number" step="0.1" id="label-lblWidth-${labelKey}" class="form-input" value="${data.lblWidth}">
+                                        <input type="number" step="0.1" id="label-lblWidth-${labelKey}" class="form-input" value="${data.lblWidth}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Label Height</label>
-                                        <input type="number" step="0.1" id="label-lblHeight-${labelKey}" class="form-input" value="${data.lblHeight}">
+                                        <input type="number" step="0.1" id="label-lblHeight-${labelKey}" class="form-input" value="${data.lblHeight}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Top Margin</label>
-                                        <input type="number" step="0.1" id="label-topMargin-${labelKey}" class="form-input" value="${data.topMargin}">
+                                        <input type="number" step="0.1" id="label-topMargin-${labelKey}" class="form-input" value="${data.topMargin}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Left Margin</label>
-                                        <input type="number" step="0.1" id="label-leftMargin-${labelKey}" class="form-input" value="${data.leftMargin}">
+                                        <input type="number" step="0.1" id="label-leftMargin-${labelKey}" class="form-input" value="${data.leftMargin}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Vertical Pitch</label>
-                                        <input type="number" step="0.1" id="label-vPitch-${labelKey}" class="form-input" value="${data.vPitch}">
+                                        <input type="number" step="0.1" id="label-vPitch-${labelKey}" class="form-input" value="${data.vPitch}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                     <div>
                                         <label class="form-label" style="font-size:11px;">Horizontal Pitch</label>
-                                        <input type="number" step="0.1" id="label-hPitch-${labelKey}" class="form-input" value="${data.hPitch}">
+                                        <input type="number" step="0.1" id="label-hPitch-${labelKey}" class="form-input" value="${data.hPitch}" oninput="updateLabelPreview('${labelKey}')">
                                     </div>
                                 </div>
                             </div>
@@ -2420,13 +2420,13 @@
                             <div style="border:1px solid #eee; padding:10px; border-radius:4px;">
                                 <label class="form-label">Font & Size</label>
                                 <div style="display:flex; gap:10px;">
-                                    <select id="label-font-${labelKey}" class="form-select" style="flex:1;">
-                                        <option>Lucida Console</option>
-                                        <option>Courier New</option>
+                                    <select id="label-font-${labelKey}" class="form-select" style="flex:1;" onchange="updateLabelPreview('${labelKey}')">
+                                        <option ${data.font==='Lucida Console'?'selected':''}>Lucida Console</option>
+                                        <option ${data.font==='Courier New'?'selected':''}>Courier New</option>
                                     </select>
-                                    <select id="label-fontSize-${labelKey}" class="form-select" style="width:90px;">
-                                        <option value="100">100 %</option>
-                                        <option value="80">80 %</option>
+                                    <select id="label-fontSize-${labelKey}" class="form-select" style="width:90px;" onchange="updateLabelPreview('${labelKey}')">
+                                        <option value="100" ${data.fontSize==100?'selected':''}>100 %</option>
+                                        <option value="80" ${data.fontSize==80?'selected':''}>80 %</option>
                                     </select>
                                 </div>
                             </div>
@@ -2434,8 +2434,8 @@
                     </div>
 
                     <!-- Labels preview -->
-                    <div class="print-preview-pane">
-                        <div class="paper-sheet" style="background:#fff; display:block;">
+                    <div class="print-preview-pane" style="overflow: auto;">
+                        <div class="paper-sheet" style="background:#fff; display:block; box-sizing: border-box;">
                             <div class="labels-grid-preview" id="labels-grid-preview-${labelKey}">
                                 <!-- Grid loaded dynamically -->
                             </div>
@@ -2452,14 +2452,58 @@
 
             const rows = parseInt(document.getElementById(`label-rows-${labelKey}`).value) || 4;
             const cols = parseInt(document.getElementById(`label-cols-${labelKey}`).value) || 2;
+            const widthEl = document.getElementById(`label-width-${labelKey}`);
+            const heightEl = document.getElementById(`label-height-${labelKey}`);
+            const lblWidthEl = document.getElementById(`label-lblWidth-${labelKey}`);
+            const lblHeightEl = document.getElementById(`label-lblHeight-${labelKey}`);
+            const topMarginEl = document.getElementById(`label-topMargin-${labelKey}`);
+            const leftMarginEl = document.getElementById(`label-leftMargin-${labelKey}`);
+            const vPitchEl = document.getElementById(`label-vPitch-${labelKey}`);
+            const hPitchEl = document.getElementById(`label-hPitch-${labelKey}`);
+            const fontEl = document.getElementById(`label-font-${labelKey}`);
+            const fontSizeEl = document.getElementById(`label-fontSize-${labelKey}`);
+
+            const pWidth = widthEl ? (parseFloat(widthEl.value) || 210) : 210;
+            const pHeight = heightEl ? (parseFloat(heightEl.value) || 297) : 297;
+            const lblWidth = lblWidthEl ? (parseFloat(lblWidthEl.value) || 90) : 90;
+            const lblHeight = lblHeightEl ? (parseFloat(lblHeightEl.value) || 30) : 30;
+            const topMargin = topMarginEl ? (parseFloat(topMarginEl.value) || 10) : 10;
+            const leftMargin = leftMarginEl ? (parseFloat(leftMarginEl.value) || 10) : 10;
+            const vPitch = vPitchEl ? (parseFloat(vPitchEl.value) || 30) : 30;
+            const hPitch = hPitchEl ? (parseFloat(hPitchEl.value) || 100) : 100;
+            const font = fontEl ? fontEl.value : 'Lucida Console';
+            const fontSize = fontSizeEl ? parseInt(fontSizeEl.value) : 100;
+
+            const paperSheet = grid.closest('.paper-sheet');
+            if (paperSheet) {
+                paperSheet.style.width = pWidth + 'mm';
+                paperSheet.style.height = pHeight + 'mm';
+                paperSheet.style.padding = '0';
+                
+                const parentWidth = paperSheet.parentElement.clientWidth || 400;
+                const sheetWidthPx = pWidth * 3.78;
+                const scale = Math.min(1, (parentWidth - 40) / sheetWidthPx);
+                paperSheet.style.transform = `scale(${scale})`;
+                paperSheet.style.transformOrigin = 'top center';
+            }
+
+            grid.style.paddingTop = topMargin + 'mm';
+            grid.style.paddingLeft = leftMargin + 'mm';
+            grid.style.gridTemplateColumns = `repeat(${cols}, ${lblWidth}mm)`;
             
-            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            const vGap = Math.max(0, vPitch - lblHeight);
+            const hGap = Math.max(0, hPitch - lblWidth);
+            grid.style.rowGap = vGap + 'mm';
+            grid.style.columnGap = hGap + 'mm';
+            
+            grid.style.fontFamily = font;
+            grid.style.fontSize = (9 * (fontSize / 100)) + 'px';
             grid.innerHTML = '';
             
             const totalLabels = rows * cols;
-            for (let i = 0; i < Math.min(totalLabels, 12); i++) {
+            for (let i = 0; i < Math.min(totalLabels, 24); i++) {
                 grid.innerHTML += `
-                    <div class="label-cell-mock">
+                    <div class="label-cell-mock" style="width: ${lblWidth}mm; height: ${lblHeight}mm; font-family: ${font}; font-size: ${(9 * (fontSize / 100))}px; box-sizing: border-box;">
                         <div style="font-weight:bold; border-bottom:1px solid #eee; padding-bottom:2px; margin-bottom:4px; display:flex; justify-content:space-between;">
                             <span>MODEL #${1000 + i}</span>
                             <span>24-JUN</span>
@@ -2473,6 +2517,7 @@
                 `;
             }
         }
+
 
         // Expense Heads
         function renderExpenseHeadsTab() {
