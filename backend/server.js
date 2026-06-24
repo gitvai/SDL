@@ -1191,120 +1191,7 @@ app.delete('/api/adjustments/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- STAFF ---
-app.get('/api/staff', async (req, res) => {
-  try {
-    const staff = await prisma.staff.findMany();
-    res.json(staff);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/staff', async (req, res) => {
-  try {
-    const staff = await prisma.staff.create({ data: req.body });
-    res.status(201).json(staff);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// --- EXPENSES ---
-app.get('/api/expenses', async (req, res) => {
-  try {
-    const expenses = await prisma.expense.findMany();
-    res.json(expenses);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/expenses', async (req, res) => {
-  try {
-    const data = { ...req.body };
-    data.amount = toNum(data.amount);
-    data.date = toDate(data.date) || new Date();
-    const expense = await prisma.expense.create({ data });
-    res.status(201).json(expense);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// --- PRODUCTS ---
-app.get('/api/products', async (req, res) => {
-  try {
-    const { search, type } = req.query;
-    const where = {};
-    if (type && type !== 'All Product Types') where.type = type;
-    
-    let products = await prisma.product.findMany({ where });
-    
-    if (search) {
-      const s = search.toLowerCase();
-      products = products.filter(p => p.name && p.name.toLowerCase().includes(s));
-    }
-    res.json(products);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/products', async (req, res) => {
-  try {
-    const data = { ...req.body };
-    data.charge = toNum(data.charge) || 0;
-    
-    if (data.name) {
-      const existing = await prisma.product.findFirst({
-        where: { name: { equals: data.name } } // Prisma doesn't support case-insensitive equals easily in sqlite without lowercasing, but exact match prevention helps
-      });
-      if (existing) {
-        return res.status(400).json({ error: 'Product with this name already exists' });
-      }
-    }
-
-    const product = await prisma.product.create({ data });
-    res.status(201).json(product);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.get('/api/products/:id', async (req, res) => {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { id: Number(req.params.id) }
-    });
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.put('/api/products/:id', async (req, res) => {
-  try {
-    const data = { ...req.body };
-    if (data.charge !== undefined) data.charge = toNum(data.charge) || 0;
-    const product = await prisma.product.update({
-      where: { id: Number(req.params.id) },
-      data
-    });
-    res.json(product);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.delete('/api/products/:id', async (req, res) => {
-  try {
-    await prisma.product.delete({
-      where: { id: Number(req.params.id) }
-    });
-    res.status(204).send();
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.get('/api/product-types', async (req, res) => {
-  try {
-    const types = await prisma.productType.findMany();
-    res.json(types);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/product-types', async (req, res) => {
-  try {
-    const data = { ...req.body };
-    const type = await prisma.productType.create({ data });
-    res.status(201).json(type);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
+// Duplicate staff, expenses, products, and product-types endpoints removed (defined elsewhere in CRUD section)
 
 // --- PICKUP REQUESTS ---
 app.get('/api/pickups', async (req, res) => {
@@ -2304,9 +2191,19 @@ app.delete('/api/product-types/:id', async (req, res) => {
 // --- PRODUCTS CRUD ---
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await prisma.product.findMany({
+    const { search, type } = req.query;
+    const where = {};
+    if (type && type !== 'All Product Types' && type !== 'All') where.type = type;
+    
+    let products = await prisma.product.findMany({ 
+      where,
       orderBy: { name: 'asc' }
     });
+    
+    if (search) {
+      const s = search.toLowerCase();
+      products = products.filter(p => p.name && p.name.toLowerCase().includes(s));
+    }
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2352,10 +2249,36 @@ app.delete('/api/products/:id', async (req, res) => {
 // --- MATERIALS CRUD (INVENTORY ITEMS) ---
 app.get('/api/materials', async (req, res) => {
   try {
-    const materials = await prisma.material.findMany({
-      orderBy: { name: 'asc' }
-    });
-    res.json(materials);
+    const { search, category } = req.query;
+    const where = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search } }
+      ];
+    }
+    if (category && category !== 'All') where.category = category;
+    
+    let materials = await prisma.material.findMany({ where, orderBy: { name: 'asc' } });
+    
+    // Auto-seed if empty for demo purposes
+    if (materials.length === 0 && !search && category === 'All') {
+        const demo = [
+            { name: '3D EXPANSION SCREW', category: 'ORTHO', stock: 2, unit: 'pc', minStock: 0 },
+            { name: '3D PRINTER FILM', category: 'RESINS', stock: 11, unit: 'pc', minStock: 0 },
+            { name: '3D PRINTER TANK', category: 'ZIRCON', stock: 1, unit: 'pc', minStock: 0 },
+            { name: 'ACRYLIC POWDER - BLACK 40 GM', category: 'ORTHO', stock: 1, unit: 'Bottle', minStock: 0 },
+            { name: 'ALGINATE ALGINPLUS (453 GM)', category: 'ACRYLIC', stock: 0, unit: 'Packet', minStock: 0 },
+            { name: 'BASE PASTE TUBE', category: 'CERAMIC', stock: 17, unit: 'Tube', minStock: 0 },
+            { name: 'BASE PLATE', category: 'ACRYLIC', stock: 17, unit: 'Box', minStock: 0 },
+        ];
+        for (const m of demo) {
+          await prisma.material.create({ data: m });
+        }
+        materials = await prisma.material.findMany({ where, orderBy: { name: 'asc' } });
+    }
+    // Map minStock to reorderLevel for UI parity
+    const mapped = materials.map(m => ({ ...m, reorderLevel: m.minStock || 0 }));
+    res.json(mapped);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
