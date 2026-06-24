@@ -858,7 +858,7 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        document.getElementById('payment-form').onsubmit = async (e) => {
+        async function handlePaymentSubmit(e) {
             e.preventDefault();
             
             let notesValue = document.getElementById('p-notes').value;
@@ -895,9 +895,9 @@
                     alert('Error saving payment: ' + err.error);
                 }
             } catch (err) { alert('Connection error'); }
-        };
+        }
 
-        document.getElementById('expense-form').onsubmit = async (e) => {
+        async function handleExpenseSubmit(e) {
             e.preventDefault();
             const data = {
                 amount: document.getElementById('e-amount').value,
@@ -923,7 +923,7 @@
                     alert('Error saving expense: ' + err.error);
                 }
             } catch (err) { alert('Connection error'); }
-        };
+        }
     </script>
 
     <!-- New Payment (Receipt) Modal -->
@@ -933,7 +933,7 @@
                 <h2 style="font-size:18px; color:var(--primary-blue); font-weight:700;">Payment</h2>
                 <button onclick="closeModal('payment-modal')" style="background:none; border:none; font-size:24px; cursor:pointer;">×</button>
             </div>
-            <form id="payment-form">
+            <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
                 <div style="margin-bottom:15px;">
                     <label style="display:block; margin-bottom:5px; font-weight:600; font-size:13px;">Client</label>
                     <select id="p-client" required style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;"></select>
@@ -997,7 +997,7 @@
                 <h2 style="font-size:18px; color:var(--primary-blue); font-weight:700;">Edit Expense Entry</h2>
                 <button onclick="closeModal('expense-modal')" style="background:none; border:none; font-size:24px; cursor:pointer;">×</button>
             </div>
-            <form id="expense-form">
+            <form id="expense-form" onsubmit="handleExpenseSubmit(event)">
                 <div style="display:grid; grid-template-columns: 100px 1fr; gap:15px; margin-bottom:12px; align-items:center;">
                     <label style="font-weight:600; font-size:13px;">Amount</label>
                     <input type="number" id="e-amount" value="1" required style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px;">
@@ -1037,7 +1037,6 @@
             </form>
         </div>
     </div>
-    </script>
 </body>
 
 </html>

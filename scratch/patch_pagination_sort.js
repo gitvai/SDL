@@ -78,17 +78,23 @@ const patchFile = (filename, renderFuncName, dataVarName, tbodyId) => {
     `;
 
     if (!content.includes('function applySortAndPagination')) {
-        content = content.replace(/<\/script>/, wrapperLogic + '\n</script>');
+        const inlineScriptStart = content.indexOf('<script>');
+        if (inlineScriptStart !== -1) {
+            const inlineScriptEnd = content.indexOf('</script>', inlineScriptStart);
+            if (inlineScriptEnd !== -1) {
+                content = content.slice(0, inlineScriptEnd) + wrapperLogic + '\n' + content.slice(inlineScriptEnd);
+            }
+        }
     }
     
     // We need to modify the place where the render function processes its data array
     // E.g., `renderOrders(orders)` -> `const pageData = applySortAndPagination(orders); ... use pageData instead of orders`
     
-    const regex = new RegExp(\`function \${renderFuncName}\\\\((\\\\w+)\\\\) \\\\{\`);
-    content = content.replace(regex, \`function \${renderFuncName}($1) {
+    const regex = new RegExp(`function ${renderFuncName}\\((\\w+)\\) \\{`);
+    content = content.replace(regex, `function ${renderFuncName}($1) {
             allFetchedData = $1;
             $1 = applySortAndPagination($1);
-    \`);
+    `);
 
     fs.writeFileSync(filename, content);
     console.log('Patched ' + filename);
