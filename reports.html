@@ -1180,6 +1180,53 @@
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.sub-tab');
+            const searchInput = document.getElementById('report-search');
+            const reportItems = document.querySelectorAll('.report-item');
+            
+            function filterSidebar() {
+                const activeTab = document.querySelector('.sub-tab.active');
+                const activeCategory = activeTab ? activeTab.textContent.trim() : 'Favourites';
+                const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                
+                let visibleCount = 0;
+                
+                reportItems.forEach(item => {
+                    const categories = (item.dataset.category || '').split(',').map(c => c.trim());
+                    const reportName = item.querySelector('span').textContent.toLowerCase();
+                    
+                    const matchesCategory = categories.includes(activeCategory);
+                    const matchesSearch = reportName.includes(searchVal);
+                    
+                    if (matchesCategory && matchesSearch) {
+                        item.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                const countSpan = document.getElementById('report-count');
+                if (countSpan) countSpan.textContent = `(${visibleCount})`;
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    filterSidebar();
+                });
+            });
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', filterSidebar);
+            }
+            
+            // Initial filter
+            filterSidebar();
+        });
+
         function createTeethGrid(selection) {
             if (!selection || selection.trim() === "") return '-';
             try {
