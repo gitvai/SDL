@@ -2458,6 +2458,49 @@
                             (adj.amount || 0).toFixed(2)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     }
+                } else if (name === 'Assigned Staff wise Scheduled Pickup Request' || name === 'Scheduled Date wise Pickup Requests') {
+                    const res = await fetch(`${API_BASE}/pickup-requests`);
+                    const pickups = await res.json();
+                    
+                    if (name === 'Assigned Staff wise Scheduled Pickup Request') {
+                        headers = ['Assigned Staff', 'Client', 'Scheduled Date', 'Scheduled Time', 'Status', 'Notes'];
+                        rows = pickups.map(pr => [
+                            pr.client ? pr.client.defaultDeliveryAgent || 'Unassigned' : 'Unassigned',
+                            pr.client ? pr.client.name : 'Unknown',
+                            pr.pickupDate ? new Date(pr.pickupDate).toLocaleDateString('en-GB') : new Date(pr.requestDate).toLocaleDateString('en-GB'),
+                            new Date(pr.pickupDate || pr.requestDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                            pr.status,
+                            pr.notes || '-'
+                        ]).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
+                    } else {
+                        headers = ['Scheduled Date', 'Client', 'Assigned Staff', 'Scheduled Time', 'Status', 'Notes'];
+                        rows = pickups.map(pr => [
+                            pr.pickupDate ? new Date(pr.pickupDate).toLocaleDateString('en-GB') : new Date(pr.requestDate).toLocaleDateString('en-GB'),
+                            pr.client ? pr.client.name : 'Unknown',
+                            pr.client ? pr.client.defaultDeliveryAgent || 'Unassigned' : 'Unassigned',
+                            new Date(pr.pickupDate || pr.requestDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                            pr.status,
+                            pr.notes || '-'
+                        ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                    }
+                } else if (name === 'Staff wise Pickup Done') {
+                    const res = await fetch(`${API_BASE}/pickup-returns`);
+                    const returns = await res.json();
+                    
+                    headers = ['Staff', 'Client', 'Done Date', 'Done Time', 'Remarks'];
+                    rows = returns.filter(r => r.status === 'Received at Lab' || r.status === 'Completed' || r.status === 'Received').map(r => {
+                        const driver = r.order && r.order.client ? r.order.client.defaultDeliveryAgent || 'Default Driver' : 'Default Driver';
+                        const clientName = r.order && r.order.client ? r.order.client.name : 'Unknown';
+                        const doneDate = r.pickupDate ? new Date(r.pickupDate).toLocaleDateString('en-GB') : new Date(r.createdAt).toLocaleDateString('en-GB');
+                        const doneTime = new Date(r.pickupDate || r.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        return [
+                            driver,
+                            clientName,
+                            doneDate,
+                            doneTime,
+                            r.itemType || 'Impression'
+                        ];
+                    }).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
                 } else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                     const ledgerData = await fetchClientLedgerData();
                     const container = document.getElementById('filter-container');
@@ -4006,7 +4049,7 @@
                 `;
             }
 
-            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type', 'Delivery Boy', 'Category', 'City', 'Area', 'Route', 'Taxable', 'Registration Date', 'Adjustment Type', 'Payment Mode'];
+            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type', 'Delivery Boy', 'Category', 'City', 'Area', 'Route', 'Taxable', 'Registration Date', 'Adjustment Type', 'Payment Mode', 'Assigned Staff', 'Scheduled Date', 'Staff'];
             if (groupingHeaders.includes(headers[0])) {
                 // Group by first column (index 0)
                 const grouped = {};

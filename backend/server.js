@@ -2423,6 +2423,42 @@ app.delete('/api/lookups/:id', async (req, res) => {
   }
 });
 
+// --- PICKUPS ---
+app.get('/api/pickup-requests', async (req, res) => {
+  try {
+    const pickups = await prisma.pickupRequest.findMany({
+      include: { client: true },
+      orderBy: { id: 'desc' }
+    });
+    res.json(pickups);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.get('/api/pickup-returns', async (req, res) => {
+  try {
+    const returns = await prisma.pickupReturn.findMany({
+      include: { order: { include: { client: true } } },
+      orderBy: { id: 'desc' }
+    });
+    res.json(returns);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/pickup-returns', async (req, res) => {
+  try {
+    const { orderId, itemType, status, pickupDate } = req.body;
+    const ret = await prisma.pickupReturn.create({
+      data: {
+        orderId: Number(orderId),
+        itemType,
+        status,
+        pickupDate: pickupDate ? new Date(pickupDate) : null
+      }
+    });
+    res.status(201).json(ret);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 const server = app.listen(PORT, () => {
   console.log(`[${new Date().toLocaleTimeString()}] Server is successfully running on port ${PORT}`);
   console.log('Keep this window open to maintain server connection.');
