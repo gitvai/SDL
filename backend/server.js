@@ -2459,6 +2459,17 @@ app.post('/api/pickup-returns', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+app.get('/api/materials', async (req, res) => {
+  try {
+    const materials = await prisma.material.findMany({
+      orderBy: { name: 'asc' }
+    });
+    res.json(materials);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const server = app.listen(PORT, () => {
   console.log(`[${new Date().toLocaleTimeString()}] Server is successfully running on port ${PORT}`);
   console.log('Keep this window open to maintain server connection.');
