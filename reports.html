@@ -3175,6 +3175,48 @@
                         (e.amount || 0).toFixed(2),
                         e.paymentMode || 'Credit Account'
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || b[1].localeCompare(a[1]));
+                } else if (name === 'Technician wise Activity Log - WorkFlow') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    headers = ['Technician', 'Date', 'Order #', 'Patient', 'Product', 'Work Stage', 'Status'];
+                    rows = orders.filter(o => o.technician).map(o => [
+                        o.technician,
+                        o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
+                        o.orderNumber || o.id,
+                        o.patientName || '-',
+                        o.productName || o.productType || '-',
+                        o.status || 'Received',
+                        o.status === 'Delivered' || o.status === 'Completed' ? 'Completed' : 'In Progress'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || b[1].localeCompare(a[1]));
+                } else if (name === 'Technician wise Activity Log - WorkFlow(Search by Order Date)') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    headers = ['Technician', 'Order #', 'Order Date', 'Patient', 'Product', 'Work Stage', 'Status'];
+                    rows = orders.filter(o => o.technician).map(o => [
+                        o.technician,
+                        o.orderNumber || o.id,
+                        o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
+                        o.patientName || '-',
+                        o.productName || o.productType || '-',
+                        o.status || 'Received',
+                        o.status === 'Delivered' || o.status === 'Completed' ? 'Completed' : 'In Progress'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || b[2].localeCompare(a[2]));
+                } else if (name === 'Technician wise Incomplete Work Stages') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    headers = ['Technician', 'Order #', 'Patient', 'Product', 'Work Stage', 'Assigned Date', 'Status'];
+                    rows = orders.filter(o => o.technician && o.status !== 'Delivered' && o.status !== 'Completed' && o.status !== 'Cancelled').map(o => [
+                        o.technician,
+                        o.orderNumber || o.id,
+                        o.patientName || '-',
+                        o.productName || o.productType || '-',
+                        o.status || 'Received',
+                        o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
+                        'Incomplete'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || b[5].localeCompare(a[5]));
                 } else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                     const ledgerData = await fetchClientLedgerData();
                     const container = document.getElementById('filter-container');
