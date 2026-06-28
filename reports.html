@@ -904,7 +904,7 @@
                 <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                     <h3 id="modal-report-title-top" style="margin:0 0 10px 0; font-size:20px; font-weight: 500;">Report Title</h3>
                     <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px;">Search Criterion</div>
-                    <div style="display: flex; gap: 10px; align-items: center; font-size: 13px; color: #555;">
+                    <div id="filter-container" style="display: flex; gap: 10px; align-items: center; font-size: 13px; color: #555; flex-wrap: wrap;">
                         <label>Invoice Date</label>
                         <select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">
     <option value="Custom Date">Custom Date</option>
@@ -1052,8 +1052,54 @@
             document.getElementById('report-count').textContent = `${visibleCount} Reports`;
         }
 
+        function setupFilters(name) {
+            const container = document.getElementById('filter-container');
+            let html = '';
+            
+            // Default filter date options
+            const dateOptions = `
+                <option value="Custom Date">Custom Date</option>
+                <option value="Recent">Recent</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="This week from Sunday">This week from Sunday</option>
+                <option value="Month To Date" selected>Month To Date</option>
+                <option value="Last 7 Days">Last 7 Days</option>
+                <option value="Last Full Week">Last Full Week</option>
+                <option value="Last Full Month">Last Full Month</option>
+                <option value="Last 30 Days">Last 30 Days</option>
+                <option value="Year To Date">Year To Date</option>
+                <option value="Financial Year To Date">Financial Year To Date</option>
+                <option value="Last 6 Months">Last 6 Months</option>
+                <option value="Last 12 Months">Last 12 Months</option>
+            `;
+            const defaultDateInputs = `
+                <input type="text" value="01/06/2026" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px; width: 90px;" disabled>
+                <input type="text" value="19/06/2026" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px; width: 90px;" disabled>
+            `;
+
+            if (name === 'Orders Jobs- by Due Date' || name === 'Due Date wise Order Jobs' || name === 'Orders Jobs- by ProductType' || name === 'Orders Jobs- by ProductType,Product - Summary') {
+                let primaryDateLabel = 'Due Date';
+                if (name === 'Orders Jobs- by ProductType' || name === 'Orders Jobs- by ProductType,Product - Summary') {
+                    primaryDateLabel = 'Order Date';
+                }
+                
+                html += `<label>Status</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option>Is One of</option><option>New</option><option>Try In</option><option>Hold</option><option>Cancelled</option></select>`;
+                html += `<label>${primaryDateLabel}</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions.replace('selected', '').replace('value="Upcoming"', 'value="Upcoming" selected')}</select>`;
+                html += defaultDateInputs;
+                
+            } else if (name === 'Client wise Invoiced Order Jobs' || name === 'Client, Product wise Invoiced Order Job Summary') {
+                html += `<label>Order Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+            } else {
+                html += `<label>Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+            }
+            
+            container.innerHTML = html;
+        }
+
         // Real Data Report Generation
         async function runReport(name) {
+            setupFilters(name);
             showToast(`Generating report: ${name}...`);
             document.getElementById('report-placeholder').style.display = 'none';
             document.getElementById('report-screen').style.display = 'flex';
@@ -1154,33 +1200,36 @@
                         if (o.jobs && o.jobs.length > 0) {
                             o.jobs.forEach(j => {
                                 const prod = j.productName || j.productType || 'Unknown';
+                                const cat = j.productType || 'Unknown';
                                 const key = clientName + '||' + prod;
-                                if (!groups[key]) groups[key] = { clientName, prod, count: 0, units: 0, amount: 0 };
+                                if (!groups[key]) groups[key] = { clientName, cat, prod, count: 0, units: 0, amount: 0 };
                                 groups[key].count++;
                                 groups[key].units += (j.units || 0);
                                 groups[key].amount += (j.totalAmount || 0);
                             });
                         } else {
                             const prod = o.productName || o.productType || 'Unknown';
+                            const cat = o.productType || 'Unknown';
                             const key = clientName + '||' + prod;
-                            if (!groups[key]) groups[key] = { clientName, prod, count: 0, units: 0, amount: 0 };
+                            if (!groups[key]) groups[key] = { clientName, cat, prod, count: 0, units: 0, amount: 0 };
                             groups[key].count++;
                             groups[key].units += (o.units || 0);
                             groups[key].amount += (o.netAmount || o.totalAmount || 0);
                         }
                     });
-                    headers = ['Client', 'Product', 'Order Count', 'Total Units', 'Net Amount'];
+                    headers = ['Client', 'Category', 'Product', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(groups).map(g => [
                         g.clientName,
+                        g.cat,
                         g.prod,
                         g.count,
                         g.units,
                         g.amount.toFixed(2)
-                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
                 } else if (name === 'Due Date wise Order Jobs') {
                     const res = await fetch(`${API_BASE}/orders`);
                     data = await res.json();
-                    headers = ['Due Date', 'Trial Date', 'Order #', 'Client', 'Patient', 'Product', 'Teeth', 'Units', 'Shade', 'Amount', 'Status'];
+                    headers = ['Due Date', 'Client', 'Order Date', 'Order #', 'Model #', 'Patient', 'Teeth', 'Product', 'Product Type', 'Shade', 'Status', 'Units'];
                     let newRows = [];
                     data.filter(o => o.dueDate && !['Complete', 'Delivered', 'Cancelled'].includes(o.status))
                         .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
@@ -1189,31 +1238,33 @@
                                 o.jobs.forEach(j => {
                                     newRows.push([
                                         new Date(o.dueDate).toLocaleDateString('en-GB'),
-                                        o.trialDate ? new Date(o.trialDate).toLocaleDateString('en-GB') : '-',
-                                        o.orderNumber || o.id,
                                         o.client ? o.client.name : 'Unknown',
+                                        o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB') : '-',
+                                        o.orderNumber || o.id,
+                                        o.modelNumber || '-',
                                         o.patientName || '-',
-                                        j.productName || j.productType || '-',
                                         createTeethGrid(j.teethSelection),
-                                        j.units || '1',
+                                        j.productName || '-',
+                                        j.productType || '-',
                                         [j.shade1, j.shade2, j.shade3].filter(s => s).join('/') || '-',
-                                        (j.totalAmount || 0).toFixed(2),
-                                        o.status
+                                        o.status,
+                                        j.units || '1'
                                     ]);
                                 });
                             } else {
                                 newRows.push([
                                     new Date(o.dueDate).toLocaleDateString('en-GB'),
-                                    o.trialDate ? new Date(o.trialDate).toLocaleDateString('en-GB') : '-',
-                                    o.orderNumber || o.id,
                                     o.client ? o.client.name : 'Unknown',
+                                    o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB') : '-',
+                                    o.orderNumber || o.id,
+                                    o.modelNumber || '-',
                                     o.patientName || '-',
-                                    o.productName || o.productType || '-',
                                     createTeethGrid(o.teethSelection),
-                                    o.units || '1',
+                                    o.productName || '-',
+                                    o.productType || '-',
                                     [o.shade1, o.shade2, o.shade3].filter(s => s).join('/') || '-',
-                                    (o.netAmount || o.totalAmount || 0).toFixed(2),
-                                    o.status
+                                    o.status,
+                                    o.units || '1'
                                 ]);
                             }
                         });
@@ -1410,21 +1461,41 @@
                     ]);
                 } else if (name === 'Orders Jobs- by ProductType') {
                     const res = await fetch(`${API_BASE}/orders`);
-                    const orders = await res.json();
-                    const typeData = {};
-                    orders.forEach(o => {
+                    data = await res.json();
+                    headers = ['Product Type', 'Client', 'Due Date', 'Order Date', 'Order #', 'Patient', 'Teeth', 'Product', 'Units'];
+                    let newRows = [];
+                    data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(o => {
                         if (o.jobs && o.jobs.length > 0) {
                             o.jobs.forEach(j => {
-                                const type = j.productType || 'Unknown';
-                                typeData[type] = (typeData[type] || 0) + 1;
+                                newRows.push([
+                                    j.productType || '-',
+                                    o.client ? o.client.name : 'Unknown',
+                                    o.dueDate ? new Date(o.dueDate).toLocaleDateString('en-GB') : '-',
+                                    o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB') : '-',
+                                    o.orderNumber || o.id,
+                                    o.patientName || '-',
+                                    createTeethGrid(j.teethSelection),
+                                    j.productName || '-',
+                                    j.units || '1'
+                                ]);
                             });
                         } else {
-                            const type = o.productType || 'Unknown';
-                            typeData[type] = (typeData[type] || 0) + 1;
+                            newRows.push([
+                                o.productType || '-',
+                                o.client ? o.client.name : 'Unknown',
+                                o.dueDate ? new Date(o.dueDate).toLocaleDateString('en-GB') : '-',
+                                o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB') : '-',
+                                o.orderNumber || o.id,
+                                o.patientName || '-',
+                                createTeethGrid(o.teethSelection),
+                                o.productName || '-',
+                                o.units || '1'
+                            ]);
                         }
                     });
-                    headers = ['Product Type', 'Order Count'];
-                    rows = Object.entries(typeData).map(([type, count]) => [type, count]).sort((a, b) => a[0].localeCompare(b[0]));
+                    
+                    // Sort by Product Type
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Orders Jobs- by ProductType,Product - Summary' || name === 'Shipped Orders Jobs- by ProductType,Product - Summary' || name === 'Shipped Orders Jobs- by ProductType, Product - Summary') {
                     const res = await fetch(`${API_BASE}/orders`);
                     let orders = await res.json();
@@ -1563,18 +1634,22 @@
                     </div>
             `;
 
-            if (name === 'Due Date wise Order Jobs' || name === 'Orders Jobs- by Due Date') {
-                // Group by Due Date (index 0)
+            if (name === 'Due Date wise Order Jobs' || name === 'Orders Jobs- by Due Date' || name === 'Orders Jobs- by ProductType' || name === 'Client, Product wise Invoiced Order Job Summary' || name.includes('ProductType,Product - Summary')) {
+                // Group by first column (index 0)
                 const grouped = {};
                 rows.forEach(r => {
-                    const date = r[0];
-                    if (!grouped[date]) grouped[date] = [];
-                    grouped[date].push(r);
+                    const groupKey = r[0] || 'Unknown';
+                    if (!grouped[groupKey]) grouped[groupKey] = [];
+                    grouped[groupKey].push(r);
                 });
                 
-                Object.keys(grouped).forEach(date => {
+                let groupTitle = 'Due Date';
+                if (name.includes('ProductType')) groupTitle = 'Product Type';
+                if (name === 'Client, Product wise Invoiced Order Job Summary') groupTitle = 'Client';
+
+                Object.keys(grouped).forEach(key => {
                     html += `
-                        <h4 style="background:#e5e7eb; padding:8px 12px; margin-top:20px; margin-bottom:0; font-size:14px; border:1px solid #ccc; border-bottom:none;">Due Date: ${date}</h4>
+                        <h4 style="background:#e5e7eb; padding:8px 12px; margin-top:20px; margin-bottom:0; font-size:14px; border:1px solid #ccc; border-bottom:none;">${groupTitle}: ${key}</h4>
                         <table style="width:100%; border-collapse:collapse; font-size:13px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom:20px;">
                             <thead>
                                 <tr style="background:#f3f4f6; text-align:left;">
