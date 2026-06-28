@@ -617,7 +617,7 @@
                 <span>Sales Manager wise Client Job Activity Summary</span>
             </a>
 
-            <!-- Clients Tab Reports -->
+            <!-- Clients Tab Reports (22 Reports exactly matching screenshots) -->
             <a href="javascript:void(0)" class="report-item" data-category="Favourites,Clients" onclick="runReport('All Clients Outstanding')">
                 <i class="fas fa-star"></i>
                 <i class="fas fa-table"></i>
@@ -628,7 +628,7 @@
                 <i class="fas fa-table"></i>
                 <span>City wise Clients</span>
             </a>
-            <a href="javascript:void(0)" class="report-item" data-category="Favourites,Clients" onclick="runReport('Client Statement of Accounts')">
+            <a href="javascript:void(0)" class="report-item" data-category="Favourites,Clients" onclick="showClientStatementModal()">
                 <i class="fas fa-star"></i>
                 <i class="fas fa-table"></i>
                 <span>Client Statement of Accounts</span>
@@ -708,10 +708,25 @@
                 <i class="fas fa-table"></i>
                 <span>Route wise Clients</span>
             </a>
-            <a href="javascript:void(0)" class="report-item" data-category="Clients" onclick="runReport('Sales Manager wise All Clients')">
+            <a href="javascript:void(0)" class="report-item" data-category="Clients" onclick="runReport('Sales Manager wise All Clients Outstanding')">
                 <i class="far fa-star empty"></i>
                 <i class="fas fa-table"></i>
-                <span>Sales Manager wise All Clients</span>
+                <span>Sales Manager wise All Clients Outstanding</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Clients" onclick="runReport('Sales Manager wise Clients')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Sales Manager wise Clients</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Clients" onclick="runReport('Sales Manager wise Clients with Balances')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Sales Manager wise Clients with Balances</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Clients" onclick="runReport('Taxable status wise all clients outstanding')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Taxable status wise all clients outstanding</span>
             </a>
 
             <!-- Lab Tab Reports -->
@@ -1270,7 +1285,19 @@
                 }
             }
             
-            // 2. Handle other dropdown filters
+            // 2. Handle City Text Search
+            const cityInput = container.querySelector('input[data-filter="city-search"]');
+            if (cityInput && cityInput.value.trim()) {
+                const searchVal = cityInput.value.toLowerCase().trim();
+                const cityColIdx = headers.findIndex(h => h.toLowerCase() === 'city');
+                filteredRows = filteredRows.filter(row => {
+                    const cellVal0 = String(row[0] || '').toLowerCase();
+                    const cellValCol = cityColIdx !== -1 ? String(row[cityColIdx] || '').toLowerCase() : '';
+                    return cellVal0.includes(searchVal) || cellValCol.includes(searchVal);
+                });
+            }
+            
+            // 3. Handle other dropdown filters
             selects.forEach(select => {
                 const filterType = select.dataset.filter;
                 if (!filterType || filterType === 'date-preset') return;
@@ -1299,6 +1326,8 @@
                     colIdx = headers.findIndex(h => h.toLowerCase().includes('try-in') || h.toLowerCase().includes('try in'));
                 } else if (typeLower === 'jobtype') {
                     colIdx = headers.findIndex(h => h.toLowerCase().includes('work type') || h.toLowerCase().includes('type'));
+                } else if (typeLower === 'route') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('route'));
                 }
                 
                 if (colIdx !== -1) {
@@ -1306,6 +1335,15 @@
                         const cellVal = String(row[colIdx] || '').trim();
                         return cellVal.toLowerCase() === selectedVal.toLowerCase();
                     });
+                } else {
+                    // Fallback to check the first column (the grouping key)
+                    const firstHeader = headers[0] || '';
+                    if (firstHeader.toLowerCase().includes(typeLower) || (typeLower === 'producttype' && firstHeader.toLowerCase() === 'category')) {
+                        filteredRows = filteredRows.filter(row => {
+                            const cellVal = String(row[0] || '').trim();
+                            return cellVal.toLowerCase() === selectedVal.toLowerCase();
+                        });
+                    }
                 }
             });
             
@@ -1384,13 +1422,30 @@
                 html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.startsWith('Sales Manager wise')) {
                 const managers = [...new Set(filterData.clients.map(c => c.salesManager).filter(Boolean))].map(m => ({ name: m }));
-                const dateLabel = name.includes('Shipments') ? 'Dispatch Date' : 'Order Date';
+                const dateLabel = name.includes('Shipments') ? 'Dispatch Date' : (name.includes('Outstanding') ? 'Invoice Date' : 'Order Date');
                 html += `<label>Sales Manager</label><select data-filter="salesManager" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(managers)}</select>`;
-                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
-            } else if (name.includes('Client wise') || name.includes('Client, Product wise') || name === 'Sub Doctor wise Order Jobs') {
-                const dateLabel = name.includes('Due Date') ? 'Due Date' : (name.includes('not yet delivered') ? 'Order Date' : 'Dispatch Date');
+                if (name.includes('Outstanding') || name.includes('Clients')) {
+                    html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                }
+            } else if (name.startsWith('Route wise')) {
+                const routes = [...new Set(filterData.clients.map(c => c.route).filter(Boolean))].map(r => ({ name: r }));
+                html += `<label>Route</label><select data-filter="route" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(routes)}</select>`;
+                if (name.includes('Outstanding')) {
+                    html += `<label>Invoice Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                }
+            } else if (name === 'New Clients with route info') {
+                const routes = [...new Set(filterData.clients.map(c => c.route).filter(Boolean))].map(r => ({ name: r }));
+                html += `<label>Route</label><select data-filter="route" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(routes)}</select>`;
+                html += `<label>Registration Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+            } else if (name.startsWith('City wise Clients')) {
+                html += `<label>City</label><select style="border:1px solid #ccc; padding:4px; border-radius:2px; width:80px;"><option value="Contains">Contains</option></select>`;
+                html += `<input type="text" data-filter="city-search" placeholder="Enter city..." style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">`;
+            } else if (name.includes('Client wise') || name.includes('Client, Product wise') || name === 'Sub Doctor wise Order Jobs' || name === 'Client Order Analysis' || name === 'Client Price List') {
+                const dateLabel = name.includes('Due Date') ? 'Due Date' : (name.includes('not yet delivered') ? 'Order Date' : (name.includes('Shipment') ? 'Dispatch Date' : 'Order Date'));
                 html += `<label>Client</label><select data-filter="client" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.clients)}</select>`;
-                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                if (name !== 'Client Price List') {
+                    html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                }
             } else if (name.includes('ProductType,Product - Summary')) {
                 html += `<label>Product Type</label><select data-filter="productType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.productTypes)}</select>`;
                 html += `<label>Shipment Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
@@ -1406,7 +1461,7 @@
                 html += `<label>Job Type</label><select data-filter="jobType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="New">New</option><option value="Repeat">Repeat</option><option value="Repair">Repair</option></select>`;
                 html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else {
-                const dateLabel = name === 'Shipments List' ? 'Shipment Date' : (name.includes('Dispatch') || name.includes('Shipment') ? 'Dispatch Date' : 'Date');
+                const dateLabel = name === 'Shipments List' ? 'Shipment Date' : (name.includes('Dispatch') || name.includes('Shipment') ? 'Dispatch Date' : (name.includes('Registration') || name.includes('emails') || name.includes('Clients list') ? 'Registration Date' : 'Date'));
                 html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             }
             
@@ -1416,6 +1471,323 @@
                 el.addEventListener('change', applyFilters);
                 el.addEventListener('input', applyFilters);
             });
+        }
+
+        async function fetchClientLedgerData() {
+            const [clientsRes, invoicesRes, receiptsRes, adjustmentsRes] = await Promise.all([
+                fetch(`${API_BASE}/clients`).then(r => r.json()),
+                fetch(`${API_BASE}/invoices`).then(r => r.json()),
+                fetch(`${API_BASE}/receipts`).then(r => r.json()),
+                fetch(`${API_BASE}/adjustments`).then(r => r.json())
+            ]);
+            return {
+                clients: clientsRes || [],
+                invoices: invoicesRes || [],
+                receipts: receiptsRes || [],
+                adjustments: adjustmentsRes || []
+            };
+        }
+        
+        function computeLedgers(data, startDate, endDate) {
+            const { clients, invoices, receipts, adjustments } = data;
+            
+            return clients.map(c => {
+                const cInvoices = invoices.filter(i => i.clientId === c.id);
+                const cReceipts = receipts.filter(r => r.clientId === c.id);
+                const cAdjustments = adjustments.filter(a => a.clientId === c.id);
+                
+                let opening = c.openingBalance || 0;
+                let billed = 0;
+                let paid = 0;
+                let creditAdj = 0;
+                let debitAdj = 0;
+                
+                cInvoices.forEach(i => {
+                    if (new Date(i.invoiceDate) < startDate) opening += (i.netAmount || 0);
+                });
+                cReceipts.forEach(r => {
+                    if (new Date(r.receiptDate) < startDate) opening -= (r.amount || 0);
+                });
+                cAdjustments.forEach(a => {
+                    if (new Date(a.date) < startDate) {
+                        if (a.type === 'Credit') opening -= (a.amount || 0);
+                        else if (a.type === 'Debit') opening += (a.amount || 0);
+                    }
+                });
+                
+                cInvoices.forEach(i => {
+                    const d = new Date(i.invoiceDate);
+                    if (d >= startDate && d <= endDate) billed += (i.netAmount || 0);
+                });
+                cReceipts.forEach(r => {
+                    const d = new Date(r.receiptDate);
+                    if (d >= startDate && d <= endDate) paid += (r.amount || 0);
+                });
+                cAdjustments.forEach(a => {
+                    const d = new Date(a.date);
+                    if (d >= startDate && d <= endDate) {
+                        if (a.type === 'Credit') creditAdj += (a.amount || 0);
+                        else if (a.type === 'Debit') debitAdj += (a.amount || 0);
+                    }
+                });
+                
+                const closing = opening + billed - paid - creditAdj + debitAdj;
+                
+                return {
+                    client: c,
+                    opening,
+                    billed,
+                    paid,
+                    creditAdj,
+                    debitAdj,
+                    closing
+                };
+            });
+        }
+
+        function injectClientStatementModal() {
+            if (document.getElementById('client-statement-modal')) return;
+            const modalDiv = document.createElement('div');
+            modalDiv.id = 'client-statement-modal';
+            modalDiv.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999; font-family: sans-serif;';
+            modalDiv.innerHTML = `
+                <div style="background:#fff; width:500px; padding:25px; border-radius:8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); box-sizing: border-box;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #eee; padding-bottom:10px; margin-bottom:20px;">
+                        <h3 style="margin:0; font-size:18px; color: #333;">Client Report Options</h3>
+                        <span onclick="closeClientStatementModal()" style="cursor:pointer; font-size:24px; font-weight:bold; color:#aaa; line-height: 20px;">&times;</span>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; font-weight:600; margin-bottom:5px; font-size:13px; color: #555;">Client</label>
+                        <select id="statement-client-select" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;"></select>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; font-weight:600; margin-bottom:5px; font-size:13px; color: #555;">Date Range</label>
+                        <div style="display:flex; gap:10px; align-items: center;">
+                            <select id="statement-date-preset" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;"></select>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top: 8px;">
+                            <input type="date" id="statement-date-start" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                            <input type="date" id="statement-date-end" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:600; margin-bottom:8px; font-size:13px; color: #555;">Optional Fields & Details</label>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:13px; color: #444;">
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-tax" checked> Tax Amount</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-ref" checked> Reference #</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-order-no" checked> Order #</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-order-date" checked> Order Date</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-model-no" checked> Model #</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-patient" checked> Patient Name</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-teeth" checked> Teeth</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-product" checked> Product</label>
+                            <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="opt-units" checked> Units</label>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button onclick="closeClientStatementModal()" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:4px; cursor:pointer; font-size:13px;">Cancel</button>
+                        <button onclick="generateClientStatement()" style="padding:8px 15px; border:none; background:#3b82f6; color:#fff; border-radius:4px; cursor:pointer; font-size:13px;">View Report</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+            
+            const presetSelect = document.getElementById('statement-date-preset');
+            presetSelect.innerHTML = `
+                <option value="Month To Date" selected>Month To Date</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="This week from Sunday">This week from Sunday</option>
+                <option value="Last 7 Days">Last 7 Days</option>
+                <option value="Last Full Month">Last Full Month</option>
+                <option value="Last 30 Days">Last 30 Days</option>
+                <option value="Year To Date">Year To Date</option>
+                <option value="Custom Date">Custom Date</option>
+            `;
+            
+            const updateInputs = () => {
+                const preset = presetSelect.value;
+                const startInput = document.getElementById('statement-date-start');
+                const endInput = document.getElementById('statement-date-end');
+                if (preset === 'Custom Date') {
+                    startInput.disabled = false;
+                    endInput.disabled = false;
+                } else {
+                    startInput.disabled = true;
+                    endInput.disabled = true;
+                    const range = getDateRange(preset);
+                    if (range.start) startInput.value = range.start.toLocaleDateString('en-CA');
+                    if (range.end) endInput.value = range.end.toLocaleDateString('en-CA');
+                }
+            };
+            
+            presetSelect.addEventListener('change', updateInputs);
+            updateInputs();
+        }
+
+        async function showClientStatementModal() {
+            injectClientStatementModal();
+            
+            const select = document.getElementById('statement-client-select');
+            if (!window.cachedFilterData || !window.cachedFilterData.clients) {
+                try {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    const clients = await res.json();
+                    window.cachedFilterData = window.cachedFilterData || {};
+                    window.cachedFilterData.clients = clients;
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            
+            const clients = (window.cachedFilterData && window.cachedFilterData.clients) || [];
+            select.innerHTML = clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            
+            document.getElementById('client-statement-modal').style.display = 'flex';
+        }
+        
+        function closeClientStatementModal() {
+            const modal = document.getElementById('client-statement-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function generateClientStatement() {
+            const clientId = parseInt(document.getElementById('statement-client-select').value);
+            const clientName = document.getElementById('statement-client-select').options[document.getElementById('statement-client-select').selectedIndex].text;
+            
+            const startVal = document.getElementById('statement-date-start').value;
+            const endVal = document.getElementById('statement-date-end').value;
+            
+            let startDate = new Date(startVal);
+            let endDate = new Date(endVal);
+            startDate.setHours(0,0,0,0);
+            endDate.setHours(23,59,59,999);
+            
+            closeClientStatementModal();
+            
+            showToast(`Generating statement for: ${clientName}...`);
+            document.getElementById('report-placeholder').style.display = 'none';
+            document.getElementById('report-screen').style.display = 'flex';
+            document.getElementById('modal-report-title').textContent = 'Client Statement of Accounts';
+            document.getElementById('modal-report-title-top').textContent = 'Client Statement of Accounts';
+            
+            const [invoices, receipts, adjustments] = await Promise.all([
+                fetch(`${API_BASE}/invoices`).then(r => r.json()),
+                fetch(`${API_BASE}/receipts`).then(r => r.json()),
+                fetch(`${API_BASE}/adjustments`).then(r => r.json())
+            ]);
+            
+            const cInvoices = invoices.filter(i => i.clientId === clientId);
+            const cReceipts = receipts.filter(r => r.clientId === clientId);
+            const cAdjustments = adjustments.filter(a => a.clientId === clientId);
+            
+            const clientRes = await fetch(`${API_BASE}/clients/${clientId}`);
+            const client = await clientRes.json();
+            let opening = client.openingBalance || 0;
+            
+            cInvoices.forEach(i => {
+                if (new Date(i.invoiceDate) < startDate) opening += (i.netAmount || 0);
+            });
+            cReceipts.forEach(r => {
+                if (new Date(r.receiptDate) < startDate) opening -= (r.amount || 0);
+            });
+            cAdjustments.forEach(a => {
+                if (new Date(a.date) < startDate) {
+                    if (a.type === 'Credit') opening -= (a.amount || 0);
+                    else if (a.type === 'Debit') opening += (a.amount || 0);
+                }
+            });
+            
+            let txs = [];
+            cInvoices.forEach(i => {
+                const d = new Date(i.invoiceDate);
+                if (d >= startDate && d <= endDate) {
+                    txs.push({ date: d, type: 'Invoice', ref: i.invoiceNumber, debit: i.netAmount || 0, credit: 0, obj: i });
+                }
+            });
+            cReceipts.forEach(r => {
+                const d = new Date(r.receiptDate);
+                if (d >= startDate && d <= endDate) {
+                    txs.push({ date: d, type: 'Receipt', ref: r.receiptNumber, debit: 0, credit: r.amount || 0, obj: r });
+                }
+            });
+            cAdjustments.forEach(a => {
+                const d = new Date(a.date);
+                if (d >= startDate && d <= endDate) {
+                    if (a.type === 'Credit') {
+                        txs.push({ date: d, type: 'Credit Note', ref: a.adjustmentNumber, debit: 0, credit: a.amount || 0, obj: a });
+                    } else {
+                        txs.push({ date: d, type: 'Debit Note', ref: a.adjustmentNumber, debit: a.amount || 0, credit: 0, obj: a });
+                    }
+                }
+            });
+            
+            txs.sort((a, b) => a.date - b.date);
+            
+            const optTax = document.getElementById('opt-tax').checked;
+            const optRef = document.getElementById('opt-ref').checked;
+            const optOrderNo = document.getElementById('opt-order-no').checked;
+            const optOrderDate = document.getElementById('opt-order-date').checked;
+            const optModelNo = document.getElementById('opt-model-no').checked;
+            const optPatient = document.getElementById('opt-patient').checked;
+            const optTeeth = document.getElementById('opt-teeth').checked;
+            const optProduct = document.getElementById('opt-product').checked;
+            const optUnits = document.getElementById('opt-units').checked;
+            
+            let headers = ['Date', 'Transaction'];
+            if (optRef) headers.push('Ref #');
+            if (optOrderNo) headers.push('Order #');
+            if (optOrderDate) headers.push('Order Date');
+            if (optModelNo) headers.push('Model #');
+            if (optPatient) headers.push('Patient');
+            if (optTeeth) headers.push('Teeth');
+            if (optProduct) headers.push('Product');
+            if (optUnits) headers.push('Units');
+            if (optTax) headers.push('Tax Amt');
+            
+            headers.push('Debit (Dr)', 'Credit (Cr)', 'Balance');
+            
+            let balance = opening;
+            let rows = [];
+            
+            let opRow = [startDate.toLocaleDateString('en-GB'), 'Opening Balance'];
+            for (let i = 2; i < headers.length - 3; i++) opRow.push('-');
+            opRow.push('-', '-', balance.toFixed(2));
+            rows.push(opRow);
+            
+            txs.forEach(tx => {
+                balance = balance + tx.debit - tx.credit;
+                
+                let row = [tx.date.toLocaleDateString('en-GB'), tx.type];
+                if (optRef) row.push(tx.ref || '-');
+                
+                if (tx.type === 'Invoice' && tx.obj.orders && tx.obj.orders.length > 0) {
+                    const orders = tx.obj.orders;
+                    if (optOrderNo) row.push(orders.map(o => o.orderNumber || o.id).join(', '));
+                    if (optOrderDate) row.push(orders.map(o => o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-').join(', '));
+                    if (optModelNo) row.push(orders.map(o => o.modelNumber || '-').join(', '));
+                    if (optPatient) row.push(orders.map(o => o.patientName).join(', '));
+                    if (optTeeth) row.push(orders.map(o => createTeethGrid(o.teethSelection)).join('; '));
+                    if (optProduct) row.push(orders.map(o => o.productName || '-').join(', '));
+                    if (optUnits) row.push(orders.map(o => o.units || 1).join(', '));
+                    if (optTax) row.push((tx.obj.taxAmount || 0).toFixed(2));
+                } else {
+                    const fillCount = (optOrderNo?1:0) + (optOrderDate?1:0) + (optModelNo?1:0) + (optPatient?1:0) + (optTeeth?1:0) + (optProduct?1:0) + (optUnits?1:0);
+                    for (let i = 0; i < fillCount; i++) row.push('-');
+                    if (optTax) row.push('-');
+                }
+                
+                row.push(tx.debit > 0 ? tx.debit.toFixed(2) : '-');
+                row.push(tx.credit > 0 ? tx.credit.toFixed(2) : '-');
+                row.push(balance.toFixed(2));
+                
+                rows.push(row);
+            });
+            
+            window.currentReportHeaders = headers;
+            window.currentReportRows = rows;
+            
+            renderTableReport('Client Statement of Accounts', headers, rows);
         }
 
         // Real Data Report Generation
@@ -1440,19 +1812,62 @@
                 let headers = [];
                 let rows = [];
 
-                if (name === 'All Clients Outstanding') {
-                    const res = await fetch(`${API_BASE}/invoices`);
-                    const allInvoices = await res.json();
-                    data = allInvoices.filter(inv => (inv.balanceAmount || 0) > 0);
-                    headers = ['Invoice #', 'Client', 'Date', 'Net Amount', 'Paid', 'Balance'];
-                    rows = data.map(inv => [
-                        inv.invoiceNumber, 
-                        inv.client ? inv.client.name : 'Unknown',
-                        new Date(inv.invoiceDate).toLocaleDateString(),
-                        (inv.netAmount || 0).toFixed(2),
-                        (inv.paidAmount || 0).toFixed(2),
-                        (inv.balanceAmount || 0).toFixed(2)
-                    ]);
+                if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
+                    const ledgerData = await fetchClientLedgerData();
+                    const container = document.getElementById('filter-container');
+                    let startDate = new Date(0);
+                    let endDate = new Date();
+                    if (container) {
+                        const dateSelect = container.querySelector('select[data-filter="date-preset"]');
+                        if (dateSelect) {
+                            const preset = dateSelect.value;
+                            const range = getDateRange(preset);
+                            startDate = range.start;
+                            endDate = range.end;
+                        }
+                    }
+                    
+                    const ledgers = computeLedgers(ledgerData, startDate, endDate);
+                    
+                    if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding') {
+                        headers = [name.includes('Route') ? 'Route' : (name.includes('Sales') ? 'Sales Manager' : 'Client'), 'Client', 'Code', 'Opening Balance', 'Billed', 'Paid', 'Credit Adj.', 'Dr. Adj.', 'Closing Balance'];
+                        rows = ledgers.map(l => [
+                            name.includes('Route') ? l.client.route || 'Default' : (name.includes('Sales') ? l.client.salesManager || 'None' : l.client.name),
+                            l.client.name,
+                            l.client.code || '-',
+                            l.opening.toFixed(2),
+                            l.billed.toFixed(2),
+                            l.paid.toFixed(2),
+                            l.creditAdj.toFixed(2),
+                            l.debitAdj.toFixed(2),
+                            l.closing.toFixed(2)
+                        ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                    } else if (name === 'Taxable status wise all clients outstanding') {
+                        headers = ['Taxable', 'Code', 'Client', 'Opening Balance', 'Billed', 'Paid', 'Credit Adj.', 'Dr. Adj.', 'Closing Balance'];
+                        rows = ledgers.map(l => [
+                            l.client.taxExemption ? 'Non-Taxable' : 'Taxable',
+                            l.client.code || '-',
+                            l.client.name,
+                            l.opening.toFixed(2),
+                            l.billed.toFixed(2),
+                            l.paid.toFixed(2),
+                            l.creditAdj.toFixed(2),
+                            l.debitAdj.toFixed(2),
+                            l.closing.toFixed(2)
+                        ]).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
+                    } else if (name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
+                        headers = [name.includes('Sales') ? 'Sales Manager' : 'Client', 'Client', 'Code', 'Total Balance', 'Off. Phone', 'Off. Phone2', 'Cell', 'Cell2'];
+                        rows = ledgers.map(l => [
+                            name.includes('Sales') ? l.client.salesManager || 'None' : l.client.name,
+                            l.client.name,
+                            l.client.code || '-',
+                            l.closing.toFixed(2),
+                            l.client.phone || '-',
+                            l.client.phone2 || '-',
+                            l.client.cellPhone || '-',
+                            l.client.cellPhone2 || '-'
+                        ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                    }
                 } else if (name === 'Client Payments' || name === 'Client wise payments') {
                     const res = await fetch(`${API_BASE}/receipts`);
                     data = await res.json();
@@ -1464,16 +1879,195 @@
                         r.paymentMode || 'Cash',
                         (r.amount || 0).toFixed(2)
                     ]);
-                } else if (name === 'City wise Clients') {
+                } else if (name === 'City wise Clients' || name === 'City wise Clients with address') {
                     const res = await fetch(`${API_BASE}/clients`);
                     data = await res.json();
-                    headers = ['City', 'Client Name', 'Code', 'Contact'];
+                    if (name === 'City wise Clients') {
+                        headers = ['City', 'Client', 'Off. Phone1', 'Off. Phone2', 'Cell', 'Cell2', 'email'];
+                        rows = data.map(c => [
+                            c.city || 'Unknown',
+                            c.name,
+                            c.phone || '-',
+                            c.phone2 || '-',
+                            c.cellPhone || '-',
+                            c.cellPhone2 || '-',
+                            c.email || '-'
+                        ]);
+                    } else {
+                        headers = ['City', 'Client', 'Adress', 'co office Phone'];
+                        rows = data.map(c => [
+                            c.city || 'Unknown',
+                            c.name,
+                            c.address || '-',
+                            c.phone || '-'
+                        ]);
+                    }
+                    rows = rows.sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Client wise Production Details' || name === 'Lab Client wise Production') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    
+                    if (name === 'Client wise Production Details') {
+                        headers = ['Client', 'order #', 'order Date', 'Teeth', 'Patient', 'Product', 'units', 'Amount'];
+                        let newRows = [];
+                        data.forEach(o => {
+                            const clientName = o.client ? o.client.name : 'Unknown';
+                            const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                            const orderNo = o.orderNumber || o.id;
+                            
+                            if (o.jobs && o.jobs.length > 0) {
+                                o.jobs.forEach(j => {
+                                    newRows.push([
+                                        clientName, orderNo, orderDate, createTeethGrid(j.teethSelection), o.patientName,
+                                        j.productName || j.productType || '-', j.units || '1', (j.totalAmount || 0).toFixed(2)
+                                    ]);
+                                });
+                            } else {
+                                newRows.push([
+                                    clientName, orderNo, orderDate, createTeethGrid(o.teethSelection), o.patientName,
+                                    o.productName || o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                                ]);
+                            }
+                        });
+                        rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                    } else {
+                        headers = ['Client', 'Jobs', 'Units', 'Amount'];
+                        const clientProd = {};
+                        data.forEach(o => {
+                            const clientName = o.client ? o.client.name : 'Unknown';
+                            if (!clientProd[clientName]) clientProd[clientName] = { jobs: 0, units: 0, amount: 0 };
+                            
+                            const jobsCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                            const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                            const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                            
+                            clientProd[clientName].jobs += jobsCount;
+                            clientProd[clientName].units += unitsCount;
+                            clientProd[clientName].amount += amt;
+                        });
+                        rows = Object.entries(clientProd).map(([client, cp]) => [
+                            client, cp.jobs, cp.units, cp.amount.toFixed(2)
+                        ]).sort((a, b) => a[0].localeCompare(b[0]));
+                    }
+                } else if (name === 'All Clients' || name === 'Clients list') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    if (name === 'All Clients') {
+                        headers = ['Client', 'Code', 'Off. Phone1', 'Off. Phone2', 'Cell', 'Cell2', 'email', 'City'];
+                        rows = data.map(c => [c.name, c.code || '-', c.phone || '-', c.phone2 || '-', c.cellPhone || '-', c.cellPhone2 || '-', c.email || '-', c.city || '-']);
+                    } else {
+                        headers = ['Description', 'Office Phone1', 'Office Phone2', 'Cell Phone', 'Cell Phone2', 'email', 'City'];
+                        rows = data.map(c => [c.name, c.phone || '-', c.phone2 || '-', c.cellPhone || '-', c.cellPhone2 || '-', c.email || '-', c.city || '-']);
+                    }
+                    rows = rows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Area wise Clients List') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Area', 'Client', 'Cell phone', 'office Phone', 'Adress'];
+                    rows = data.map(c => [c.area || 'Default', c.name, c.cellPhone || '-', c.phone || '-', c.address || '-']).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Client emails') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Client', 'email', 'email2'];
+                    rows = data.map(c => [c.name, c.email || '-', c.phone || '-']).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Client Order Analysis') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Client', 'Type', 'Product', 'Order #', 'Order Date', 'Patient Name', 'Model #', 'Units', 'Total Amount'];
+                    rows = data.map(o => [
+                        o.client ? o.client.name : 'Unknown',
+                        o.orderType || 'New',
+                        o.productName || o.productType || '-',
+                        o.orderNumber || o.id,
+                        o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
+                        o.patientName,
+                        o.modelNumber || '-',
+                        o.units || '1',
+                        (o.netAmount || 0).toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Client Price List') {
+                    const res = await fetch(`${API_BASE}/products`);
+                    data = await res.json();
+                    
+                    const container = document.getElementById('filter-container');
+                    let discountPct = 0;
+                    if (container) {
+                        const clientSelect = container.querySelector('select[data-filter="client"]');
+                        if (clientSelect && clientSelect.value !== 'All') {
+                            const clientName = clientSelect.value;
+                            const clientsRes = await fetch(`${API_BASE}/clients`);
+                            const clients = await clientsRes.json();
+                            const client = clients.find(c => c.name === clientName);
+                            if (client) discountPct = client.discountPercentage || 0;
+                        }
+                    }
+                    
+                    headers = ['Category', 'Product Name', 'Price', 'Discounted Price'];
+                    rows = data.map(p => [
+                        p.type || 'General',
+                        p.name,
+                        p.charge.toFixed(2),
+                        (p.charge * (1 - discountPct / 100)).toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Clients List - by Registration Date') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Registration Date', 'Client', 'Off. Phone1', 'Off. Phone2', 'Cell', 'Cell2', 'City'];
                     rows = data.map(c => [
-                        c.city || 'N/A',
+                        c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-GB') : '-',
+                        c.name,
+                        c.phone || '-',
+                        c.phone2 || '-',
+                        c.cellPhone || '-',
+                        c.cellPhone2 || '-',
+                        c.city || '-'
+                    ]).sort((a, b) => {
+                        const partsA = a[0].split('/');
+                        const partsB = b[0].split('/');
+                        return new Date(partsA[2], partsA[1]-1, partsA[0]) - new Date(partsB[2], partsB[1]-1, partsB[0]);
+                    });
+                } else if (name === 'Clients with GSTIN/TaxID') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Client', 'TaxID', 'Cell Phone'];
+                    rows = data.map(c => [c.name, c.taxId || c.trn || '-', c.cellPhone || '-']).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'New Clients with route info') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Route', 'Client', 'Reg. Date', 'Cell', 'email', 'Address', 'City'];
+                    rows = data.map(c => [
+                        c.route || 'Default',
+                        c.name,
+                        c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-GB') : '-',
+                        c.cellPhone || '-',
+                        c.email || '-',
+                        c.address || '-',
+                        c.city || '-'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Route wise Clients') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Route', 'Client', 'Code', 'Contact', 'Address', 'City'];
+                    rows = data.map(c => [
+                        c.route || 'Default',
                         c.name,
                         c.code || '-',
-                        c.cellPhone || '-'
-                    ]).sort((a, b) => a[0].localeCompare(b[0]));
+                        c.cellPhone || '-',
+                        c.address || '-',
+                        c.city || '-'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Sales Manager wise Clients') {
+                    const res = await fetch(`${API_BASE}/clients`);
+                    data = await res.json();
+                    headers = ['Sales Manager', 'Client', 'Code', 'Contact', 'Address', 'City'];
+                    rows = data.map(c => [
+                        c.salesManager || 'None',
+                        c.name,
+                        c.code || '-',
+                        c.cellPhone || '-',
+                        c.address || '-',
+                        c.city || '-'
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Due Date wise Order Jobs') {
                     const res = await fetch(`${API_BASE}/orders`);
                     data = await res.json();
@@ -2766,7 +3360,7 @@
                 `;
             }
 
-            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type', 'Delivery Boy', 'Category'];
+            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type', 'Delivery Boy', 'Category', 'City', 'Area', 'Route', 'Taxable', 'Registration Date'];
             if (groupingHeaders.includes(headers[0])) {
                 // Group by first column (index 0)
                 const grouped = {};
