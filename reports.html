@@ -3217,6 +3217,276 @@
                         o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                         'Incomplete'
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || b[5].localeCompare(a[5]));
+                } else if (name === 'Orders Jobs- by ProductType') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    headers = ['Product Type', 'Order #', 'Order Date', 'Client', 'Patient', 'Product', 'Units', 'Amount'];
+                    rows = orders.map(o => [
+                        o.productType || 'General',
+                        o.orderNumber || o.id,
+                        o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
+                        o.client ? o.client.name : 'Unknown',
+                        o.patientName || '-',
+                        o.productName || '-',
+                        o.units || 1,
+                        (o.netAmount || 0).toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Orders Jobs- by ProductType,Product - Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const summary = {};
+                    orders.forEach(o => {
+                        const type = o.productType || 'General';
+                        const prod = o.productName || '-';
+                        const key = `${type}||${prod}`;
+                        if (!summary[key]) {
+                            summary[key] = { type, prod, jobs: 0, units: 0, amount: 0 };
+                        }
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        summary[key].jobs += jobCount;
+                        summary[key].units += unitsCount;
+                        summary[key].amount += amt;
+                    });
+                    
+                    headers = ['Category', 'Product', 'Jobs', 'Units', 'Amount'];
+                    rows = Object.values(summary).map(s => [
+                        s.type, s.prod, s.jobs, s.units, s.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Area , Client wise Job summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const summary = {};
+                    orders.forEach(o => {
+                        const area = o.client ? o.client.area || 'Default' : 'Default';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const key = `${area}||${clientName}`;
+                        if (!summary[key]) {
+                            summary[key] = { area, clientName, orders: 0, jobs: 0, units: 0, amount: 0 };
+                        }
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        summary[key].orders++;
+                        summary[key].jobs += jobCount;
+                        summary[key].units += unitsCount;
+                        summary[key].amount += amt;
+                    });
+                    
+                    headers = ['Area', 'Client', 'Orders', 'Jobs', 'Units', 'Amount'];
+                    rows = Object.values(summary).map(s => [
+                        s.area, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'City wise Daily Order Activity Summary' || name === 'Client Area , Date wise Order analysis') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const isCity = name.includes('City');
+                    const summary = {};
+                    orders.forEach(o => {
+                        const loc = o.client ? (isCity ? o.client.city : o.client.area) || 'Default' : 'Default';
+                        const dateStr = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        const key = `${loc}||${dateStr}`;
+                        
+                        if (!summary[key]) {
+                            summary[key] = { loc, dateStr, clients: new Set(), jobs: 0, orders: 0, units: 0, amount: 0 };
+                        }
+                        const rec = summary[key];
+                        if (o.client) rec.clients.add(o.client.name);
+                        rec.orders++;
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        rec.jobs += jobCount;
+                        rec.units += unitsCount;
+                        rec.amount += amt;
+                    });
+                    
+                    headers = [isCity ? 'City' : 'Area', 'Order Date', 'Clients', 'Jobs', 'Orders', 'Units', 'Amount'];
+                    rows = Object.values(summary).map(s => [
+                        s.loc, s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'City wise production details' || name === 'Client Area wise Production Details') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const isCity = name.includes('City');
+                    headers = [isCity ? 'City' : 'Area', 'Client', 'Order Date', 'Order #', 'Patient', 'Teeth', 'Product', 'Product Type', 'Units', 'Amount'];
+                    
+                    let newRows = [];
+                    orders.forEach(o => {
+                        const loc = o.client ? (isCity ? o.client.city : o.client.area) || 'Default' : 'Default';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    loc, clientName, orderDate, orderNo, o.patientName || '-', createTeethGrid(j.teethSelection),
+                                    j.productName || '-', j.productType || '-', j.units || 1, (j.totalAmount || 0).toFixed(2)
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                loc, clientName, orderDate, orderNo, o.patientName || '-', createTeethGrid(o.teethSelection),
+                                o.productName || '-', o.productType || '-', o.units || 1, (o.netAmount || 0).toFixed(2)
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Daily Order Activity Summary' || name === 'Daily Order Job Activity Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const summary = {};
+                    orders.forEach(o => {
+                        const dateStr = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        if (!summary[dateStr]) {
+                            summary[dateStr] = { dateStr, clients: new Set(), orders: 0, jobs: 0, units: 0, amount: 0 };
+                        }
+                        const rec = summary[dateStr];
+                        if (o.client) rec.clients.add(o.client.name);
+                        rec.orders++;
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        rec.jobs += jobCount;
+                        rec.units += unitsCount;
+                        rec.amount += amt;
+                    });
+                    
+                    if (name === 'Daily Order Activity Summary') {
+                        headers = ['Order Date', 'Clients', 'Orders', 'Job Amount', 'Additional Amount', 'Order Amount'];
+                        rows = Object.values(summary).map(s => [
+                            s.dateStr, s.clients.size, s.orders, s.amount.toFixed(2), '0.00', s.amount.toFixed(2)
+                        ]).sort((a, b) => a[0].localeCompare(b[0]));
+                    } else {
+                        headers = ['Order Date', 'Clients', 'Jobs', 'Orders', 'Units', 'Job Amount'];
+                        rows = Object.values(summary).map(s => [
+                            s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                        ]).sort((a, b) => a[0].localeCompare(b[0]));
+                    }
+                } else if (name === 'Month , Client wise Order Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const summary = {};
+                    orders.forEach(o => {
+                        const dateObj = new Date(o.receivedDate);
+                        const monthStr = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const key = `${monthStr}||${clientName}`;
+                        
+                        if (!summary[key]) {
+                            summary[key] = { monthStr, clientName, jobs: 0, orders: 0, units: 0, amount: 0 };
+                        }
+                        const rec = summary[key];
+                        rec.orders++;
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        rec.jobs += jobCount;
+                        rec.units += unitsCount;
+                        rec.amount += amt;
+                    });
+                    
+                    headers = ['Month', 'Client', 'Jobs', 'Orders', 'Units', 'Amount'];
+                    rows = Object.values(summary).map(s => [
+                        s.monthStr, s.clientName, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Product Category vs Clients Crosstab') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const prodTypes = [...new Set(orders.map(o => o.productType || 'General'))];
+                    const clients = [...new Set(orders.map(o => o.client ? o.client.name : 'Unknown'))];
+                    
+                    headers = ['Client Name', ...prodTypes, 'Total Products', 'Total Amount'];
+                    
+                    rows = clients.map(cName => {
+                        const row = [cName];
+                        let totalProducts = 0;
+                        let totalAmount = 0;
+                        
+                        prodTypes.forEach(pType => {
+                            const cOrders = orders.filter(o => (o.client ? o.client.name : 'Unknown') === cName && (o.productType || 'General') === pType);
+                            const count = cOrders.reduce((sum, o) => sum + (o.units || 1), 0);
+                            const amt = cOrders.reduce((sum, o) => sum + (o.netAmount || 0), 0);
+                            
+                            row.push(count);
+                            totalProducts += count;
+                            totalAmount += amt;
+                        });
+                        
+                        row.push(totalProducts, totalAmount.toFixed(2));
+                        return row;
+                    }).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Product vs Clients , Monthwise Sales Value Crosstab') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const products = [...new Set(orders.map(o => o.productName || 'General'))];
+                    const clients = [...new Set(orders.map(o => o.client ? o.client.name : 'Unknown'))];
+                    
+                    headers = ['Client Name', ...products, 'Total Amount'];
+                    
+                    rows = clients.map(cName => {
+                        const row = [cName];
+                        let totalAmount = 0;
+                        
+                        products.forEach(prod => {
+                            const cOrders = orders.filter(o => (o.client ? o.client.name : 'Unknown') === cName && (o.productName || 'General') === prod);
+                            const amt = cOrders.reduce((sum, o) => sum + (o.netAmount || 0), 0);
+                            
+                            row.push(amt.toFixed(2));
+                            totalAmount += amt;
+                        });
+                        
+                        row.push(totalAmount.toFixed(2));
+                        return row;
+                    }).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Sales Manager wise Client Job Activity Summary' || name === 'Sales Manager wise Client Order Activity') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    const orders = await res.json();
+                    
+                    const summary = {};
+                    orders.forEach(o => {
+                        const salesManager = o.client ? o.client.salesManager || 'None' : 'None';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const key = `${salesManager}||${clientName}`;
+                        
+                        if (!summary[key]) {
+                            summary[key] = { salesManager, clientName, orders: 0, jobs: 0, units: 0, amount: 0 };
+                        }
+                        const rec = summary[key];
+                        rec.orders++;
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        rec.jobs += jobCount;
+                        rec.units += unitsCount;
+                        rec.amount += amt;
+                    });
+                    
+                    headers = ['Sales Manager', 'Client', 'Orders', 'Jobs', 'Units', 'Amount'];
+                    rows = Object.values(summary).map(s => [
+                        s.salesManager, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                     const ledgerData = await fetchClientLedgerData();
                     const container = document.getElementById('filter-container');
