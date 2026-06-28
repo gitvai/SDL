@@ -2277,7 +2277,8 @@
                         (inv.netAmount || 0).toFixed(2),
                         (inv.paidAmount || 0).toFixed(2),
                         (inv.balanceAmount || 0).toFixed(2)
-                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[3].localeCompare(b[3])); else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[3].localeCompare(b[3]));
+                } else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                     const ledgerData = await fetchClientLedgerData();
                     const container = document.getElementById('filter-container');
                     let startDate = new Date(0);
