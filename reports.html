@@ -1031,7 +1031,7 @@
                         <input type="text" value="19/06/2026" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px; width: 90px;" disabled>
                     </div>
                     <div style="display: flex; gap: 20px; margin-top: 15px; font-size: 14px;">
-                        <a href="javascript:void(0)" style="color: #0056b3; text-decoration: none;" onclick="runReport(document.getElementById('modal-report-title').textContent)">Refresh Report</a>
+                        <a href="javascript:void(0)" style="color: #0056b3; text-decoration: none;" onclick="runReport(document.getElementById('modal-report-title').textContent, true)">Refresh Report</a>
                         <a href="javascript:void(0)" style="color: #0056b3; text-decoration: none;" onclick="window.print()">Print Report</a>
                         <a href="javascript:void(0)" style="color: #0056b3; text-decoration: none;" onclick="exportReportToCSV()">Export Report</a>
                         <a href="javascript:void(0)" style="color: #0056b3; text-decoration: none;" onclick="alert('Full Screen Mode')">Full Screen</a>
@@ -1157,11 +1157,151 @@
             document.getElementById('report-count').textContent = `${visibleCount} Reports`;
         }
 
+        function getDateRange(preset) {
+            const today = new Date();
+            let start = new Date();
+            let end = new Date();
+            
+            switch (preset) {
+                case 'Today':
+                    start.setHours(0,0,0,0);
+                    end.setHours(23,59,59,999);
+                    break;
+                case 'Yesterday':
+                    start.setDate(today.getDate() - 1);
+                    start.setHours(0,0,0,0);
+                    end.setDate(today.getDate() - 1);
+                    end.setHours(23,59,59,999);
+                    break;
+                case 'Last 7 Days':
+                    start.setDate(today.getDate() - 7);
+                    break;
+                case 'Last 30 Days':
+                    start.setDate(today.getDate() - 30);
+                    break;
+                case 'This week from Sunday':
+                    const day = today.getDay();
+                    start.setDate(today.getDate() - day);
+                    break;
+                case 'Month To Date':
+                    start.setDate(1);
+                    break;
+                case 'Last Full Month':
+                    start.setMonth(today.getMonth() - 1);
+                    start.setDate(1);
+                    end.setDate(0);
+                    break;
+                case 'Year To Date':
+                    start.setMonth(0);
+                    start.setDate(1);
+                    break;
+                default:
+                    break;
+            }
+            return { start, end };
+        }
+
+        function applyFilters() {
+            if (!window.currentReportRows || !window.currentReportHeaders) return;
+            
+            let filteredRows = [...window.currentReportRows];
+            const headers = window.currentReportHeaders;
+            const container = document.getElementById('filter-container');
+            if (!container) return;
+            
+            const selects = container.querySelectorAll('select');
+            
+            // 1. Handle Date Filter first if present
+            const dateSelect = Array.from(selects).find(s => s.dataset.filter === 'date-preset');
+            if (dateSelect) {
+                const preset = dateSelect.value;
+                let startDate, endDate;
+                
+                const startInput = container.querySelector('input[data-filter="date-start"]');
+                const endInput = container.querySelector('input[data-filter="date-end"]');
+                
+                if (preset === 'Custom Date') {
+                    if (startInput) startInput.disabled = false;
+                    if (endInput) endInput.disabled = false;
+                    startDate = startInput ? new Date(startInput.value) : null;
+                    endDate = endInput ? new Date(endInput.value) : null;
+                } else {
+                    if (startInput) startInput.disabled = true;
+                    if (endInput) endInput.disabled = true;
+                    const range = getDateRange(preset);
+                    startDate = range.start;
+                    endDate = range.end;
+                    if (startInput && startDate) startInput.value = startDate.toLocaleDateString('en-CA');
+                    if (endInput && endDate) endInput.value = endDate.toLocaleDateString('en-CA');
+                }
+                
+                const dateHeaderTerms = ['date', 'on', 'scheduled', 'dispatch', 'returned', 'due'];
+                const dateColIdx = headers.findIndex(h => dateHeaderTerms.some(term => h.toLowerCase().includes(term)));
+                
+                if (dateColIdx !== -1 && startDate && endDate) {
+                    startDate.setHours(0,0,0,0);
+                    endDate.setHours(23,59,59,999);
+                    
+                    filteredRows = filteredRows.filter(row => {
+                        const cellVal = row[dateColIdx];
+                        if (!cellVal || cellVal === '-') return false;
+                        const parts = cellVal.split('/');
+                        if (parts.length === 3) {
+                            const cellDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                            return cellDate >= startDate && cellDate <= endDate;
+                        }
+                        return true;
+                    });
+                }
+            }
+            
+            // 2. Handle other dropdown filters
+            selects.forEach(select => {
+                const filterType = select.dataset.filter;
+                if (!filterType || filterType === 'date-preset') return;
+                
+                const selectedVal = select.value;
+                if (selectedVal === 'All') return;
+                
+                let colIdx = -1;
+                const typeLower = filterType.toLowerCase();
+                
+                if (typeLower === 'status') {
+                    colIdx = headers.findIndex(h => h.toLowerCase() === 'status' || h.toLowerCase() === 'order status' || h.toLowerCase() === 'status name');
+                } else if (typeLower === 'technician') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('technician'));
+                } else if (typeLower === 'product') {
+                    colIdx = headers.findIndex(h => h.toLowerCase() === 'product' || h.toLowerCase() === 'product name');
+                } else if (typeLower === 'producttype') {
+                    colIdx = headers.findIndex(h => h.toLowerCase() === 'product type' || h.toLowerCase() === 'type' || h.toLowerCase() === 'category');
+                } else if (typeLower === 'priority') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('priority'));
+                } else if (typeLower === 'salesmanager') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('manager'));
+                } else if (typeLower === 'client') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('client'));
+                } else if (typeLower === 'tryin') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('try-in') || h.toLowerCase().includes('try in'));
+                } else if (typeLower === 'jobtype') {
+                    colIdx = headers.findIndex(h => h.toLowerCase().includes('work type') || h.toLowerCase().includes('type'));
+                }
+                
+                if (colIdx !== -1) {
+                    filteredRows = filteredRows.filter(row => {
+                        const cellVal = String(row[colIdx] || '').trim();
+                        return cellVal.toLowerCase() === selectedVal.toLowerCase();
+                    });
+                }
+            });
+            
+            const reportName = document.getElementById('modal-report-title').textContent;
+            renderTableReport(reportName, headers, filteredRows);
+        }
+
         async function setupFilters(name) {
             const container = document.getElementById('filter-container');
             let html = '';
             
-            // Default filter date options
             const dateOptions = `
                 <option value="Custom Date">Custom Date</option>
                 <option value="Recent">Recent</option>
@@ -1178,12 +1318,14 @@
                 <option value="Last 6 Months">Last 6 Months</option>
                 <option value="Last 12 Months">Last 12 Months</option>
             `;
+            const firstDayStr = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-CA');
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            
             const defaultDateInputs = `
-                <input type="text" value="01/06/2026" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px; width: 90px;" disabled>
-                <input type="text" value="19/06/2026" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px; width: 90px;" disabled>
+                <input type="date" data-filter="date-start" value="${firstDayStr}" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">
+                <input type="date" data-filter="date-end" value="${todayStr}" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">
             `;
 
-            // Dynamic Data caching
             if (!window.cachedFilterData) {
                 window.cachedFilterData = {};
                 try {
@@ -1207,54 +1349,59 @@
             }
             const filterData = window.cachedFilterData;
 
-            // Generate options helper
             const getOptions = (list, key = 'name') => {
                 return `<option value="All">All</option>` + list.map(item => `<option value="${item[key]}">${item[key]}</option>`).join('');
             };
 
-            // Setup filters based on report
             if (name === 'Technician wise Activity Log' || name === 'Last Assigned Technician wise Jobs') {
-                html += `<label>Technician</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.staff)}</select>`;
-                html += `<label>Order Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Technician</label><select data-filter="technician" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.staff)}</select>`;
+                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Product wise Order Diary' || name === 'Product wise Order Diary (Search by Due Date)') {
                 const dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
-                html += `<label>Product</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.products)}</select>`;
-                html += `<label>${dateLabel}</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Product</label><select data-filter="product" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.products)}</select>`;
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Product Type wise production') {
-                html += `<label>Product Type</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.productTypes)}</select>`;
-                html += `<label>Due Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Product Type</label><select data-filter="productType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.productTypes)}</select>`;
+                html += `<label>Due Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.startsWith('Priority wise Order Jobs')) {
                 const dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
-                html += `<label>Priority</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Normal">Normal</option><option value="Urgent">Urgent</option></select>`;
-                html += `<label>${dateLabel}</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Priority</label><select data-filter="priority" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Normal">Normal</option><option value="Urgent">Urgent</option></select>`;
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Sales Manager wise Order Jobs') {
                 const managers = [...new Set(filterData.clients.map(c => c.salesManager).filter(Boolean))].map(m => ({ name: m }));
-                html += `<label>Sales Manager</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(managers)}</select>`;
-                html += `<label>Order Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Sales Manager</label><select data-filter="salesManager" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(managers)}</select>`;
+                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Sub Doctor wise Order Jobs') {
-                html += `<label>Client</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.clients)}</select>`;
-                html += `<label>Order Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Client</label><select data-filter="client" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.clients)}</select>`;
+                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Orders Jobs- by Due Date' || name === 'Due Date wise Order Jobs' || name === 'Orders List' || name === 'Orders List - by Due Date' || name === 'Orders yet to be invoiced' || name === 'Pending Deliveries') {
                 let dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
                 if (name === 'Pending Deliveries') dateLabel = 'As On Date';
-                html += `<label>Status</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Received">Received</option><option value="In Progress">In Progress</option><option value="Dispatched">Dispatched</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option></select>`;
-                html += `<label>${dateLabel}</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Status</label><select data-filter="status" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Received">Received</option><option value="In Progress">In Progress</option><option value="Dispatched">Dispatched</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option></select>`;
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.includes('Try-In') || name === 'Scheduled Try Ins') {
-                html += `<label>Try In</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Yes">Yes</option><option value="No">No</option></select>`;
-                html += `<label>Scheduled Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Try In</label><select data-filter="tryIn" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Yes">Yes</option><option value="No">No</option></select>`;
+                html += `<label>Scheduled Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Work Type wise production') {
-                html += `<label>Job Type</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="New">New</option><option value="Repeat">Repeat</option><option value="Repair">Repair</option></select>`;
-                html += `<label>Order Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Job Type</label><select data-filter="jobType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="New">New</option><option value="Repeat">Repeat</option><option value="Repair">Repair</option></select>`;
+                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else {
-                html += `<label>Date</label><select style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             }
             
             container.innerHTML = html;
+            
+            container.querySelectorAll('select, input').forEach(el => {
+                el.addEventListener('change', applyFilters);
+                el.addEventListener('input', applyFilters);
+            });
         }
 
         // Real Data Report Generation
-        async function runReport(name) {
-            await setupFilters(name);
+        async function runReport(name, isRefresh = false) {
+            if (!isRefresh) {
+                await setupFilters(name);
+            }
             showToast(`Generating report: ${name}...`);
             document.getElementById('report-placeholder').style.display = 'none';
             document.getElementById('report-screen').style.display = 'flex';
@@ -2143,7 +2290,9 @@
                     return;
                 }
 
-                renderTableReport(name, headers, rows);
+                window.currentReportHeaders = headers;
+                window.currentReportRows = rows;
+                applyFilters();
             } catch (err) {
                 console.error(err);
                 document.getElementById('report-viewer-content').innerHTML = `
