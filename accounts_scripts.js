@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Command | Accounts</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="transitions.js"></script>
-    <script>
+
 
         window.applySortAndPagination = function(data, containerId) {
             currentRenderContainer = containerId;
@@ -78,180 +68,8 @@
             if(currentRenderFn) currentRenderFn();
         };
     
-</script>
-</head>
-<body>
-    <header>
-        <a href="index.html" class="logo-section" style="text-decoration: none;">
-            <img src="logo.jpeg" alt="SOHAR DENTAL LAB" style="height: 45px; object-fit: contain;">
-            <span>SOHAR DENTAL LAB</span>
-        </a>
-        <nav class="nav-links">
-            <a href="index.html">HOME</a>
-            <a href="clients.html">CLIENTS</a>
-            <a href="orders.html">ORDERS</a>
-            <a href="shipments.html">SHIPMENTS</a>
-            <a href="accounts.html" class="active">ACCOUNTS</a>
-            <a href="office.html">OFFICE</a>
-            <a href="reports.html">REPORTS</a>
-            <a href="settings.html">SETTINGS</a>
-        </nav>
 
-    </header>
 
-    <div class="container" style="display:flex; min-height: calc(100vh - 60px);">
-        <!-- Sidebar -->
-        <aside style="width: 200px; background: #f3f4f6; border-right: 1px solid #ddd; padding: 0;">
-            <div style="padding: 10px; font-weight: 700; font-size: 13px; color: #4b5563;">Invoices</div>
-            <div class="sidebar-items">
-                <a href="javascript:void(0)" class="sidebar-link active" onclick="loadInvoices('all', 'Search Invoices')">Search</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadGenerateInvoices('generate', 'Generate Invoices')">Generate Invoices</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadInvoices('awaiting', 'Awaiting Payment')">Awaiting Payment</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadInvoices('paid', 'Paid invoices')">Paid invoices</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadInvoices('cancelled', 'Cancelled Invoices')">Cancelled Invoices</a>
-            </div>
-            <div style="padding: 10px; font-weight: 700; font-size: 13px; color: #4b5563; margin-top: 20px;">Collections</div>
-            <div class="sidebar-items">
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadReceipts('payments', 'Payments')">Payments</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadReceipts('cancelled', 'Cancelled Payments')">Cancelled Payments</a>
-            </div>
-            <div style="padding: 10px; font-weight: 700; font-size: 13px; color: #4b5563; margin-top: 20px;">Adjustments</div>
-            <div class="sidebar-items">
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadAdjustments('Credit', 'Credit Adjustments')">Credit Adjustments</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadAdjustments('Debit', 'Debit Adjustments')">Debit Adjustments</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="loadAdjustments('Journal', 'Journal Voucher')">Journal Voucher</a>
-            </div>
-            <div style="padding: 10px; font-weight: 700; font-size: 13px; color: #4b5563; margin-top: 20px;">Backup & Export</div>
-            <div class="sidebar-items">
-                <a href="/api/backup/system" class="sidebar-link"><i class="fas fa-file-archive"></i> System Backup (.zip)</a>
-                <a href="javascript:void(0)" class="sidebar-link" onclick="showExportModal()"><i class="fas fa-file-export"></i> Export Data</a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main style="flex: 1; padding: 20px; background: #fff;" class="fade-in">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h1 id="page-title" style="font-size: 20px; color: #1f2937;">Search Invoices</h1>
-                <div style="display:flex; gap:10px;">
-                    <button id="btn-new-payment" class="btn-action primary" style="background:#ec4899; color:#fff; display:none;" onclick="openNewPaymentModal()">+ New Payment</button>
-                    <button class="btn-action primary" onclick="location.href='new-order.html'">+ New Invoice</button>
-                </div>
-            </div>
-
-            <!-- Advanced Filter Card -->
-            <div class="card" style="padding: 15px; margin-bottom: 20px; border: 1px solid #ddd; background: #fff;">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <label style="display:block; font-size:12px; margin-bottom:5px;"><input type="radio" checked> Search <input type="radio"> Scan</label>
-                        <input type="text" id="invoice-search-input" placeholder="Name / Code / Cell / Email / #" style="width:100%; padding:6px; border:1px solid #ccc;" onkeyup="if(event.key==='Enter') loadData()" oninput="if(this.value.length > 2 || this.value.length === 0) loadData()">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; margin-bottom:5px;">Payment</label>
-                        <select id="filter-payment" style="width:100%; padding:6px; border:1px solid #ccc;"><option value="">Ignore</option><option>Paid</option><option>Unpaid</option></select>
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; margin-bottom:5px;">Tax</label>
-                        <select id="filter-tax" style="width:100%; padding:6px; border:1px solid #ccc;"><option value="">Ignore</option><option>With Tax</option><option>Without Tax</option></select>
-                    </div>
-                    <div style="display:flex; align-items:flex-end;">
-                        <button class="btn-action" onclick="loadData()"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 15px; align-items: center; background: #f9fafb; padding: 10px; border: 1px solid #ddd;">
-                    <div style="font-size:12px;">
-                        <label>Invoice Date</label>
-                        <select id="filter-date-range" style="padding:4px; margin-left:10px;" onchange="updateDateRange(); loadData()">
-    <option value="Custom Date">Custom Date</option>
-    <option value="Recent">Recent</option>
-    <option value="Today">Today</option>
-    <option value="Yesterday">Yesterday</option>
-    <option value="This week from Sunday">This week from Sunday</option>
-    <option value="Month To Date" selected>Month To Date</option>
-    <option value="Last 7 Days">Last 7 Days</option>
-    <option value="Last Full Week">Last Full Week</option>
-    <option value="Last Full Month">Last Full Month</option>
-    <option value="Last 30 Days">Last 30 Days</option>
-    <option value="Year To Date">Year To Date</option>
-    <option value="Financial Year To Date">Financial Year To Date</option>
-    <option value="Last 6 Months">Last 6 Months</option>
-    <option value="Last 12 Months">Last 12 Months</option>
-                        </select>
-                    </div>
-                    <input type="date" id="filter-date-start" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
-                    <input type="date" id="filter-date-end" style="padding:4px; border:1px solid #ccc;" onchange="handleManualDateChange()">
-                </div>
-                <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
-                    <span style="font-size:13px; font-weight:700; color: var(--accent-pink);">Client Search</span>
-                    <input type="text" id="filter-client" placeholder="Name / Code / Cell / Email" style="flex:1; padding:6px; border:1px solid #ccc;" oninput="loadData()">
-                    <a href="javascript:void(0)" style="font-size:12px; color:#3b82f6; text-decoration:none;">Advanced Search</a>
-                </div>
-            </div>
-
-            <!-- Toolbar -->
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <button class="btn-toolbar" onclick="bulkPrintAccounts()"><i class="fas fa-print"></i> Print</button>
-                <button class="btn-toolbar"><i class="fas fa-envelope"></i> Email</button>
-                <button id="btn-bulk-generate-invoice" class="btn-toolbar" style="display:none; background: #10b981; color: #fff; border-color: #059669;" onclick="openConfirmInvoiceModal()"><i class="fas fa-file-invoice-dollar"></i> Generate Invoice</button>
-                <button id="btn-new-adjustment" class="btn-toolbar" style="display:none; background: #ec4899; color: #fff; border-color: #db2777;" onclick="openNewAdjustmentModal()"><i class="fas fa-plus"></i> New Adjustment</button>
-                <div style="margin-left:auto; display:flex; align-items:center;">
-                    <a href="javascript:void(0)" onclick="openGridSettingsModal(event)" style="font-size:14px; color:#3b82f6; text-decoration:none; font-weight:700;">Fields</a>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div class="card" style="padding:0; overflow:hidden;">
-                <table id="accounts-table">
-                    <thead>
-                        <tr style="background:#f3f4f6;">
-                            <th style="width:30px;"><input type="checkbox" onclick="toggleSelectAll(this)"></th>
-                            <th>#</th>
-                            <th id="th-id">Invoice #</th>
-                            <th id="th-order">Order #</th>
-                            <th id="th-date">Invoice Date</th>
-                            <th>Client</th>
-                            <th id="th-amount">Amount</th>
-                            <th id="th-due">Due Date</th>
-                            <th id="th-paid">Paid</th>
-                            <th id="th-balance">Balance</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows here -->
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-
-    <style>
-        .sidebar-link {
-            display: block;
-            padding: 8px 15px;
-            font-size: 13px;
-            color: #1f2937;
-            text-decoration: none;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-link:hover { background: #e5e7eb; }
-        .sidebar-link.active {
-            background: #fff;
-            border-left-color: #ec4899;
-            color: #ec4899;
-            font-weight: 700;
-        }
-        .btn-toolbar {
-            padding: 4px 10px;
-            font-size: 12px;
-            background: #fff;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
-        #accounts-table th { font-size: 11px; text-transform: uppercase; color: #4b5563; padding: 10px; border-bottom: 1px solid #ddd; }
-        #accounts-table td { font-size: 13px; padding: 10px; border-bottom: 1px solid #f3f4f6; text-align: left; }
-    </style>
-
-    <script>
 
         let currentPage = 1;
         let itemsPerPage = 50;
@@ -261,8 +79,7 @@
     
 
 
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         let currentMode = 'invoices';
         let currentAdjustmentType = 'Credit';
         let currentEditingReceiptId = null;
@@ -408,7 +225,7 @@
             const cols = gridSettingsAccounts[currentMode].columns.filter(c => c.visible);
             const thead = document.querySelector('#accounts-table thead');
             if (!thead) return;
-            let ths = '<tr style="background:#f3f4f6;"><th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCb" onclick="toggleSelectAll(this)"></th><th style="width: 40px;">#</th>';
+            let ths = '<tr style="background:#f3f4f6;"><th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCb" onclick="toggleSelectAll()"></th><th style="width: 40px;">#</th>';
             cols.forEach(c => {
                 ths += `<th>${c.caption}</th>`;
             });
@@ -979,31 +796,6 @@
 
         function downloadInvoicePDF(id) {
             window.open(`invoice.html?id=${id}&download=true`, '_blank');
-        }
-
-        function bulkPrintAccounts() {
-            const checkboxes = document.querySelectorAll('#accounts-table tbody input[type="checkbox"]:checked');
-            if (checkboxes.length === 0) {
-                alert('Please select at least one item.');
-                return;
-            }
-            if (currentMode === 'invoices') {
-                checkboxes.forEach(cb => {
-                    const tr = cb.closest('tr');
-                    const id = tr.dataset.invoiceId;
-                    if (id) window.open(`invoice.html?id=${id}&download=true`, '_blank');
-                });
-            } else if (currentMode === 'payments') {
-                checkboxes.forEach(cb => {
-                    const tr = cb.closest('tr');
-                    const id = tr.dataset.receiptId;
-                    if (id) window.open(`invoice.html?id=${id}&type=receipt`, '_blank');
-                });
-            } else if (currentMode === 'generate') {
-                alert('Please generate invoices first, then print from the Invoices section.');
-            } else {
-                alert('Print is not available for this section.');
-            }
         }
 
         function viewInvoice(id) {
@@ -2003,23 +1795,8 @@
         window.saveEditData = saveEditData;
         window.deleteReceipt = deleteReceipt;
     
-</script>
-
-<!-- Fields Settings Modal -->
-<div id="fields-settings-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
-    <div style="background:#fff; width:400px; border-radius:8px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; font-family:'Inter', sans-serif;">Select Fields</h3>
-        <div id="fields-checklist" style="max-height:300px; overflow-y:auto; padding:10px 0; font-family:'Inter', sans-serif; font-size:14px;">
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-            <button onclick="document.getElementById('fields-settings-modal').style.display='none'" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:4px; cursor:pointer;">Cancel</button>
-            <button onclick="saveFieldsSettings()" style="padding:8px 15px; border:none; background:#3b82f6; color:#fff; border-radius:4px; cursor:pointer; font-weight:bold;">Save</button>
-        </div>
-    </div>
-</div>
 
 
-<script>
 // --- GRID SETTINGS MODAL LOGIC ---
 
         function detectActiveType() {
@@ -2505,7 +2282,3 @@
         }
 
 // --- END GRID SETTINGS MODAL LOGIC ---
-</script>
-
-</body>
-</html>

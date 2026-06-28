@@ -2108,7 +2108,7 @@
 
             let opRow = [startDate.toLocaleDateString('en-GB'), 'Opening Balance'];
             for (let i = 2; i < headers.length - 3; i++) opRow.push('-');
-            opRow.push('-', '-', balance.toFixed(2));
+            opRow.push('-', '-', balance.toFixed(3));
             rows.push(opRow);
 
             txs.forEach(tx => {
@@ -2126,16 +2126,16 @@
                     if (optTeeth) row.push(orders.map(o => createTeethGrid(o.teethSelection)).join('; '));
                     if (optProduct) row.push(orders.map(o => o.productName || '-').join(', '));
                     if (optUnits) row.push(orders.map(o => o.units || 1).join(', '));
-                    if (optTax) row.push((tx.obj.taxAmount || 0).toFixed(2));
+                    if (optTax) row.push((tx.obj.taxAmount || 0).toFixed(3));
                 } else {
                     const fillCount = (optOrderNo ? 1 : 0) + (optOrderDate ? 1 : 0) + (optModelNo ? 1 : 0) + (optPatient ? 1 : 0) + (optTeeth ? 1 : 0) + (optProduct ? 1 : 0) + (optUnits ? 1 : 0);
                     for (let i = 0; i < fillCount; i++) row.push('-');
                     if (optTax) row.push('-');
                 }
 
-                row.push(tx.debit > 0 ? tx.debit.toFixed(2) : '-');
-                row.push(tx.credit > 0 ? tx.credit.toFixed(2) : '-');
-                row.push(balance.toFixed(2));
+                row.push(tx.debit > 0 ? tx.debit.toFixed(3) : '-');
+                row.push(tx.credit > 0 ? tx.credit.toFixed(3) : '-');
+                row.push(balance.toFixed(3));
 
                 rows.push(row);
             });
@@ -2298,9 +2298,9 @@
                     tx.date.toLocaleDateString('en-GB'),
                     tx.type,
                     tx.ref,
-                    tx.debit > 0 ? tx.debit.toFixed(2) : '-',
-                    tx.credit > 0 ? tx.credit.toFixed(2) : '-',
-                    balance.toFixed(2)
+                    tx.debit > 0 ? tx.debit.toFixed(3) : '-',
+                    tx.credit > 0 ? tx.credit.toFixed(3) : '-',
+                    balance.toFixed(3)
                 ];
             });
 
@@ -2396,7 +2396,7 @@
                         p.type || 'General',
                         p.name,
                         p.code || '-',
-                        p.charge.toFixed(2)
+                        p.charge.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Client wise Invoiced Order Jobs' || name === 'Sub Doctor wise Invoiced Order Jobs') {
                     const res = await fetch(`${API_BASE}/invoices`);
@@ -2413,9 +2413,9 @@
                         const clientName = inv.client ? inv.client.name : 'Unknown';
                         const invDate = new Date(inv.invoiceDate).toLocaleDateString('en-GB');
                         const invNum = inv.invoiceNumber;
-                        const gross = (inv.grossAmount || 0).toFixed(2);
-                        const tax = (inv.taxAmount || 0).toFixed(2);
-                        const net = (inv.netAmount || 0).toFixed(2);
+                        const gross = (inv.grossAmount || 0).toFixed(3);
+                        const tax = (inv.taxAmount || 0).toFixed(3);
+                        const net = (inv.netAmount || 0).toFixed(3);
 
                         (inv.orders || []).forEach(o => {
                             const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
@@ -2428,12 +2428,12 @@
                                         newRows.push([
                                             clientName, invDate, invNum, orderDate, orderNo, o.patientName,
                                             createTeethGrid(j.teethSelection), j.productType || '-', j.productName || '-',
-                                            (j.totalAmount || 0).toFixed(2), gross, tax, net, j.units || '1'
+                                            (j.totalAmount || 0).toFixed(3), gross, tax, net, j.units || '1'
                                         ]);
                                     } else {
                                         newRows.push([
                                             subDoc, invDate, invNum, orderNo, orderDate, o.patientName,
-                                            j.productName || '-', j.units || '1', (j.totalAmount || 0).toFixed(2), net
+                                            j.productName || '-', j.units || '1', (j.totalAmount || 0).toFixed(3), net
                                         ]);
                                     }
                                 });
@@ -2442,12 +2442,12 @@
                                     newRows.push([
                                         clientName, invDate, invNum, orderDate, orderNo, o.patientName,
                                         createTeethGrid(o.teethSelection), o.productType || '-', o.productName || '-',
-                                        (o.netAmount || 0).toFixed(2), gross, tax, net, o.units || '1'
+                                        (o.netAmount || 0).toFixed(3), gross, tax, net, o.units || '1'
                                     ]);
                                 } else {
                                     newRows.push([
                                         subDoc, invDate, invNum, orderNo, orderDate, o.patientName,
-                                        o.productName || '-', o.units || '1', (o.netAmount || 0).toFixed(2), net
+                                        o.productName || '-', o.units || '1', (o.netAmount || 0).toFixed(3), net
                                     ]);
                                 }
                             }
@@ -2472,8 +2472,8 @@
                         const clientName = inv.client ? inv.client.name : 'Unknown';
                         const invDate = new Date(inv.invoiceDate).toLocaleDateString('en-GB');
                         const invNum = inv.invoiceNumber;
-                        const net = (inv.netAmount || 0).toFixed(2);
-                        const balance = (inv.balanceAmount || 0).toFixed(2);
+                        const net = (inv.netAmount || 0).toFixed(3);
+                        const balance = (inv.balanceAmount || 0).toFixed(3);
                         const route = inv.client ? inv.client.route || 'Default' : 'Default';
                         const manager = inv.client ? inv.client.salesManager || 'None' : 'None';
                         const dateObj = new Date(inv.invoiceDate);
@@ -2518,7 +2518,7 @@
 
                     headers = [name.includes('Client') ? 'Client' : 'Category', 'Product', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.group, s.subGroup, s.jobs, s.units, s.amount.toFixed(2)
+                        s.group, s.subGroup, s.jobs, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'City wise Client Invoice Summary' || name === 'City wise Outstanding Invoice Summary' || name === 'Client Invoice Summary' || name === 'Outstanding Invoice Summary') {
                     const res = await fetch(`${API_BASE}/invoices`);
@@ -2553,22 +2553,22 @@
                     if (name === 'City wise Client Invoice Summary') {
                         headers = ['City', 'Client', 'Invoices', 'Total Billed', 'Amount Paid', 'Credit Notes', 'Debit Notes', 'Balance'];
                         rows = Object.values(summary).map(s => [
-                            s.city, s.client, s.invoices, s.billed.toFixed(2), s.paid.toFixed(2), s.credit.toFixed(2), s.debit.toFixed(2), s.balance.toFixed(2)
+                            s.city, s.client, s.invoices, s.billed.toFixed(3), s.paid.toFixed(3), s.credit.toFixed(3), s.debit.toFixed(3), s.balance.toFixed(3)
                         ]);
                     } else if (name === 'City wise Outstanding Invoice Summary') {
                         headers = ['City', 'Code', 'Client', 'Billed', 'Paid', 'Balance'];
                         rows = Object.values(summary).map(s => [
-                            s.city, s.code, s.client, s.billed.toFixed(2), s.paid.toFixed(2), s.balance.toFixed(2)
+                            s.city, s.code, s.client, s.billed.toFixed(3), s.paid.toFixed(3), s.balance.toFixed(3)
                         ]);
                     } else if (name === 'Client Invoice Summary') {
                         headers = ['Client', 'Invoices', 'Total Billed', 'Amount Paid', 'Credit Notes', 'Debit Notes', 'Balance'];
                         rows = Object.values(summary).map(s => [
-                            s.client, s.invoices, s.billed.toFixed(2), s.paid.toFixed(2), s.credit.toFixed(2), s.debit.toFixed(2), s.balance.toFixed(2)
+                            s.client, s.invoices, s.billed.toFixed(3), s.paid.toFixed(3), s.credit.toFixed(3), s.debit.toFixed(3), s.balance.toFixed(3)
                         ]);
                     } else {
                         headers = ['Code', 'Client', 'Billed', 'Paid', 'Balance'];
                         rows = Object.values(summary).map(s => [
-                            s.code, s.client, s.billed.toFixed(2), s.paid.toFixed(2), s.balance.toFixed(2)
+                            s.code, s.client, s.billed.toFixed(3), s.paid.toFixed(3), s.balance.toFixed(3)
                         ]);
                     }
                     rows = rows.sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
@@ -2597,11 +2597,11 @@
                         const taxRate = gross > 0 ? ((tax / gross) * 100).toFixed(0) + '%' : '0%';
 
                         if (name === 'Client wise Invoice List with Tax Information') {
-                            return [clientName, invNum, invDate, dueDate, gross.toFixed(2), taxRate, tax.toFixed(2), net.toFixed(2), paid.toFixed(2), balance.toFixed(2)];
+                            return [clientName, invNum, invDate, dueDate, gross.toFixed(3), taxRate, tax.toFixed(3), net.toFixed(3), paid.toFixed(3), balance.toFixed(3)];
                         } else if (name === 'Invoice List with Tax Information' || name === 'Invoice List (sorted by Client Name)') {
-                            return [invNum, invDate, clientName, gross.toFixed(2), taxRate, tax.toFixed(2), net.toFixed(2), paid.toFixed(2), balance.toFixed(2)];
+                            return [invNum, invDate, clientName, gross.toFixed(3), taxRate, tax.toFixed(3), net.toFixed(3), paid.toFixed(3), balance.toFixed(3)];
                         } else {
-                            return [taxRate, invNum, invDate, clientName, gross.toFixed(2), tax.toFixed(2), net.toFixed(2), paid.toFixed(2), balance.toFixed(2)];
+                            return [taxRate, invNum, invDate, clientName, gross.toFixed(3), tax.toFixed(3), net.toFixed(3), paid.toFixed(3), balance.toFixed(3)];
                         }
                     });
 
@@ -2628,7 +2628,7 @@
 
                     headers = [name === 'Daily Invoice Amount' ? 'Invoice Date' : 'Month', 'Invoice Count', 'Billed Amount'];
                     rows = Object.values(summary).sort((a, b) => a.sortDate - b.sortDate).map(s => [
-                        s.key, s.count, s.amount.toFixed(2)
+                        s.key, s.count, s.amount.toFixed(3)
                     ]);
                 } else if (name === 'GSTIN excel report' || name === 'Tally Sales Import') {
                     const res = await fetch(`${API_BASE}/invoices`);
@@ -2653,16 +2653,16 @@
                         const taxRateVal = gross > 0 ? (tax / gross) * 100 : 0;
                         const taxRate = taxRateVal.toFixed(0) + '%';
 
-                        const cgst = (tax / 2).toFixed(2);
-                        const sgst = (tax / 2).toFixed(2);
+                        const cgst = (tax / 2).toFixed(3);
+                        const sgst = (tax / 2).toFixed(3);
                         const igst = '0.00';
 
                         (inv.orders || [{}]).forEach(o => {
                             const category = o.productType || 'General';
                             if (name === 'GSTIN excel report') {
-                                rows.push([clientName, gstin, invNum, invDate, gross.toFixed(2), taxRate, cgst, sgst, igst, tax.toFixed(2), net.toFixed(2)]);
+                                rows.push([clientName, gstin, invNum, invDate, gross.toFixed(3), taxRate, cgst, sgst, igst, tax.toFixed(3), net.toFixed(3)]);
                             } else {
-                                rows.push([invDate, invNum, clientName, state, gstin, category, gross.toFixed(2), taxRate, tax.toFixed(2), net.toFixed(2)]);
+                                rows.push([invDate, invNum, clientName, state, gstin, category, gross.toFixed(3), taxRate, tax.toFixed(3), net.toFixed(3)]);
                             }
                         });
                     });
@@ -2682,12 +2682,12 @@
                         const invDate = new Date(inv.invoiceDate).toLocaleDateString('en-GB');
                         const invNum = inv.invoiceNumber;
                         const clientName = inv.client ? inv.client.name : 'Unknown';
-                        const invNet = (inv.netAmount || 0).toFixed(2);
+                        const invNet = (inv.netAmount || 0).toFixed(3);
 
                         (inv.orders || []).forEach(o => {
                             const orderNo = o.orderNumber || o.id;
                             const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
-                            const orderAmt = (o.netAmount || 0).toFixed(2);
+                            const orderAmt = (o.netAmount || 0).toFixed(3);
                             const jobDetail = (o.jobs || []).map(j => `${j.productName || j.productType} (x${j.units || 1})`).join(', ') || o.productName || o.productType || '-';
 
                             if (name === 'Invoiced Orders') {
@@ -2708,9 +2708,9 @@
                         inv.client ? inv.client.cellPhone || '-' : '-',
                         new Date(inv.invoiceDate).toLocaleDateString('en-GB'),
                         inv.invoiceNumber,
-                        (inv.netAmount || 0).toFixed(2),
-                        (inv.paidAmount || 0).toFixed(2),
-                        (inv.balanceAmount || 0).toFixed(2)
+                        (inv.netAmount || 0).toFixed(3),
+                        (inv.paidAmount || 0).toFixed(3),
+                        (inv.balanceAmount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[3].localeCompare(b[3]));
                 } else if (name === 'Client Payments' || name === 'Client wise payments' || name === 'Monthly Collection Amount' || name === 'Daily Collection Amount' || name === 'Payment mode wise collections - chart' || name === 'Payment Mode wise collections list' || name === 'Route wise collections list' || name === 'Route,Client wise Collection and Outstanding summary' || name === 'Sales Manager wise collections') {
                     const res = await fetch(`${API_BASE}/receipts`);
@@ -2722,9 +2722,9 @@
                             r.receiptNumber || r.id,
                             new Date(r.receiptDate).toLocaleDateString('en-GB'),
                             r.client ? r.client.name : 'Unknown',
-                            (r.amount || 0).toFixed(2),
-                            (r.appliedAmount || 0).toFixed(2),
-                            ((r.amount || 0) - (r.appliedAmount || 0)).toFixed(2)
+                            (r.amount || 0).toFixed(3),
+                            (r.appliedAmount || 0).toFixed(3),
+                            ((r.amount || 0) - (r.appliedAmount || 0)).toFixed(3)
                         ]).sort((a, b) => b[0] - a[0]);
                     } else if (name === 'Client wise payments') {
                         headers = ['Client', 'Payment Date', 'Receipt #', 'Payment Mode', 'Cheq/Ref #', 'Amount'];
@@ -2734,7 +2734,7 @@
                             r.receiptNumber || r.id,
                             r.paymentMode || 'Cash',
                             r.chequeNumber || r.reference || '-',
-                            (r.amount || 0).toFixed(2)
+                            (r.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else if (name === 'Monthly Collection Amount' || name === 'Daily Collection Amount') {
                         const summary = {};
@@ -2748,7 +2748,7 @@
                         });
                         headers = [name === 'Daily Collection Amount' ? 'Date' : 'Month', 'Collection Amount'];
                         rows = Object.values(summary).sort((a, b) => a.sortDate - b.sortDate).map(s => [
-                            s.key, s.amount.toFixed(2)
+                            s.key, s.amount.toFixed(3)
                         ]);
                     } else if (name === 'Payment mode wise collections - chart') {
                         const summary = {};
@@ -2758,7 +2758,7 @@
                         });
                         headers = ['Payment Mode', 'Collection Amount'];
                         rows = Object.entries(summary).map(([mode, amt]) => [
-                            mode, amt.toFixed(2)
+                            mode, amt.toFixed(3)
                         ]).sort((a, b) => b[1] - a[1]);
                     } else if (name === 'Payment Mode wise collections list') {
                         headers = ['Payment Mode', 'Client', 'Payment Date', 'Receipt #', 'Cheq/Ref #', 'Amount'];
@@ -2768,7 +2768,7 @@
                             new Date(r.receiptDate).toLocaleDateString('en-GB'),
                             r.receiptNumber || r.id,
                             r.chequeNumber || r.reference || '-',
-                            (r.amount || 0).toFixed(2)
+                            (r.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else if (name === 'Route wise collections list') {
                         headers = ['Route', 'Client', 'Payment Date', 'Payment Mode', 'Receipt #', 'Amount'];
@@ -2778,7 +2778,7 @@
                             new Date(r.receiptDate).toLocaleDateString('en-GB'),
                             r.paymentMode || 'Cash',
                             r.receiptNumber || r.id,
-                            (r.amount || 0).toFixed(2)
+                            (r.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else if (name === 'Route,Client wise Collection and Outstanding summary') {
                         const clientsRes = await fetch(`${API_BASE}/clients`);
@@ -2798,8 +2798,8 @@
                             return [
                                 c.route || 'Default',
                                 c.name,
-                                amt.toFixed(2),
-                                (c.balanceAmount !== undefined ? c.balanceAmount : balance).toFixed(2)
+                                amt.toFixed(3),
+                                (c.balanceAmount !== undefined ? c.balanceAmount : balance).toFixed(3)
                             ];
                         }).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else if (name === 'Sales Manager wise collections') {
@@ -2810,7 +2810,7 @@
                             new Date(r.receiptDate).toLocaleDateString('en-GB'),
                             r.paymentMode || 'Cash',
                             r.receiptNumber || r.id,
-                            (r.amount || 0).toFixed(2)
+                            (r.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     }
                 } else if (name === 'Adjustment Type wise Credit Adjustments' || name === 'Client wise Credit Adjustments') {
@@ -2827,9 +2827,9 @@
                             adj.adjustmentNumber || adj.id,
                             adj.invoice ? adj.invoice.invoiceNumber : '-',
                             adj.invoice ? new Date(adj.invoice.invoiceDate).toLocaleDateString('en-GB') : '-',
-                            adj.invoice ? (adj.invoice.netAmount || 0).toFixed(2) : '-',
-                            adj.invoice ? (adj.invoice.balanceAmount || 0).toFixed(2) : '-',
-                            (adj.amount || 0).toFixed(2)
+                            adj.invoice ? (adj.invoice.netAmount || 0).toFixed(3) : '-',
+                            adj.invoice ? (adj.invoice.balanceAmount || 0).toFixed(3) : '-',
+                            (adj.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else {
                         headers = ['Client', 'Adjustment Type', 'Adj. Date', 'Adj. #', 'Invoice #', 'Invoice Date', 'Invoice Amount', 'Invoice Balance', 'Adj. Amount'];
@@ -2840,9 +2840,9 @@
                             adj.adjustmentNumber || adj.id,
                             adj.invoice ? adj.invoice.invoiceNumber : '-',
                             adj.invoice ? new Date(adj.invoice.invoiceDate).toLocaleDateString('en-GB') : '-',
-                            adj.invoice ? (adj.invoice.netAmount || 0).toFixed(2) : '-',
-                            adj.invoice ? (adj.invoice.balanceAmount || 0).toFixed(2) : '-',
-                            (adj.amount || 0).toFixed(2)
+                            adj.invoice ? (adj.invoice.netAmount || 0).toFixed(3) : '-',
+                            adj.invoice ? (adj.invoice.balanceAmount || 0).toFixed(3) : '-',
+                            (adj.amount || 0).toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     }
                 } else if (name === 'Assigned Staff wise Scheduled Pickup Request' || name === 'Scheduled Date wise Pickup Requests') {
@@ -2924,9 +2924,9 @@
                             tx.date.toLocaleDateString('en-GB'),
                             tx.voucher,
                             tx.head,
-                            tx.debit > 0 ? tx.debit.toFixed(2) : '0.00',
-                            tx.credit > 0 ? tx.credit.toFixed(2) : '0.00',
-                            balance.toFixed(2)
+                            tx.debit > 0 ? tx.debit.toFixed(3) : '0.00',
+                            tx.credit > 0 ? tx.credit.toFixed(3) : '0.00',
+                            balance.toFixed(3)
                         ];
                     });
                 } else if (name === 'Daily Expense' || name === 'Monthly Expense') {
@@ -2945,7 +2945,7 @@
                     
                     headers = [name === 'Daily Expense' ? 'Date' : 'Month', 'Expense Amount'];
                     rows = Object.values(summary).sort((a, b) => a.sortDate - b.sortDate).map(s => [
-                        s.key, s.amount.toFixed(2)
+                        s.key, s.amount.toFixed(3)
                     ]);
                 } else if (name === 'Expense Head wise expenses') {
                     const res = await fetch(`${API_BASE}/expenses`);
@@ -2958,7 +2958,7 @@
                         e.voucherNo || '-',
                         e.paymentMode || 'Cash Account',
                         e.notes || '-',
-                        (e.amount || 0).toFixed(2)
+                        (e.amount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Expenses List') {
                     const res = await fetch(`${API_BASE}/expenses`);
@@ -2970,7 +2970,7 @@
                         e.paidTo || '-',
                         e.voucherNo || '-',
                         e.paymentMode || 'Cash Account',
-                        (e.amount || 0).toFixed(2)
+                        (e.amount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Mailing Labels for Account Heads') {
                     const res = await fetch(`${API_BASE}/expenses`);
@@ -3014,7 +3014,7 @@
                         new Date(e.date).toLocaleDateString('en-GB'),
                         e.voucherNo || '-',
                         e.paymentMode || 'Cash',
-                        (e.amount || 0).toFixed(2)
+                        (e.amount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Inventory Tax Invoice summary') {
                     const res = await fetch(`${API_BASE}/expenses`);
@@ -3031,13 +3031,13 @@
                             e.paidTo || 'Supplier',
                             new Date(e.date).toLocaleDateString('en-GB'),
                             e.voucherNo || ('INV-' + (10000 + idx)),
-                            taxableVal.toFixed(2),
+                            taxableVal.toFixed(3),
                             '5%',
-                            cgst.toFixed(2),
-                            sgst.toFixed(2),
+                            cgst.toFixed(3),
+                            sgst.toFixed(3),
                             '0.00',
-                            totalGst.toFixed(2),
-                            amt.toFixed(2)
+                            totalGst.toFixed(3),
+                            amt.toFixed(3)
                         ];
                     }).sort((a, b) => a[0].localeCompare(b[0]) || b[1].localeCompare(a[1]));
                 } else if (name === 'Item Definitions') {
@@ -3071,9 +3071,9 @@
                             doc1,
                             'INDIA',
                             '1.20',
-                            baseQty.toFixed(2),
+                            baseQty.toFixed(3),
                             m.unit || 'pc',
-                            (baseQty * 1.20).toFixed(2)
+                            (baseQty * 1.20).toFixed(3)
                         ]);
                         newRows.push([
                             m.name,
@@ -3172,7 +3172,7 @@
                         e.paidTo || 'Supplier',
                         new Date(e.date).toLocaleDateString('en-GB'),
                         e.voucherNo || '-',
-                        (e.amount || 0).toFixed(2),
+                        (e.amount || 0).toFixed(3),
                         e.paymentMode || 'Credit Account'
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || b[1].localeCompare(a[1]));
                 } else if (name === 'Technician wise Activity Log - WorkFlow') {
@@ -3230,7 +3230,7 @@
                         o.patientName || '-',
                         o.productName || '-',
                         o.units || 1,
-                        (o.netAmount || 0).toFixed(2)
+                        (o.netAmount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Orders Jobs- by ProductType,Product - Summary') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3255,7 +3255,7 @@
                     
                     headers = ['Category', 'Product', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.type, s.prod, s.jobs, s.units, s.amount.toFixed(2)
+                        s.type, s.prod, s.jobs, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Area , Client wise Job summary') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3281,7 +3281,7 @@
                     
                     headers = ['Area', 'Client', 'Orders', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.area, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(2)
+                        s.area, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'City wise Daily Order Activity Summary' || name === 'Client Area , Date wise Order analysis') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3312,7 +3312,7 @@
                     
                     headers = [isCity ? 'City' : 'Area', 'Order Date', 'Clients', 'Jobs', 'Orders', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.loc, s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                        s.loc, s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'City wise production details' || name === 'Client Area wise Production Details') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3332,13 +3332,13 @@
                             o.jobs.forEach(j => {
                                 newRows.push([
                                     loc, clientName, orderDate, orderNo, o.patientName || '-', createTeethGrid(j.teethSelection),
-                                    j.productName || '-', j.productType || '-', j.units || 1, (j.totalAmount || 0).toFixed(2)
+                                    j.productName || '-', j.productType || '-', j.units || 1, (j.totalAmount || 0).toFixed(3)
                                 ]);
                             });
                         } else {
                             newRows.push([
                                 loc, clientName, orderDate, orderNo, o.patientName || '-', createTeethGrid(o.teethSelection),
-                                o.productName || '-', o.productType || '-', o.units || 1, (o.netAmount || 0).toFixed(2)
+                                o.productName || '-', o.productType || '-', o.units || 1, (o.netAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -3369,12 +3369,12 @@
                     if (name === 'Daily Order Activity Summary') {
                         headers = ['Order Date', 'Clients', 'Orders', 'Job Amount', 'Additional Amount', 'Order Amount'];
                         rows = Object.values(summary).map(s => [
-                            s.dateStr, s.clients.size, s.orders, s.amount.toFixed(2), '0.00', s.amount.toFixed(2)
+                            s.dateStr, s.clients.size, s.orders, s.amount.toFixed(3), '0.00', s.amount.toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]));
                     } else {
                         headers = ['Order Date', 'Clients', 'Jobs', 'Orders', 'Units', 'Job Amount'];
                         rows = Object.values(summary).map(s => [
-                            s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                            s.dateStr, s.clients.size, s.jobs, s.orders, s.units, s.amount.toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]));
                     }
                 } else if (name === 'Month , Client wise Order Summary') {
@@ -3405,7 +3405,7 @@
                     
                     headers = ['Month', 'Client', 'Jobs', 'Orders', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.monthStr, s.clientName, s.jobs, s.orders, s.units, s.amount.toFixed(2)
+                        s.monthStr, s.clientName, s.jobs, s.orders, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Product Category vs Clients Crosstab') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3431,7 +3431,7 @@
                             totalAmount += amt;
                         });
                         
-                        row.push(totalProducts, totalAmount.toFixed(2));
+                        row.push(totalProducts, totalAmount.toFixed(3));
                         return row;
                     }).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Product vs Clients , Monthwise Sales Value Crosstab') {
@@ -3451,11 +3451,11 @@
                             const cOrders = orders.filter(o => (o.client ? o.client.name : 'Unknown') === cName && (o.productName || 'General') === prod);
                             const amt = cOrders.reduce((sum, o) => sum + (o.netAmount || 0), 0);
                             
-                            row.push(amt.toFixed(2));
+                            row.push(amt.toFixed(3));
                             totalAmount += amt;
                         });
                         
-                        row.push(totalAmount.toFixed(2));
+                        row.push(totalAmount.toFixed(3));
                         return row;
                     }).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Sales Manager wise Client Job Activity Summary' || name === 'Sales Manager wise Client Order Activity') {
@@ -3485,7 +3485,7 @@
                     
                     headers = ['Sales Manager', 'Client', 'Orders', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(summary).map(s => [
-                        s.salesManager, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(2)
+                        s.salesManager, s.clientName, s.orders, s.jobs, s.units, s.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'All Clients Outstanding' || name === 'Route wise All Clients Outstanding' || name === 'Sales Manager wise All Clients Outstanding' || name === 'Taxable status wise all clients outstanding' || name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                     const ledgerData = await fetchClientLedgerData();
@@ -3510,12 +3510,12 @@
                             name.includes('Route') ? l.client.route || 'Default' : (name.includes('Sales') ? l.client.salesManager || 'None' : l.client.name),
                             l.client.name,
                             l.client.code || '-',
-                            l.opening.toFixed(2),
-                            l.billed.toFixed(2),
-                            l.paid.toFixed(2),
-                            l.creditAdj.toFixed(2),
-                            l.debitAdj.toFixed(2),
-                            l.closing.toFixed(2)
+                            l.opening.toFixed(3),
+                            l.billed.toFixed(3),
+                            l.paid.toFixed(3),
+                            l.creditAdj.toFixed(3),
+                            l.debitAdj.toFixed(3),
+                            l.closing.toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                     } else if (name === 'Taxable status wise all clients outstanding') {
                         headers = ['Taxable', 'Code', 'Client', 'Opening Balance', 'Billed', 'Paid', 'Credit Adj.', 'Dr. Adj.', 'Closing Balance'];
@@ -3523,12 +3523,12 @@
                             l.client.taxExemption ? 'Non-Taxable' : 'Taxable',
                             l.client.code || '-',
                             l.client.name,
-                            l.opening.toFixed(2),
-                            l.billed.toFixed(2),
-                            l.paid.toFixed(2),
-                            l.creditAdj.toFixed(2),
-                            l.debitAdj.toFixed(2),
-                            l.closing.toFixed(2)
+                            l.opening.toFixed(3),
+                            l.billed.toFixed(3),
+                            l.paid.toFixed(3),
+                            l.creditAdj.toFixed(3),
+                            l.debitAdj.toFixed(3),
+                            l.closing.toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
                     } else if (name === 'Clients with Balances' || name === 'Sales Manager wise Clients with Balances') {
                         headers = [name.includes('Sales') ? 'Sales Manager' : 'Client', 'Client', 'Code', 'Total Balance', 'Off. Phone', 'Off. Phone2', 'Cell', 'Cell2'];
@@ -3536,7 +3536,7 @@
                             name.includes('Sales') ? l.client.salesManager || 'None' : l.client.name,
                             l.client.name,
                             l.client.code || '-',
-                            l.closing.toFixed(2),
+                            l.closing.toFixed(3),
                             l.client.phone || '-',
                             l.client.phone2 || '-',
                             l.client.cellPhone || '-',
@@ -3552,7 +3552,7 @@
                         r.client ? r.client.name : 'Unknown',
                         new Date(r.receiptDate).toLocaleDateString(),
                         r.paymentMode || 'Cash',
-                        (r.amount || 0).toFixed(2)
+                        (r.amount || 0).toFixed(3)
                     ]);
                 } else if (name === 'City wise Clients' || name === 'City wise Clients with address') {
                     const res = await fetch(`${API_BASE}/clients`);
@@ -3594,13 +3594,13 @@
                                 o.jobs.forEach(j => {
                                     newRows.push([
                                         clientName, orderNo, orderDate, createTeethGrid(j.teethSelection), o.patientName,
-                                        j.productName || j.productType || '-', j.units || '1', (j.totalAmount || 0).toFixed(2)
+                                        j.productName || j.productType || '-', j.units || '1', (j.totalAmount || 0).toFixed(3)
                                     ]);
                                 });
                             } else {
                                 newRows.push([
                                     clientName, orderNo, orderDate, createTeethGrid(o.teethSelection), o.patientName,
-                                    o.productName || o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                                    o.productName || o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                                 ]);
                             }
                         });
@@ -3621,7 +3621,7 @@
                             clientProd[clientName].amount += amt;
                         });
                         rows = Object.entries(clientProd).map(([client, cp]) => [
-                            client, cp.jobs, cp.units, cp.amount.toFixed(2)
+                            client, cp.jobs, cp.units, cp.amount.toFixed(3)
                         ]).sort((a, b) => a[0].localeCompare(b[0]));
                     }
                 } else if (name === 'All Clients' || name === 'Clients list') {
@@ -3658,7 +3658,7 @@
                         o.patientName,
                         o.modelNumber || '-',
                         o.units || '1',
-                        (o.netAmount || 0).toFixed(2)
+                        (o.netAmount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Client Price List') {
                     const res = await fetch(`${API_BASE}/products`);
@@ -3681,8 +3681,8 @@
                     rows = data.map(p => [
                         p.type || 'General',
                         p.name,
-                        p.charge.toFixed(2),
-                        (p.charge * (1 - discountPct / 100)).toFixed(2)
+                        p.charge.toFixed(3),
+                        (p.charge * (1 - discountPct / 100)).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Clients List - by Registration Date') {
                     const res = await fetch(`${API_BASE}/clients`);
@@ -3863,12 +3863,12 @@
                                 if (isDueSearch) {
                                     newRows.push([
                                         clientName, dateVal, o.orderNumber || o.id, o.patientName, j.productName || '-',
-                                        createTeethGrid(j.teethSelection), o.status, o.modelNumber || '-', j.units || '1', (j.totalAmount || 0).toFixed(2)
+                                        createTeethGrid(j.teethSelection), o.status, o.modelNumber || '-', j.units || '1', (j.totalAmount || 0).toFixed(3)
                                     ]);
                                 } else {
                                     newRows.push([
                                         clientName, dateVal, o.orderNumber || o.id, o.patientName, createTeethGrid(j.teethSelection),
-                                        j.productName || '-', j.productType || '-', o.status, o.modelNumber || '-', j.units || '1', (j.totalAmount || 0).toFixed(2)
+                                        j.productName || '-', j.productType || '-', o.status, o.modelNumber || '-', j.units || '1', (j.totalAmount || 0).toFixed(3)
                                     ]);
                                 }
                             });
@@ -3876,12 +3876,12 @@
                             if (isDueSearch) {
                                 newRows.push([
                                     clientName, dateVal, o.orderNumber || o.id, o.patientName, o.productName || '-',
-                                    createTeethGrid(o.teethSelection), o.status, o.modelNumber || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                                    createTeethGrid(o.teethSelection), o.status, o.modelNumber || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                                 ]);
                             } else {
                                 newRows.push([
                                     clientName, dateVal, o.orderNumber || o.id, o.patientName, createTeethGrid(o.teethSelection),
-                                    o.productName || '-', o.productType || '-', o.status, o.modelNumber || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                                    o.productName || '-', o.productType || '-', o.status, o.modelNumber || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                                 ]);
                             }
                         }
@@ -3915,7 +3915,7 @@
                     });
                     headers = ['Client', 'Category', 'Product', 'Jobs', 'Units', 'Amount'];
                     rows = Object.values(groups).map(g => [
-                        g.clientName, g.cat, g.prod, g.count, g.units, g.amount.toFixed(2)
+                        g.clientName, g.cat, g.prod, g.count, g.units, g.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[2].localeCompare(b[2]));
                 } else if (name === 'Due Date, Time Slot wise Order Jobs') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -3972,7 +3972,7 @@
                             o.orderNumber || o.id, o.modelNumber || '-',
                             o.dueDate ? new Date(o.dueDate).toLocaleDateString('en-GB') : '-',
                             o.client ? o.client.name : 'Unknown', o.patientName, o.productType || '-',
-                            o.productName || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                            o.productName || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                         ]);
                     });
                     rows = newRows;
@@ -3987,7 +3987,7 @@
                             o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                             o.dueDate ? new Date(o.dueDate).toLocaleDateString('en-GB') : '-',
                             o.productName || o.productType || '-', o.units || '1',
-                            (o.price || 0).toFixed(2), (o.netAmount || 0).toFixed(2), o.status
+                            (o.price || 0).toFixed(3), (o.netAmount || 0).toFixed(3), o.status
                         ]);
                     });
                     rows = newRows;
@@ -4002,8 +4002,8 @@
                             o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                             o.orderNumber || o.id,
                             '0.00',
-                            (o.netAmount || 0).toFixed(2),
-                            (o.netAmount || 0).toFixed(2)
+                            (o.netAmount || 0).toFixed(3),
+                            (o.netAmount || 0).toFixed(3)
                         ]);
                     });
                     rows = newRows;
@@ -4018,7 +4018,7 @@
                         monthly[month].amount += (o.netAmount || 0);
                     });
                     headers = ['Month', 'Order Count', 'Total Value'];
-                    rows = Object.entries(monthly).map(([m, val]) => [m, val.count, val.amount.toFixed(2)]);
+                    rows = Object.entries(monthly).map(([m, val]) => [m, val.count, val.amount.toFixed(3)]);
                 } else if (name === 'Order Activity Logs') {
                     const res = await fetch(`${API_BASE}/orders`);
                     data = await res.json();
@@ -4057,12 +4057,12 @@
                         if (name.includes('Sorted')) {
                             newRows.push([
                                 o.orderNumber || o.id, dateStr, o.client ? o.client.name : 'Unknown', o.patientName,
-                                createTeethGrid(o.teethSelection), o.productName || '-', o.units || '1', o.status, (o.netAmount || 0).toFixed(2)
+                                createTeethGrid(o.teethSelection), o.productName || '-', o.units || '1', o.status, (o.netAmount || 0).toFixed(3)
                             ]);
                         } else {
                             newRows.push([
                                 dateStr, o.orderNumber || o.id, o.client ? o.client.name : 'Unknown', o.patientName,
-                                createTeethGrid(o.teethSelection), o.productName || '-', o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                                createTeethGrid(o.teethSelection), o.productName || '-', o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -4183,7 +4183,7 @@
                                     newRows.push([
                                         j.productName || 'General', o.client ? o.client.name : 'Unknown', dateStr,
                                         o.orderNumber || o.id, o.patientName, createTeethGrid(j.teethSelection), j.units || '1',
-                                        (j.totalAmount || 0).toFixed(2)
+                                        (j.totalAmount || 0).toFixed(3)
                                     ]);
                                 }
                             });
@@ -4197,7 +4197,7 @@
                                 newRows.push([
                                     o.productName || 'General', o.client ? o.client.name : 'Unknown', dateStr,
                                     o.orderNumber || o.id, o.patientName, createTeethGrid(o.teethSelection), o.units || '1',
-                                    (o.netAmount || 0).toFixed(2)
+                                    (o.netAmount || 0).toFixed(3)
                                 ]);
                             }
                         }
@@ -4214,7 +4214,7 @@
                             o.subDoctor || '-', o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                             o.orderNumber || o.id, o.patientName, o.modelNumber || '-', o.orderType || 'New',
                             o.productName || o.productType || '-', createTeethGrid(o.teethSelection), o.units || '1',
-                            (o.netAmount || 0).toFixed(2)
+                            (o.netAmount || 0).toFixed(3)
                         ]);
                     });
                     rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
@@ -4259,7 +4259,7 @@
                             o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                             o.orderNumber || o.id, o.patientName, o.modelNumber || '-',
                             o.productName || o.productType || '-', createTeethGrid(o.teethSelection), o.units || '1',
-                            (o.netAmount || 0).toFixed(2)
+                            (o.netAmount || 0).toFixed(3)
                         ]);
                     });
                     rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
@@ -4273,7 +4273,7 @@
                             o.orderType || 'New', o.client ? o.client.name : 'Unknown',
                             o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-',
                             o.orderNumber || o.id, o.patientName, createTeethGrid(o.teethSelection),
-                            o.productName || '-', o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(2)
+                            o.productName || '-', o.productType || '-', o.units || '1', (o.netAmount || 0).toFixed(3)
                         ]);
                     });
                     rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
@@ -4286,7 +4286,7 @@
                         monthly[month] = (monthly[month] || 0) + (r.amount || 0);
                     });
                     headers = ['Month', 'Collection Amount'];
-                    rows = Object.entries(monthly).map(([m, val]) => [m, val.toFixed(2)]);
+                    rows = Object.entries(monthly).map(([m, val]) => [m, val.toFixed(3)]);
                 } else if (name === 'Client wise invoices') {
                     const res = await fetch(`${API_BASE}/invoices`);
                     data = await res.json();
@@ -4295,7 +4295,7 @@
                         inv.client ? inv.client.name : 'Unknown',
                         inv.invoiceNumber,
                         new Date(inv.invoiceDate).toLocaleDateString(),
-                        (inv.netAmount || 0).toFixed(2)
+                        (inv.netAmount || 0).toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Daily Collection Amount') {
                     const res = await fetch(`${API_BASE}/receipts`);
@@ -4306,7 +4306,7 @@
                         daily[date] = (daily[date] || 0) + (r.amount || 0);
                     });
                     headers = ['Date', 'Collection Amount'];
-                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(2)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(3)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
                 } else if (name.includes('Adjustment')) {
                     const res = await fetch(`${API_BASE}/adjustments`);
                     data = await res.json();
@@ -4316,7 +4316,7 @@
                         new Date(a.date).toLocaleDateString(),
                         a.client ? a.client.name : 'Unknown',
                         a.type,
-                        (a.amount || 0).toFixed(2),
+                        (a.amount || 0).toFixed(3),
                         a.reason || '-'
                     ]);
                 } else if (name === 'Sales Manager wise collections') {
@@ -4328,7 +4328,7 @@
                         managerData[mgr] = (managerData[mgr] || 0) + (r.amount || 0);
                     });
                     headers = ['Sales Manager', 'Total Collection'];
-                    rows = Object.entries(managerData).map(([mgr, val]) => [mgr, val.toFixed(2)]);
+                    rows = Object.entries(managerData).map(([mgr, val]) => [mgr, val.toFixed(3)]);
                 } else if (name === 'Scheduled Date wise Pickup Requests') {
                     const res = await fetch(`${API_BASE}/pickups`);
                     const pickups = await res.json();
@@ -4364,7 +4364,7 @@
                         daily[date] = (daily[date] || 0) + (e.amount || 0);
                     });
                     headers = ['Date', 'Total Expense'];
-                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(2)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(3)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
                 } else if (name === 'Monthly Expense') {
                     const res = await fetch(`${API_BASE}/expenses`);
                     const expenses = await res.json();
@@ -4374,7 +4374,7 @@
                         monthly[month] = (monthly[month] || 0) + (e.amount || 0);
                     });
                     headers = ['Month', 'Total Expense'];
-                    rows = Object.entries(monthly).map(([m, val]) => [m, val.toFixed(2)]);
+                    rows = Object.entries(monthly).map(([m, val]) => [m, val.toFixed(3)]);
                 } else if (name === 'Expense Head wise expenses') {
                     const res = await fetch(`${API_BASE}/expenses`);
                     const expenses = await res.json();
@@ -4384,7 +4384,7 @@
                         categoryData[cat] = (categoryData[cat] || 0) + (e.amount || 0);
                     });
                     headers = ['Expense Category', 'Total Amount'];
-                    rows = Object.entries(categoryData).map(([cat, val]) => [cat, val.toFixed(2)]);
+                    rows = Object.entries(categoryData).map(([cat, val]) => [cat, val.toFixed(3)]);
                 } else if (name === 'Expenses List') {
                     const res = await fetch(`${API_BASE}/expenses`);
                     data = await res.json();
@@ -4393,7 +4393,7 @@
                         new Date(e.date).toLocaleDateString(),
                         e.category,
                         e.description || '-',
-                        (e.amount || 0).toFixed(2)
+                        (e.amount || 0).toFixed(3)
                     ]);
                 } else if (name === 'Item Definitions' || name.includes('Stock Position')) {
                     const res = await fetch(`${API_BASE}/materials`);
@@ -4402,7 +4402,7 @@
                     rows = data.map(m => [
                         m.category || 'General',
                         m.name,
-                        (m.stock || 0).toFixed(2),
+                        (m.stock || 0).toFixed(3),
                         m.unit || 'pcs'
                     ]).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Invoice List' || name.includes('Invoiced Orders')) {
@@ -4413,7 +4413,7 @@
                         inv.invoiceNumber,
                         inv.client ? inv.client.name : 'Unknown',
                         new Date(inv.invoiceDate).toLocaleDateString(),
-                        (inv.netAmount || 0).toFixed(2),
+                        (inv.netAmount || 0).toFixed(3),
                         inv.status
                     ]);
                 } else if (name === 'Daily Invoice Amount') {
@@ -4425,7 +4425,7 @@
                         daily[date] = (daily[date] || 0) + (inv.netAmount || 0);
                     });
                     headers = ['Date', 'Total Invoiced'];
-                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(2)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+                    rows = Object.entries(daily).map(([d, val]) => [d, val.toFixed(3)]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
                 } else if (name === 'Client wise Invoiced Order Jobs') {
                     const res = await fetch(`${API_BASE}/orders`);
                     const allOrders = await res.json();
@@ -4441,7 +4441,7 @@
                                     o.patientName,
                                     j.productName || j.productType || '-',
                                     o.invoiceId,
-                                    (j.totalAmount || 0).toFixed(2)
+                                    (j.totalAmount || 0).toFixed(3)
                                 ]);
                             });
                         } else {
@@ -4451,7 +4451,7 @@
                                 o.patientName,
                                 o.productName || o.productType || '-',
                                 o.invoiceId,
-                                (o.netAmount || o.totalAmount || 0).toFixed(2)
+                                (o.netAmount || o.totalAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -4463,9 +4463,9 @@
                     rows = data.map(inv => [
                         inv.invoiceNumber,
                         inv.client ? inv.client.name : 'Unknown',
-                        (inv.grossAmount || 0).toFixed(2),
-                        (inv.taxAmount || 0).toFixed(2),
-                        (inv.netAmount || 0).toFixed(2)
+                        (inv.grossAmount || 0).toFixed(3),
+                        (inv.taxAmount || 0).toFixed(3),
+                        (inv.netAmount || 0).toFixed(3)
                     ]);
                 } else if (name === 'Orders Jobs- by ProductType') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4520,14 +4520,14 @@
                                 newRows.push([
                                     clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
                                     orderNo, o.orderType || 'New', j.productName || '-', createTeethGrid(j.teethSelection), j.units || '1',
-                                    (j.totalAmount || 0).toFixed(2)
+                                    (j.totalAmount || 0).toFixed(3)
                                 ]);
                             });
                         } else {
                             newRows.push([
                                 clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
                                 orderNo, o.orderType || 'New', o.productName || '-', createTeethGrid(o.teethSelection), o.units || '1',
-                                (o.netAmount || 0).toFixed(2)
+                                (o.netAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -4559,7 +4559,7 @@
                         }
                     });
                     rows = Object.values(grouped).map(g => [
-                        g.cat, g.prod, g.jobs, g.units, g.amount.toFixed(2)
+                        g.cat, g.prod, g.jobs, g.units, g.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Client wise Order Job Shipments Summary') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4579,7 +4579,7 @@
                         clientData[clientName].amount += amt;
                     });
                     rows = Object.entries(clientData).map(([client, c]) => [
-                        client, c.jobs, c.units, c.amount.toFixed(2)
+                        client, c.jobs, c.units, c.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Client wise Orders not yet delivered') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4596,14 +4596,14 @@
                                 newRows.push([
                                     clientName, orderNo, orderDate, o.patientName, createTeethGrid(j.teethSelection),
                                     j.productName || '-', o.status, o.technician || '-', j.units || '1',
-                                    (j.totalAmount || 0).toFixed(2)
+                                    (j.totalAmount || 0).toFixed(3)
                                 ]);
                             });
                         } else {
                             newRows.push([
                                 clientName, orderNo, orderDate, o.patientName, createTeethGrid(o.teethSelection),
                                 o.productName || '-', o.status, o.technician || '-', o.units || '1',
-                                (o.netAmount || 0).toFixed(2)
+                                (o.netAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -4662,7 +4662,7 @@
                         }
                     });
                     rows = Object.values(clientProdData).map(cp => [
-                        cp.client, cp.prod, cp.jobs, cp.units, cp.amount.toFixed(2)
+                        cp.client, cp.prod, cp.jobs, cp.units, cp.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Date wise Dispatch Values') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4682,7 +4682,7 @@
                         daily[dateStr].amount += amt;
                     });
                     rows = Object.entries(daily).map(([d, val]) => [
-                        d, val.jobs, val.units, val.amount.toFixed(2)
+                        d, val.jobs, val.units, val.amount.toFixed(3)
                     ]).sort((a, b) => {
                         const partsA = a[0].split('/');
                         const partsB = b[0].split('/');
@@ -4743,7 +4743,7 @@
                         record.units += unitsCount;
                     });
                     rows = Object.values(deliveryClientData).map(r => [
-                        r.delBoy, r.client, r.shipments.size, r.orders.size, r.jobs, r.amount.toFixed(2), r.units
+                        r.delBoy, r.client, r.shipments.size, r.orders.size, r.jobs, r.amount.toFixed(3), r.units
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Month wise Dispatch Values') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4765,7 +4765,7 @@
                         monthly[monthStr].amount += amt;
                     });
                     rows = Object.entries(monthly).sort((a, b) => a[1].sortDate - b[1].sortDate).map(([m, val]) => [
-                        m, val.jobs, val.units, val.amount.toFixed(2)
+                        m, val.jobs, val.units, val.amount.toFixed(3)
                     ]);
                 } else if (name === 'Month wise Dispatch- Count') {
                     const res = await fetch(`${API_BASE}/orders`);
@@ -4858,14 +4858,14 @@
                                 newRows.push([
                                     salesManager, clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
                                     orderNo, o.orderType || 'New', j.productName || '-', createTeethGrid(j.teethSelection), j.units || '1',
-                                    (j.totalAmount || 0).toFixed(2)
+                                    (j.totalAmount || 0).toFixed(3)
                                 ]);
                             });
                         } else {
                             newRows.push([
                                 salesManager, clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
                                 orderNo, o.orderType || 'New', o.productName || '-', createTeethGrid(o.teethSelection), o.units || '1',
-                                (o.netAmount || 0).toFixed(2)
+                                (o.netAmount || 0).toFixed(3)
                             ]);
                         }
                     });
@@ -4894,7 +4894,7 @@
                         record.amount += amt;
                     });
                     rows = Object.values(managerClientData).map(r => [
-                        r.salesManager, r.client, r.jobs, r.units, r.amount.toFixed(2)
+                        r.salesManager, r.client, r.jobs, r.units, r.amount.toFixed(3)
                     ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
                 } else if (name === 'Shipments List') {
                     const res = await fetch(`${API_BASE}/shipment-notes`);
@@ -4904,7 +4904,7 @@
                         sn.noteNumber || sn.id,
                         new Date(sn.noteDate).toLocaleDateString('en-GB'),
                         sn.client ? sn.client.name : 'Unknown',
-                        (sn.totalAmount || 0).toFixed(2),
+                        (sn.totalAmount || 0).toFixed(3),
                         sn.client ? sn.client.cellPhone || '-' : '-',
                         sn.client ? sn.client.email || '-' : '-'
                     ]).sort((a, b) => b[0] - a[0]);
@@ -4928,7 +4928,7 @@
                     const res = await fetch(`${API_BASE}/staff`);
                     data = await res.json();
                     headers = ['Staff Name', 'Role', 'Monthly Salary'];
-                    rows = data.map(s => [s.name, s.role || '-', (s.salary || 0).toFixed(2)]);
+                    rows = data.map(s => [s.name, s.role || '-', (s.salary || 0).toFixed(3)]);
                 } else if (name === 'Attendance Log') {
                     headers = ['Date', 'Staff Name', 'Status', 'In Time', 'Out Time'];
                     rows = [['2024-05-07', 'John Doe', 'Present', '09:00 AM', '06:00 PM']]; // Mock
@@ -5024,7 +5024,7 @@
                     html += `
                         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
                             <span style="font-size: 10px; font-weight: 600; color: #1e3a8a; margin-bottom: 5px;">${val.toFixed(0)}</span>
-                            <div style="width: 100%; height: ${pct}%; background: linear-gradient(180deg, #3b82f6, #1d4ed8); border-radius: 4px 4px 0 0; transition: height 0.5s ease-in-out;" title="${label}: ${val.toFixed(2)}"></div>
+                            <div style="width: 100%; height: ${pct}%; background: linear-gradient(180deg, #3b82f6, #1d4ed8); border-radius: 4px 4px 0 0; transition: height 0.5s ease-in-out;" title="${label}: ${val.toFixed(3)}"></div>
                             <span style="font-size: 10px; color: #64748b; margin-top: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 60px;">${label}</span>
                         </div>
                     `;
@@ -5109,7 +5109,7 @@
                             <tr style="background:#f3f4f6; font-weight:bold;">
                                 ${headers.map((h, i) => {
                         if (numericColIndices.includes(i)) {
-                            return `<td style="padding:10px; border:1px solid #ccc; text-align:right;">${totals[i].toFixed(2)}</td>`;
+                            return `<td style="padding:10px; border:1px solid #ccc; text-align:right;">${totals[i].toFixed(3)}</td>`;
                         } else if (i === 0 && firstNumericIdx > 0) {
                             return `<td style="padding:10px; border:1px solid #ccc; text-align:right;" colspan="${firstNumericIdx}">Total</td>`;
                         } else if (i < firstNumericIdx && i !== 0) {

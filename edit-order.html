@@ -1380,7 +1380,7 @@
                 total = unitCount * rate;
             }
             
-            totalText.value = total.toFixed(2);
+            totalText.value = total.toFixed(3);
             
             let activeColor = '#ec4899';
             if (typeof editingJobIndex !== 'undefined' && editingJobIndex >= 0 && orderJobs[editingJobIndex]) {
@@ -1671,7 +1671,7 @@
                     html += '    </div>';
                     html += '    <div style="display:flex; align-items:center; gap:20px; margin-top:4px; color:#555;">';
                     html += '        <div>' + j.units + ' Units @' + j.rate + '</div>';
-                    html += '        <div>Total charge: <span style="font-weight:bold; color:#111;">' + parseFloat(j.total).toFixed(2) + '</span></div>';
+                    html += '        <div>Total charge: <span style="font-weight:bold; color:#111;">' + parseFloat(j.total).toFixed(3) + '</span></div>';
                     html += '    </div>';
                     html += '    <div style="position:absolute; right:0; bottom:10px; display:flex; gap:10px;">';
                     html += '        <button type="button" onclick="editJobInList(' + idx + ')" style="padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; color:#0056b3; border-radius:3px;"><i class="fas fa-edit"></i></button>';

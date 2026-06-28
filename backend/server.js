@@ -80,6 +80,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Helper for numeric fields
 const toNum = (val) => (val !== undefined && val !== null && val !== "" ? Number(val) : null);
+const toMoney = (val) => (val !== undefined && val !== null && val !== "" ? Math.round(Number(val) * 1000) / 1000 : 0);
 const toDate = (val) => (val && val !== "" ? new Date(val) : null);
 
 // --- CLIENTS ---
@@ -312,18 +313,18 @@ app.post('/api/orders', async (req, res) => {
     }
 
     data.age = toNum(data.age);
-    data.price = toNum(data.price) || 0;
-    data.discountAmount = toNum(data.discountAmount) || 0;
-    data.taxAmount = toNum(data.taxAmount) || 0;
+    data.price = toMoney(data.price) || 0;
+    data.discountAmount = toMoney(data.discountAmount) || 0;
+    data.taxAmount = toMoney(data.taxAmount) || 0;
     
     let jobsTotal = 0;
     if (jobsData && jobsData.length > 0) {
-      jobsTotal = jobsData.reduce((sum, job) => sum + (toNum(job.totalAmount) || toNum(job.price) || 0), 0);
+      jobsTotal = jobsData.reduce((sum, job) => sum + (toMoney(job.totalAmount) || toMoney(job.price) || 0), 0);
     }
     
-    const basePrice = (jobsData && jobsData.length > 0) ? 0 : (toNum(data.price) || 0);
-    data.grossAmount = basePrice + jobsTotal;
-    data.netAmount = toNum(req.body.netAmount) || (data.grossAmount - (data.discountAmount || 0) + (data.taxAmount || 0));
+    const basePrice = (jobsData && jobsData.length > 0) ? 0 : (toMoney(data.price) || 0);
+    data.grossAmount = Math.round((basePrice + jobsTotal) * 1000) / 1000;
+    data.netAmount = toMoney(req.body.netAmount) || Math.round((data.grossAmount - (data.discountAmount || 0) + (data.taxAmount || 0)) * 1000) / 1000;
     data.totalAmount = data.netAmount;
     
     data.receivedDate = toDate(data.receivedDate) || new Date();
@@ -375,8 +376,8 @@ app.post('/api/orders', async (req, res) => {
           shadeNotes: job.shadeNotes,
           stumpShade: job.stumpShade,
           units: toNum(job.units) || 1,
-          price: toNum(job.price) || 0,
-          totalAmount: toNum(job.totalAmount) || 0,
+          price: toMoney(job.price) || 0,
+          totalAmount: toMoney(job.totalAmount) || 0,
           slab1Rate: toNum(job.slab1Rate),
           slab2Rate: toNum(job.slab2Rate),
           slab1Units: toNum(job.slab1Units),
@@ -474,7 +475,7 @@ app.get('/api/orders/summary', async (req, res) => {
         cellPhone: client.cellPhone,
         city: client.city,
         email: client.email,
-        value: totalValue.toFixed(2),
+        value: totalValue.toFixed(3),
         num: client.orders.length
       };
     });
@@ -510,9 +511,9 @@ app.put('/api/orders/:id', async (req, res) => {
     const data = { ...req.body };
     if (data.clientId) data.clientId = Number(data.clientId);
     if (data.age) data.age = toNum(data.age);
-    if (data.price) data.price = toNum(data.price);
-    if (data.discountAmount) data.discountAmount = toNum(data.discountAmount);
-    if (data.taxAmount) data.taxAmount = toNum(data.taxAmount);
+    if (data.price) data.price = toMoney(data.price);
+    if (data.discountAmount) data.discountAmount = toMoney(data.discountAmount);
+    if (data.taxAmount) data.taxAmount = toMoney(data.taxAmount);
     if (data.netAmount) data.netAmount = toNum(data.netAmount);
     if (data.totalAmount) data.totalAmount = toNum(data.totalAmount);
     
@@ -556,8 +557,8 @@ app.put('/api/orders/:id', async (req, res) => {
             productType: j.productType || j.type || 'General',
             teethSelection: j.teethSelection || (Array.isArray(j.teeth) ? j.teeth.join(', ') : j.teeth) || null,
             units: toNum(j.units) || 1,
-            price: toNum(j.price) || toNum(j.rate) || 0,
-            totalAmount: toNum(j.totalAmount) || toNum(j.total) || 0,
+            price: toMoney(j.price) || toNum(j.rate) || 0,
+            totalAmount: toMoney(j.totalAmount) || toNum(j.total) || 0,
             slab1Rate: toNum(j.slab1Rate),
             slab2Rate: toNum(j.slab2Rate),
             slab1Units: toNum(j.slab1Units),
@@ -576,9 +577,9 @@ app.put('/api/orders/:id', async (req, res) => {
       }
 
       // Recalculate netAmount and totalAmount based on jobs
-      const jobsTotal = req.body.jobs.reduce((sum, j) => sum + (toNum(j.totalAmount) || toNum(j.total) || (toNum(j.units) || 1) * (toNum(j.price) || toNum(j.rate) || 0)), 0);
+      const jobsTotal = req.body.jobs.reduce((sum, j) => sum + (toMoney(j.totalAmount) || toNum(j.total) || (toNum(j.units) || 1) * (toMoney(j.price) || toNum(j.rate) || 0)), 0);
       cleanData.grossAmount = jobsTotal;
-      cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toNum(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toNum(data.taxAmount) || 0);
+      cleanData.netAmount = jobsTotal - (toNum(cleanData.discountAmount) || toMoney(data.discountAmount) || 0) + (toNum(cleanData.taxAmount) || toMoney(data.taxAmount) || 0);
       cleanData.totalAmount = cleanData.netAmount;
     } else {
       // Fallback to totalAmount if price is not explicitly set in the request body
@@ -912,8 +913,8 @@ app.post('/api/invoices', async (req, res) => {
     }
 
     data.grossAmount = toNum(data.grossAmount) || computedGross;
-    data.discountAmount = toNum(data.discountAmount) || 0;
-    data.taxAmount = toNum(data.taxAmount) || 0;
+    data.discountAmount = toMoney(data.discountAmount) || 0;
+    data.taxAmount = toMoney(data.taxAmount) || 0;
     data.netAmount = toNum(data.netAmount) || (data.grossAmount - data.discountAmount + data.taxAmount);
     data.paidAmount = toNum(data.paidAmount) || 0;
     data.balanceAmount = data.netAmount - data.paidAmount;
@@ -1978,7 +1979,7 @@ app.get('/api/clients/:id/financial-summary', async (req, res) => {
     const balance = (invoicesTotal._sum.netAmount || 0) - (receiptsTotal._sum.amount || 0);
     
     res.json({
-      balance: balance.toFixed(2),
+      balance: balance.toFixed(3),
       lastInvoice: client.invoices[0],
       lastPayment: client.receipts[0]
     });

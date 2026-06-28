@@ -22,12 +22,12 @@ async function loadDashboardStats() {
         const total = stats.totalOrders || 0;
         const pending = stats.pendingOrders || 0;
         document.getElementById('stat-delivered').textContent = Math.max(0, total - pending);
-        document.getElementById('stat-revenue').textContent = '₹' + (stats.totalRevenue || 0).toLocaleString();
+        document.getElementById('stat-revenue').textContent = 'OMR ' + (stats.totalRevenue || 0).toLocaleString();
     } else {
         document.getElementById('stat-total-orders').textContent = '0';
         document.getElementById('stat-pending').textContent = '0';
         document.getElementById('stat-delivered').textContent = '0';
-        document.getElementById('stat-revenue').textContent = '₹0';
+        document.getElementById('stat-revenue').textContent = 'OMR 0';
     }
 }
 

@@ -235,7 +235,7 @@
         const rateVal = j.price !== undefined ? j.price : (j.rate !== undefined ? j.rate : j.unitRate || 0);
         document.getElementById('eo-rate').value = rateVal;
         document.getElementById('eo-units').value = j.units || 1;
-        document.getElementById('eo-total-charge-text').textContent = (j.totalAmount !== undefined ? j.totalAmount : j.total || 0).toFixed(2);
+        document.getElementById('eo-total-charge-text').textContent = (j.totalAmount !== undefined ? j.totalAmount : j.total || 0).toFixed(3);
         
         // Load teeth Selection
         document.querySelectorAll('.tooth-num').forEach(t => t.classList.remove('selected'));
@@ -309,7 +309,7 @@
                 <td style="padding: 6px; text-align:right;">
                     <input type="number" step="any" value="${price}" style="width:70px; text-align:right; padding:2px; border:1px solid #ccc; border-radius:4px;" onchange="updateEditJob(${idx}, 'rate', this.value)">
                 </td>
-                <td style="padding: 6px; text-align:right; font-weight:bold; color: #111827;">${total.toFixed(2)}</td>
+                <td style="padding: 6px; text-align:right; font-weight:bold; color: #111827;">${total.toFixed(3)}</td>
                 <td style="padding: 6px; text-align:center;">
                     <button type="button" onclick="editJobInList(${idx})" style="color:#3b82f6; background:none; border:none; cursor:pointer; margin-right:8px;" title="Edit Job"><i class="fas fa-edit"></i></button>
                     <button type="button" onclick="removeEditJob(${idx})" style="color:#ef4444; background:none; border:none; cursor:pointer;" title="Remove Job"><i class="fas fa-trash"></i></button>
@@ -321,10 +321,10 @@
         wrapper.innerHTML = html;
         
         const tcText = document.getElementById('eo-total-charge-text');
-        if (tcText) tcText.textContent = grandTotal.toFixed(2);
+        if (tcText) tcText.textContent = grandTotal.toFixed(3);
         
         const tcInput = document.getElementById('eo-total');
-        if (tcInput) tcInput.value = grandTotal.toFixed(2);
+        if (tcInput) tcInput.value = grandTotal.toFixed(3);
     };
 
     window.updateEditJob = function(idx, field, val) {
@@ -996,7 +996,7 @@ Products: ${products.join(' | ')}
                                 rowHTML += `<td>${order.invoice ? (order.invoice.invoiceNumber || order.invoice.id) : '-'}</td>`;
                                 break;
                             case 'amount':
-                                rowHTML += `<td>₹${(order.totalAmount || 0).toFixed(2)}</td>`;
+                                rowHTML += `<td>OMR ${(order.totalAmount || 0).toFixed(3)}</td>`;
                                 break;
                         }
                     });
@@ -1386,7 +1386,7 @@ Products: ${products.join(' | ')}
 
                 document.getElementById('eo-prod-name').textContent = order.productName || order.productType || 'PRODUCT';
                 document.getElementById('eo-prod-name').dataset.type = order.productType || 'General';
-                document.getElementById('eo-rate').value = (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : (order.units ? (order.totalAmount / order.units).toFixed(2) : 0);
+                document.getElementById('eo-rate').value = (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : (order.units ? (order.totalAmount / order.units).toFixed(3) : 0);
 
                 const slabsContainer = document.getElementById('eo-slabs-container');
                 const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
@@ -1527,10 +1527,10 @@ Products: ${products.join(' | ')}
                 if (document.getElementById('eo-slab2-units-display')) document.getElementById('eo-slab2-units-display').textContent = slab2Units;
 
                 total = (slab1Units * slab1Rate) + (slab2Units * slab2Rate);
-                document.getElementById('eo-rate').value = units > 0 ? (total / units).toFixed(2) : 0;
+                document.getElementById('eo-rate').value = units > 0 ? (total / units).toFixed(3) : 0;
                 
                 const slabTotalDisp = document.getElementById('eo-slab-total-display');
-                if (slabTotalDisp) slabTotalDisp.textContent = total.toFixed(2);
+                if (slabTotalDisp) slabTotalDisp.textContent = total.toFixed(3);
                 
                 const rc = document.getElementById('eo-rate-container');
                 if (rc) rc.style.display = 'none';
@@ -1542,10 +1542,10 @@ Products: ${products.join(' | ')}
                 if (rc) rc.style.display = 'flex';
             }
 
-            document.getElementById('eo-total-charge-text').textContent = total.toFixed(2);
+            document.getElementById('eo-total-charge-text').textContent = total.toFixed(3);
             
             const grandTotal = getGrandTotalEditOrder(total);
-            document.getElementById('eo-total').value = grandTotal.toFixed(2);
+            document.getElementById('eo-total').value = grandTotal.toFixed(3);
         }
 
         async function openEditProductModal() {
@@ -1753,7 +1753,7 @@ Products: ${products.join(' | ')}
                         <td style="padding:10px; border-bottom:1px solid #eee;">${o.productName || o.productType || '...'}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;"><span style="background:#f3f4f6; padding:2px 6px; border-radius:4px;">${o.status}</span></td>
                         <td style="padding:10px; border-bottom:1px solid #eee; color:#10b981; font-weight:700;">${o.shipmentNote ? o.shipmentNote.noteNumber : (o.shipmentNoteId || '-')}</td>
-                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700;">₹${(o.totalAmount || 0).toFixed(2)}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700;">OMR ${(o.totalAmount || 0).toFixed(3)}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">
                             <div style="display:flex; gap:5px;">
                                 <button class="btn-toolbar" title="Edit" onclick="openEditModal(${o.id})" style="background:none; border:1px solid #ddd; padding:4px 8px; cursor:pointer;"><i class="fas fa-edit"></i></button>
@@ -1772,7 +1772,7 @@ Products: ${products.join(' | ')}
                         <tr>
                             <td style="padding:10px; border-bottom:1px solid #eee;">${s.noteNumber || s.id}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">${new Date(s.noteDate || s.createdAt).toLocaleDateString()}</td>
-                            <td style="padding:10px; border-bottom:1px solid #eee;">₹${shipmentTotal.toFixed(2)}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">OMR ${shipmentTotal.toFixed(3)}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">
                                 <button class="btn-toolbar" style="background:none; border:none; color:#3b82f6; cursor:pointer;" onclick="window.print()"><i class="fas fa-print"></i></button>
                             </td>
@@ -1787,8 +1787,8 @@ Products: ${products.join(' | ')}
                         <td style="padding:10px; border-bottom:1px solid #eee;">${new Date(r.receiptDate || r.createdAt).toLocaleDateString()}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${r.receiptNumber || r.id}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${r.paymentMethod || 'Cash'}</td>
-                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700; color:#10b981;">${(r.amount || 0).toFixed(2)}</td>
-                        <td style="padding:10px; border-bottom:1px solid #eee;">${(r.balanceAfter || 0).toFixed(2)}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; font-weight:700; color:#10b981;">${(r.amount || 0).toFixed(3)}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee;">${(r.balanceAfter || 0).toFixed(3)}</td>
                     </tr>
                 `).join('');
 
@@ -1798,7 +1798,7 @@ Products: ${products.join(' | ')}
                     <tr>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${i.invoiceNumber || i.id}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${new Date(i.invoiceDate).toLocaleDateString()}</td>
-                        <td style="padding:10px; border-bottom:1px solid #eee;">₹${(i.netAmount || 0).toFixed(2)}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee;">OMR ${(i.netAmount || 0).toFixed(3)}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">${i.status || 'Unpaid'}</td>
                         <td style="padding:10px; border-bottom:1px solid #eee;">
                             <button class="btn-toolbar" style="background:none; border:none; color:#3b82f6; cursor:pointer;" onclick="window.open('invoice.html?id=${i.id}&print=true', '_blank')"><i class="fas fa-print"></i></button>

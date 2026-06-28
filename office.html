@@ -211,7 +211,7 @@
                 <div class="header-stats" style="display: flex; gap: 20px;">
                     <div class="stat-item">
                         <span class="stat-label">Stock Value</span>
-                        <span class="stat-value" id="total-stock-value">₹0</span>
+                        <span class="stat-value" id="total-stock-value">OMR 0</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Pending Inwards</span>
@@ -277,7 +277,7 @@
                         <form id="inline-expense-form" onsubmit="saveInlineExpense(event)" style="max-width: 550px;">
                             <div style="display: grid; grid-template-columns: 160px 1fr; gap: 15px; align-items: center; margin-bottom: 12px;">
                                 <label style="font-size: 14px; font-weight: 500; color: #4b5563;">Amount</label>
-                                <input type="number" id="inline-exp-amount" value="0" required min="0.01" step="0.01" style="width: 180px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; font-size: 14px; color: #111827;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.15)';" onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';">
+                                <input type="number" id="inline-exp-amount" value="0" required min="0.01" step="0.001" style="width: 180px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; font-size: 14px; color: #111827;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.15)';" onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';">
                             </div>
                             <div style="display: grid; grid-template-columns: 160px 1fr; gap: 15px; align-items: center; margin-bottom: 12px;">
                                 <label style="font-size: 14px; font-weight: 500; color: #4b5563;">Paid To</label>
@@ -427,15 +427,15 @@
                                     <div style="display: flex; gap: 30px; margin: 20px 0; background: #f9fafb; padding: 12px; border-radius: 6px;">
                                         <div>
                                             <span style="font-size: 11px; text-transform: uppercase; color: #6b7280; display: block;">Gross</span>
-                                            <span id="inward-gross-val" style="font-size: 18px; font-weight: 700; color: #111827;">₹0.00</span>
+                                            <span id="inward-gross-val" style="font-size: 18px; font-weight: 700; color: #111827;">OMR 0.00</span>
                                         </div>
                                         <div>
                                             <span style="font-size: 11px; text-transform: uppercase; color: #6b7280; display: block;">Tax</span>
-                                            <span id="inward-tax-val" style="font-size: 18px; font-weight: 700; color: #111827;">₹0.00</span>
+                                            <span id="inward-tax-val" style="font-size: 18px; font-weight: 700; color: #111827;">OMR 0.00</span>
                                         </div>
                                         <div>
                                             <span style="font-size: 11px; text-transform: uppercase; color: #6b7280; display: block;">Grand Total</span>
-                                            <span id="inward-grand-val" style="font-size: 18px; font-weight: 700; color: var(--accent-pink);">₹0.00</span>
+                                            <span id="inward-grand-val" style="font-size: 18px; font-weight: 700; color: var(--accent-pink);">OMR 0.00</span>
                                         </div>
                                     </div>
 
@@ -451,7 +451,7 @@
                                                     <th style="padding: 8px;">Sr</th>
                                                     <th style="padding: 8px; text-align: left;">Item</th>
                                                     <th style="padding: 8px; width: 70px;">Qty</th>
-                                                    <th style="padding: 8px; width: 90px;">Rate (₹)</th>
+                                                    <th style="padding: 8px; width: 90px;">Rate (OMR )</th>
                                                     <th style="padding: 8px; width: 70px;">Tax%</th>
                                                     <th style="padding: 8px; width: 100px;">Total</th>
                                                     <th style="padding: 8px; width: 50px;"></th>
@@ -968,8 +968,8 @@
                     }
                     
                     let value = 0;
-                    if (t.type === 'Inward' && t.notes && t.notes.includes('Rate: ₹')) {
-                        const match = t.notes.match(/Rate:\s*₹\s*([0-9.]+)/);
+                    if (t.type === 'Inward' && t.notes && t.notes.includes('Rate: OMR ')) {
+                        const match = t.notes.match(/Rate:\s*OMR \s*([0-9.]+)/);
                         if (match) {
                             const rate = parseFloat(match[1]) || 0;
                             value = rate * qty;
@@ -1011,7 +1011,7 @@
                     totalReduce += entry.reduce;
                     
                     const dateFormatted = entry.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const valText = entry.value > 0 ? `₹${entry.value.toFixed(2)}` : '0';
+                    const valText = entry.value > 0 ? `OMR ${entry.value.toFixed(3)}` : '0';
                     const addText = entry.add > 0 ? entry.add : '0';
                     const reduceText = entry.reduce > 0 ? entry.reduce : '0';
                     
@@ -1034,7 +1034,7 @@
                 document.getElementById('ledger-tfoot').innerHTML = `
                     <tr>
                         <td colspan="5" style="border: 1px solid #ddd; padding: 10px; text-align: left;">Total</td>
-                        <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">₹${totalValue.toFixed(2)}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">OMR ${totalValue.toFixed(3)}</td>
                         <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">${totalAdd}</td>
                         <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">${totalReduce}</td>
                         <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">${finalBalance}</td>
@@ -1101,7 +1101,7 @@
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #eee;">${p.name}</td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee;">${p.type || '-'}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee;">₹${p.charge || p.baseRate || 0}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">OMR ${p.charge || p.baseRate || 0}</td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee;">
                             <button class="btn-action" onclick="try{editProduct(${p.id});}catch(e){alert('Error editing: '+e);}"><i class="fas fa-edit"></i> Edit</button>
                         </td>
@@ -1197,7 +1197,7 @@
                 }
                 list.innerHTML = `<table style="width:100%; border-collapse: collapse;">
                     <thead><tr style="background:#f3f4f6;"><th style="padding:8px; text-align:left;">Date</th><th style="padding:8px; text-align:left;">Category</th><th style="padding:8px; text-align:left;">Paid To</th><th style="padding:8px; text-align:left;">Amount</th></tr></thead>
-                    <tbody>${expenses.map(e => `<tr><td style="padding:8px; border-bottom:1px solid #eee;">${new Date(e.date).toLocaleDateString()}</td><td style="padding:8px; border-bottom:1px solid #eee;">${e.category}</td><td style="padding:8px; border-bottom:1px solid #eee;">${e.paidTo}</td><td style="padding:8px; border-bottom:1px solid #eee; font-weight:700;">₹${e.amount}</td></tr>`).join('')}</tbody>
+                    <tbody>${expenses.map(e => `<tr><td style="padding:8px; border-bottom:1px solid #eee;">${new Date(e.date).toLocaleDateString()}</td><td style="padding:8px; border-bottom:1px solid #eee;">${e.category}</td><td style="padding:8px; border-bottom:1px solid #eee;">${e.paidTo}</td><td style="padding:8px; border-bottom:1px solid #eee; font-weight:700;">OMR ${e.amount}</td></tr>`).join('')}</tbody>
                 </table>`;
             } catch (err) { console.error(err); }
         }
@@ -1523,9 +1523,9 @@
             if (inwardItems.length === 0) {
                 msg.style.display = 'block';
                 wrapper.style.display = 'none';
-                document.getElementById('inward-gross-val').textContent = '₹0.00';
-                document.getElementById('inward-tax-val').textContent = '₹0.00';
-                document.getElementById('inward-grand-val').textContent = '₹0.00';
+                document.getElementById('inward-gross-val').textContent = 'OMR 0.00';
+                document.getElementById('inward-tax-val').textContent = 'OMR 0.00';
+                document.getElementById('inward-grand-val').textContent = 'OMR 0.00';
                 return;
             }
             
@@ -1548,15 +1548,15 @@
                         <td style="padding:8px; border-bottom:1px solid #eee; text-align:center;">${index + 1}</td>
                         <td style="padding:8px; border-bottom:1px solid #eee; font-weight:500; color:#1e3a8a;">${item.name} (${item.unit})</td>
                         <td style="padding:8px; border-bottom:1px solid #eee;">
-                            <input type="number" value="${item.quantity}" min="0.01" step="0.01" style="width:65px; padding:4px;" onchange="updateInwardItem(${item.materialId}, 'quantity', this.value)">
+                            <input type="number" value="${item.quantity}" min="0.01" step="0.001" style="width:65px; padding:4px;" onchange="updateInwardItem(${item.materialId}, 'quantity', this.value)">
                         </td>
                         <td style="padding:8px; border-bottom:1px solid #eee;">
-                            <input type="number" value="${item.rate}" min="0" step="0.01" style="width:80px; padding:4px;" onchange="updateInwardItem(${item.materialId}, 'rate', this.value)">
+                            <input type="number" value="${item.rate}" min="0" step="0.001" style="width:80px; padding:4px;" onchange="updateInwardItem(${item.materialId}, 'rate', this.value)">
                         </td>
                         <td style="padding:8px; border-bottom:1px solid #eee;">
                             <input type="number" value="${item.taxPercent}" min="0" max="100" step="1" style="width:60px; padding:4px;" onchange="updateInwardItem(${item.materialId}, 'taxPercent', this.value)">
                         </td>
-                        <td style="padding:8px; border-bottom:1px solid #eee; text-align:right; font-weight:600;">₹${itemTotal.toFixed(2)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #eee; text-align:right; font-weight:600;">OMR ${itemTotal.toFixed(3)}</td>
                         <td style="padding:8px; border-bottom:1px solid #eee; text-align:center;">
                             <button type="button" onclick="removeMaterialFromInward(${item.materialId})" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                         </td>
@@ -1565,9 +1565,9 @@
             }).join('');
             
             const grandTotal = grossTotal + taxTotal;
-            document.getElementById('inward-gross-val').textContent = `₹${grossTotal.toFixed(2)}`;
-            document.getElementById('inward-tax-val').textContent = `₹${taxTotal.toFixed(2)}`;
-            document.getElementById('inward-grand-val').textContent = `₹${grandTotal.toFixed(2)}`;
+            document.getElementById('inward-gross-val').textContent = `OMR ${grossTotal.toFixed(3)}`;
+            document.getElementById('inward-tax-val').textContent = `OMR ${taxTotal.toFixed(3)}`;
+            document.getElementById('inward-grand-val').textContent = `OMR ${grandTotal.toFixed(3)}`;
         }
 
         async function saveInwardDocument(event) {
@@ -1600,7 +1600,7 @@
                         date: date,
                         supplier: supplier,
                         docNumber: `${docType} #${docNo}` + (refNum ? ` (Ref: ${refNum})` : ''),
-                        notes: `Rate: ₹${item.rate.toFixed(2)} | Tax: ${item.taxPercent}%` + (notes ? ` | ${notes}` : '')
+                        notes: `Rate: OMR ${item.rate.toFixed(3)} | Tax: ${item.taxPercent}%` + (notes ? ` | ${notes}` : '')
                     };
                     
                     return fetch(`${API_BASE}/inventory/transactions`, {
@@ -1767,7 +1767,7 @@
                         <td style="padding:8px; border-bottom:1px solid #eee; text-align:center;">${index + 1}</td>
                         <td style="padding:8px; border-bottom:1px solid #eee; font-weight:500; color:#1e3a8a;">${item.name} (${item.unit})</td>
                         <td style="padding:8px; border-bottom:1px solid #eee;">
-                            <input type="number" value="${item.quantity}" min="0.01" max="${item.maxStock}" step="0.01" style="width:80px; padding:4px;" onchange="updateOutwardItem(${item.materialId}, this.value)">
+                            <input type="number" value="${item.quantity}" min="0.01" max="${item.maxStock}" step="0.001" style="width:80px; padding:4px;" onchange="updateOutwardItem(${item.materialId}, this.value)">
                             <span style="font-size:11px; color:#6b7280; margin-left:5px;">(Max: ${item.maxStock})</span>
                         </td>
                         <td style="padding:8px; border-bottom:1px solid #eee; text-align:center;">
@@ -2037,8 +2037,8 @@
                     <input type="text" id="prod-type-new" placeholder="Enter custom type" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; display:none;">
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Default Charge (₹)</label>
-                    <input type="number" id="prod-rate" required min="0" step="0.01" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Default Charge (OMR )</label>
+                    <input type="number" id="prod-rate" required min="0" step="0.001" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
                 </div>
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button type="button" onclick="closeModal('product-modal')" style="background:none; border:none; cursor:pointer;">Cancel</button>
@@ -2068,7 +2068,7 @@
                     </div>
                     <div>
                         <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Quantity <span style="color:red">*</span></label>
-                        <input type="number" id="inv-quantity" required min="0.01" step="0.01" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <input type="number" id="inv-quantity" required min="0.01" step="0.001" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
@@ -2118,7 +2118,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Amount (₹)</label>
+                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Amount (OMR )</label>
                     <input type="number" id="exp-amount" required min="1" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-weight:bold; color:var(--accent-pink);">
                 </div>
                 <div style="margin-bottom:15px;">

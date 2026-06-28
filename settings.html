@@ -1489,7 +1489,7 @@
                                 <th style="width:50px;">Sr</th>
                                 <th>Name</th>
                                 <th>Type / Category</th>
-                                <th>Charge (₹)</th>
+                                <th>Charge (OMR )</th>
                                 <th style="width:140px; text-align:center;">Actions</th>
                             </tr>
                         </thead>
@@ -1527,7 +1527,7 @@
                         <td>${idx + 1}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td>${escapeHtml(item.type || '')}</td>
-                        <td>₹${item.charge || 0}</td>
+                        <td>OMR ${item.charge || 0}</td>
                         <td style="text-align:center;">
                             <button class="btn-sm edit" onclick="openProductModal(${item.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteProduct(${item.id})">Delete</button>
@@ -2386,7 +2386,7 @@
                     { id: 'name', label: 'Product Name / Description' },
                     { id: 'dept', label: 'Department' },
                     { id: 'qty', label: 'Quantity' },
-                    { id: 'rate', label: 'Unit Rate (₹)' },
+                    { id: 'rate', label: 'Unit Rate (OMR )' },
                     { id: 'disc', label: 'Discount %' },
                     { id: 'tax', label: 'Tax %' },
                     { id: 'net', label: 'Net Amount' }
@@ -2417,8 +2417,8 @@
                     { id: 'date', label: 'Transaction Date' },
                     { id: 'type', label: 'Reference Type' },
                     { id: 'refno', label: 'Ref / Bill Number' },
-                    { id: 'debit', label: 'Debit Amount (₹)' },
-                    { id: 'credit', label: 'Credit Amount (₹)' },
+                    { id: 'debit', label: 'Debit Amount (OMR )' },
+                    { id: 'credit', label: 'Credit Amount (OMR )' },
                     { id: 'balance', label: 'Running Balance' }
                 ],
                 pricelist: [
@@ -2443,16 +2443,16 @@
                 name: { header: 'Product Description', cell: 'Zirconia Swiss Classic' },
                 dept: { header: 'Department', cell: 'Porcelain' },
                 qty: { header: 'Qty', cell: '2' },
-                rate: { header: 'Rate', cell: '₹2000.00' },
+                rate: { header: 'Rate', cell: 'OMR 2000.00' },
                 disc: { header: 'Disc %', cell: '10%' },
                 tax: { header: 'Tax %', cell: '5%' },
-                net: { header: 'Net Amount', cell: '₹3600.00' },
+                net: { header: 'Net Amount', cell: 'OMR 3600.00' },
                 
                 date: { header: 'Date', cell: '24-Jun-2026' },
                 num: { header: 'Receipt #', cell: 'RCT-10023' },
                 mode: { header: 'Payment Mode', cell: 'Bank Transfer' },
                 ref: { header: 'Reference', cell: 'TXN-9846284' },
-                amount: { header: 'Amount', cell: '₹5000.00' },
+                amount: { header: 'Amount', cell: 'OMR 5000.00' },
                 
                 tooth: { header: 'Tooth #', cell: '14, 15' },
                 teeth: { header: 'Teeth Layout', cell: 'FDI: 14, 15' },
@@ -2462,9 +2462,9 @@
                 
                 type: { header: 'Type', cell: 'Invoice' },
                 refno: { header: 'Ref No.', cell: 'INV-2026-05' },
-                debit: { header: 'Debit', cell: '₹4000.00' },
-                credit: { header: 'Credit', cell: '₹0.00' },
-                balance: { header: 'Balance', cell: '₹12000.00' },
+                debit: { header: 'Debit', cell: 'OMR 4000.00' },
+                credit: { header: 'Credit', cell: 'OMR 0.00' },
+                balance: { header: 'Balance', cell: 'OMR 12000.00' },
                 
                 cat: { header: 'Category', cell: 'Crown & Bridge' }
             };
@@ -2489,9 +2489,9 @@
                     if (fid === 'date') return `<td style="padding:4px 4px;">20-Jun-2026</td>`;
                     if (fid === 'type') return `<td style="padding:4px 4px;">Invoice</td>`;
                     if (fid === 'refno') return `<td style="padding:4px 4px;">INV-2026-05</td>`;
-                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">₹4000.00</td>`;
-                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">₹0.00</td>`;
-                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">₹12000.00</td>`;
+                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">OMR 4000.00</td>`;
+                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">OMR 0.00</td>`;
+                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">OMR 12000.00</td>`;
                     return `<td style="padding:4px 4px;"></td>`;
                 }).join('');
                 
@@ -2499,9 +2499,9 @@
                     if (fid === 'date') return `<td style="padding:4px 4px;">24-Jun-2026</td>`;
                     if (fid === 'type') return `<td style="padding:4px 4px;">Receipt</td>`;
                     if (fid === 'refno') return `<td style="padding:4px 4px;">RCT-10023</td>`;
-                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">₹0.00</td>`;
-                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">₹5000.00</td>`;
-                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">₹7000.00</td>`;
+                    if (fid === 'debit') return `<td style="text-align:right; padding:4px 4px;">OMR 0.00</td>`;
+                    if (fid === 'credit') return `<td style="text-align:right; padding:4px 4px;">OMR 5000.00</td>`;
+                    if (fid === 'balance') return `<td style="text-align:right; padding:4px 4px;">OMR 7000.00</td>`;
                     return `<td style="padding:4px 4px;"></td>`;
                 }).join('');
                 
@@ -3219,7 +3219,7 @@
                     { id: 'name', label: 'Product Name / Description' },
                     { id: 'dept', label: 'Department' },
                     { id: 'qty', label: 'Quantity' },
-                    { id: 'rate', label: 'Unit Rate (₹)' },
+                    { id: 'rate', label: 'Unit Rate (OMR )' },
                     { id: 'disc', label: 'Discount %' },
                     { id: 'tax', label: 'Tax %' },
                     { id: 'net', label: 'Net Amount' }
@@ -3250,8 +3250,8 @@
                     { id: 'date', label: 'Transaction Date' },
                     { id: 'type', label: 'Reference Type' },
                     { id: 'refno', label: 'Ref / Bill Number' },
-                    { id: 'debit', label: 'Debit Amount (₹)' },
-                    { id: 'credit', label: 'Credit Amount (₹)' },
+                    { id: 'debit', label: 'Debit Amount (OMR )' },
+                    { id: 'credit', label: 'Credit Amount (OMR )' },
                     { id: 'balance', label: 'Running Balance' }
                 ],
                 pricelist: [
@@ -3330,7 +3330,7 @@
                     </div>
                     <div>
                         <label class="form-label">Default Tax Rate (%)</label>
-                        <input type="number" step="0.01" id="tax-rate-input" class="form-input" value="${data.defaultRate}">
+                        <input type="number" step="0.001" id="tax-rate-input" class="form-input" value="${data.defaultRate}">
                     </div>
                     <div>
                         <label class="checkbox-container">
@@ -3494,7 +3494,7 @@
                         <input type="text" id="staff-contact" class="form-input" value="${escapeHtml(staff.contact || '')}">
                     </div>
                     <div>
-                        <label class="form-label">Salary (₹)</label>
+                        <label class="form-label">Salary (OMR )</label>
                         <input type="number" id="staff-salary" class="form-input" value="${staff.salary || 0}">
                     </div>
                     <div class="form-group-full">
@@ -3627,7 +3627,7 @@
                         </select>
                     </div>
                     <div class="form-group-full">
-                        <label class="form-label">Rate / Charge (₹)</label>
+                        <label class="form-label">Rate / Charge (OMR )</label>
                         <input type="number" id="prod-charge" class="form-input" value="${prod.charge || 0}">
                     </div>
                 </div>

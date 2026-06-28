@@ -742,8 +742,8 @@
                                     </td>
                                     <td style="padding: 5px 10px !important;">${createTeethGrid(job.teethSelection)}</td>
                                     <td style="text-align:center;">${units}</td>
-                                    <td style="text-align:right;" class="nowrap">${rate.toFixed(2)}</td>
-                                    <td style="text-align:right;" class="nowrap">${price.toFixed(2)}</td>
+                                    <td style="text-align:right;" class="nowrap">${rate.toFixed(3)}</td>
+                                    <td style="text-align:right;" class="nowrap">${price.toFixed(3)}</td>
                                 </tr>
                             `;
                         });
@@ -754,8 +754,8 @@
                 
                 itemsBody.innerHTML = html;
                 document.getElementById('total-units').textContent = totalUnits;
-                document.getElementById('total-amount-val').textContent = computedTotalAmount.toFixed(2);
-                document.getElementById('grand-total-val').textContent = computedTotalAmount.toFixed(2);
+                document.getElementById('total-amount-val').textContent = computedTotalAmount.toFixed(3);
+                document.getElementById('grand-total-val').textContent = computedTotalAmount.toFixed(3);
                 
                 const amountInt = Math.floor(computedTotalAmount);
                 document.getElementById('total-words-val').textContent = 'OMR ' + numberToWords(amountInt);

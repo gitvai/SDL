@@ -1,468 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Command | New Order</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
 
-        .container { max-width: 1200px; margin: 20px auto; background: #fff; border: 1px solid #ccc; padding: 20px; }
-        h1 { font-size: 24px; margin: 0 0 20px 0; color: #222; }
-        h2 { font-size: 16px; margin: 0 0 10px 0; color: #444; }
-
-        .classic-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        .classic-table th { background: #e9ecef; border: 1px solid #ccc; padding: 8px; text-align: left; }
-        .classic-table td { border: 1px solid #ccc; padding: 8px; }
-        .classic-table tr:hover { background: #f8f9fa; cursor: pointer; }
-
-        /* Step 2 Form Styles */
-        .order-header-box { display: grid; grid-template-columns: 1fr 2fr; gap: 2px; background: #ccc; border: 1px solid #ccc; margin-bottom: 10px; }
-        .order-header-box > div { background: #fff; padding: 10px; }
-        
-        .field-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 12px; }
-        .field-row label { width: 70px; color: #666; }
-        .field-row input, .field-row select { padding: 3px; border: 1px solid #ccc; flex: 1; font-size: 12px; }
-
-        .balance-box { border: 1px solid #d63384; color: #d63384; padding: 2px 8px; font-weight: 700; }
-        .section-bar { background: #dee2e6; padding: 5px 10px; font-weight: 700; font-size: 13px; border: 1px solid #ccc; margin-top: 10px; text-align: center; }
-
-        /* Teeth Selector Styles */
-        .teeth-selector-container { border: 2px solid #666; background: #fff; margin-top: 10px; padding: 15px; position: relative; }
-        .teeth-grid { display: flex; flex-direction: column; align-items: center; gap: 0; user-select: none; }
-        .teeth-row { display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #444; padding: 10px 0; }
-        .teeth-row:last-child { border-bottom: none; }
-        .teeth-quadrant { display: flex; gap: 8px; }
-        .tooth-num { color: #0056b3; font-weight: 700; font-size: 18px; cursor: pointer; padding: 4px; width: 25px; text-align: center; }
-        .tooth-num.selected { background: #ec4899; color: #fff; border-radius: 4px; }
-        .divider-v { width: 2px; background: #444; height: 40px; }
-
-        .teeth-footer { display: flex; gap: 20px; margin-top: 15px; font-size: 13px; align-items: center; }
-        .footer-field { display: flex; flex-direction: column; gap: 4px; }
-        .footer-field input { width: 80px; padding: 4px; border: 1px solid #ccc; }
-
-        .btn-actions { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
-        .btn-pink { background: #ec4899; color: #fff; border: none; padding: 10px 20px; font-weight: 700; cursor: pointer; border-radius: 4px; }
-        .btn-outline { background: #fff; border: 1px solid #ccc; padding: 8px 15px; cursor: pointer; font-size: 13px; }
-        .tab-btn {
-            padding: 8px 25px;
-            border: 1px solid #666;
-            background: #e5e7eb;
-            cursor: pointer;
-            font-size: 14px;
-            color: #333;
-        }
-        .tab-btn.active {
-            background: #fff;
-            border-bottom: none;
-            font-weight: bold;
-        }
-        .tab-btn.log-btn {
-            border-color: #ec4899;
-            color: #ec4899;
-            background: transparent;
-        }
-        .tab-btn.log-btn.active {
-            background: #fff5f8;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none; /* Changed via JS to flex */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-    </style>
-    <script src="transitions.js"></script>
-    <!-- Cache buster 1780828418761 -->
-</head>
-<body>
-    <header>
-        <a href="index.html" class="logo-section" style="text-decoration: none;">
-            <img src="logo.jpeg" alt="SOHAR DENTAL LAB" style="height: 45px; object-fit: contain;">
-            <span>SOHAR DENTAL LAB</span>
-        </a>
-        <nav class="nav-links">
-            <a href="index.html">HOME</a>
-            <a href="clients.html">CLIENTS</a>
-            <a href="orders.html" class="active">ORDERS</a>
-            <a href="shipments.html">SHIPMENTS</a>
-            <a href="accounts.html">ACCOUNTS</a>
-            <a href="office.html">OFFICE</a>
-            <a href="reports.html">REPORTS</a>
-        </nav>
-
-    </header>
-
-    <div class="container">
-        <h1>New Order</h1>
-
-        <!-- STEP 1 -->
-        <div id="step-1">
-            <h2 style="font-size: 13px; color:#666;">Select Client</h2>
-            <div style="margin-bottom:15px; display:flex; gap:10px;">
-                <input type="text" id="client-search" placeholder="Search clients.." style="padding:5px; border:1px solid #ccc; width:250px;">
-                <button class="btn-outline" onclick="location.href='clients.html'">+ New Client</button>
-            </div>
-            <table class="classic-table">
-                <thead>
-                    <tr><th>Sr</th><th>Name</th><th>Code</th><th>Price Band</th><th>Bill To</th><th></th></tr>
-                </thead>
-                <tbody id="client-table-body">
-                    <tr><td colspan="6" style="text-align:center; padding: 20px; color: #666; font-weight: 500;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- STEP 2 -->
-        <div id="step-2" style="display: none;">
-            <!-- Tab Buttons at the Top -->
-            <div style="display:flex; justify-content: flex-end; gap:10px; margin-bottom:10px;">
-                <button type="button" id="btn-tab-detail" class="tab-btn active" onclick="showTab('detail')">Detail</button>
-                <button type="button" id="btn-tab-images" class="tab-btn" onclick="showTab('images')">Add Images</button>
-                <button type="button" id="btn-tab-log" class="tab-btn log-btn" onclick="showTab('log')">Log</button>
-            </div>
-
-            <div class="order-header-box">
-                <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
-                    <div>
-                        <div class="field-row"><label>Order Date</label><input type="date" id="order-date-input" style="flex:1; padding:4px;"></div>
-                        <div class="field-row">
-                            <label>Due Date</label>
-                            <input type="date" id="due-date-input" style="flex:1; padding:4px;">
-                            <span style="margin: 0 5px;">@</span>
-                            <select style="width:100px; padding:4px;"><option value=""></option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
-                        </div>
-                        <div class="field-row">
-                            <label>Date In</label>
-                            <input type="date" id="date-in-input" style="flex:1; padding:4px;">
-                            <span style="margin: 0 5px;">@</span>
-                            <select style="width:100px; padding:4px;"><option value=""></option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="field-row"><label>Model #</label><input type="text" id="model-number-input" style="flex:1; padding:4px;"></div>
-                        <div class="field-row"><label>Order #</label><input type="text" id="order-number-display" value="27729" readonly style="flex:1; padding:4px; background:#f3f4f6;"></div>
-                    </div>
-                </div>
-                <div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <div style="font-size:14px;">Client <b id="display-client-name" style="color:#0056b3;">360 CARE MEDICAL...</b> <i class="fas fa-info-circle" style="color:#007bff;"></i></div>
-                        <div>Balance <span class="balance-box">458</span></div>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12px;">
-                        <div>
-                            <div class="field-row"><label>Patient</label><input type="text" id="patient-name" placeholder="Enter patient name" style="border: 1px solid #d63384; background: #fff5f8;"></div>
-                            <div style="margin-top:5px;">Price Band: Regular</div>
-                            <div>Bill To: Self</div>
-                        </div>
-                        <div>
-                            <div>Invoice #: Not invoiced</div>
-                            <div>Shipment #: Not created</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Area for Tabs -->
-            <div id="tab-detail-content">
-                <div id="added-jobs-list" style="margin-bottom:15px; font-size:12px; display:none;">
-                    <div class="section-bar">Order Items / Jobs</div>
-                    <div id="jobs-container" style="border:1px solid #ccc; padding:10px; background:#fff; border-top:none;"></div>
-                </div>
-                <div id="product-selection-area">
-                    <div style="display:flex; gap:10px; padding:10px; background:#f8f9fa; border:1px solid #ccc; margin-bottom:10px;">
-                        <div style="display:flex; flex-direction:column; font-size:11px; color:#666;">
-                            <label>Search Product</label>
-                            <input type="text" id="product-search" placeholder="Name / Code" style="padding:4px; border:1px solid #ccc; width:300px;" oninput="refreshProducts()">
-                        </div>
-                        <div style="display:flex; flex-direction:column; font-size:11px; color:#666;">
-                            <label>Filter by Type</label>
-                            <select id="product-type-filter" style="padding:4px; border:1px solid #ccc; width:200px;" onchange="refreshProducts()">
-                                <option>All Product Types</option>
-                            </select>
-                        </div>
-                        <div style="display:flex; align-items:flex-end;">
-                            <button class="btn-action" style="padding:6px 12px; font-size:11px; background:#10b981; color:#fff; border:none; border-radius:4px; cursor:pointer;" onclick="openQuickProductModal()">+ Add New Product</button>
-                        </div>
-                    </div>
-                    <table class="classic-table">
-                        <thead><tr><th>#</th><th>Name</th><th>Product type</th><th>Charge</th></tr></thead>
-                        <tbody id="product-table-body"></tbody>
-                    </table>
-                </div>
-
-                <div id="teeth-selection-area" style="display:none;">
-                    <div style="display:flex; justify-content:space-between; margin-top:20px; align-items:center;">
-                        <div style="font-weight:700; font-size:14px;" id="selected-product-name">2D EXPANSION SCREW</div>
-                        <button class="btn-outline" style="padding:4px 10px;" onclick="cancelTeethSelection()">Change Product</button>
-                    </div>
-                    
-                    <div class="teeth-selector-container">
-                        <div style="position:absolute; top:5px; right:10px; font-size:12px; color:#0056b3; font-weight:700;">Select Teeth</div>
-                        <div style="margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;">
-                            <button type="button" class="btn-outline" style="font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #fdf2f8; border-color: #ec4899; color: #ec4899; font-weight: 600;" onclick="selectArch('upper')">Upper Arch</button>
-                            <button type="button" class="btn-outline" style="font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #fdf2f8; border-color: #ec4899; color: #ec4899; font-weight: 600;" onclick="selectArch('lower')">Lower Arch</button>
-                            <button type="button" class="btn-outline" style="font-size: 11px; padding: 3px 10px; border-radius: 20px;" onclick="clearTeeth()">Clear All</button>
-                        </div>
-                        <div class="teeth-grid">
-                            <div class="teeth-row">
-                                <div class="teeth-quadrant" id="upper-left">
-                                    <div class="tooth-num" onclick="toggleTooth(this, 18)">8</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 17)">7</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 16)">6</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 15)">5</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 14)">4</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 13)">3</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 12)">2</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 11)">1</div>
-                                </div>
-                                <div class="divider-v"></div>
-                                <div class="teeth-quadrant" id="upper-right">
-                                    <div class="tooth-num" onclick="toggleTooth(this, 21)">1</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 22)">2</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 23)">3</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 24)">4</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 25)">5</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 26)">6</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 27)">7</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 28)">8</div>
-                                </div>
-                            </div>
-                            <div class="teeth-row">
-                                <div class="teeth-quadrant" id="lower-left">
-                                    <div class="tooth-num" onclick="toggleTooth(this, 48)">8</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 47)">7</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 46)">6</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 45)">5</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 44)">4</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 43)">3</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 42)">2</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 41)">1</div>
-                                </div>
-                                <div class="divider-v"></div>
-                                <div class="teeth-quadrant" id="lower-right">
-                                    <div class="tooth-num" onclick="toggleTooth(this, 31)">1</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 32)">2</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 33)">3</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 34)">4</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 35)">5</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 36)">6</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 37)">7</div>
-                                    <div class="tooth-num" onclick="toggleTooth(this, 38)">8</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="teeth-footer">
-                            <div class="footer-field"><label>Teeth</label><input type="text" id="selected-teeth-list" oninput="handleTeethManualInput(this.value)"></div>
-                            <div class="footer-field"><label>Units</label><input type="number" id="unit-count" value="0" oninput="updateTeethUI(false, false, true)"></div>
-                            <div class="footer-field" id="footer-unit-rate-container"><label>Unit Rate</label><input type="number" id="unit-rate" value="0" oninput="updateTeethUI(true)"></div>
-                            <div class="footer-field" id="footer-total-price-container"><label>Total</label><input type="number" id="total-price" value="0" readonly></div>
-                        </div>
-
-                        <!-- Slabs for RPD Products -->
-                        <div id="slabs-container" style="display:none; border: 1px solid #ccc; padding: 10px; margin-top: 10px; font-size: 13px; background: #fafafa;">
-                            <div style="font-weight:bold; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span>Slabs</span><div style="font-weight:normal;"><label style="margin-right:5px; font-weight:600;">Total Units:</label><input type="number" id="slab-total-units" value="0" min="0" style="width:60px; padding:4px; border:1px solid #ccc; border-radius:4px;" oninput="document.getElementById('unit-count').value = this.value; updateTeethUI(false, true)"></div></div>
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                                <span>First Tooth (<span id="slab1-units-display" style="font-weight:bold;">0 / 1</span> Unit) @</span>
-                                <input type="number" step="any" id="slab1-rate" value="17" style="width:70px; padding:4px; border:1px solid #ccc;" oninput="updateTeethUI()" onchange="updateTeethUI()">
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                                <span>Remaining Teeth (<span id="slab2-units-display" style="font-weight:bold;">0</span> Units) @</span>
-                                <input type="number" step="any" id="slab2-rate" value="2" style="width:70px; padding:4px; border:1px solid #ccc;" oninput="updateTeethUI()" onchange="updateTeethUI()">
-                                <span>per unit</span>
-                            </div>
-                            <div style="font-weight:bold; font-size:14px; color:#b91c1c; border-top:1px dashed #ccc; padding-top:8px;">
-                                Total Slab Charge: <span id="slab-total-display">0.00</span>
-                            </div>
-                        </div>
-
-                        <div id="custom-unit-text-container" style="display:none; margin-top:10px;">
-                            <label style="font-weight:600; font-size:12px; color:#333;">Unit Description (if no teeth selected)</label>
-                            <textarea id="custom-unit-text" rows="2" style="width:100%; padding:4px; border:1px solid #ccc;" placeholder="E.g. Upper right 3, 4, 5..."></textarea>
-                        </div>
-                        
-                        <div style="margin-top:20px; display:flex; gap:10px;">
-                            <button type="button" class="btn-outline" onclick="saveAndAddNewJob()">Save and Add New Job</button>
-                            <button type="button" class="btn-outline" onclick="confirmTeeth()">OK</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- New detailed order options area -->
-                <div id="order-details-area" style="display:none; margin-top:20px; border-top: 1px solid #ddd; padding-top: 20px;">
-                    <div style="display:flex; gap:20px;">
-                    <div style="flex:3;">
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:10px; font-size:12px;">
-                             <div class="form-group"><label>Shade 1</label><input type="text" id="shade1" list="shade-list" style="width:100%; padding:4px;"></div>
-                             <div class="form-group"><label>Shade 2</label><input type="text" id="shade2" list="shade-list" style="width:100%; padding:4px;"></div>
-                             <div class="form-group"><label>Shade 3</label><input type="text" id="shade3" list="shade-list" style="width:100%; padding:4px;"></div>
-                            <div class="form-group"><label>Shade Notes</label><input type="text" id="shade-notes" style="width:100%; padding:4px;"></div>
-                        </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px; font-size:12px;">
-                            <div class="form-group"><label>Priority</label><select id="priority" style="width:100%; padding:4px;"><option>Normal</option><option>Urgent</option></select></div>
-                            <div class="form-group" style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="io-scan"><label>I O Scan</label></div>
-                            <div class="form-group"><label>Articulator Tag</label><input type="text" id="articulator-tag" style="width:100%; padding:4px;"></div>
-                            <div class="form-group"><label>Additional Amount</label><input type="number" id="additional-amount" value="0" style="width:100%; padding:4px;"></div>
-                        </div>
-                    </div>
-                    <div style="flex:2; border:1px solid #ddd; padding:10px; background:#f9fafb;">
-                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                            <thead>
-                                <tr style="border-bottom:1px solid #ddd; text-align:left;">
-                                    <th># TryIn</th>
-                                    <th>Scheduled</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <td style="padding:5px 0;">1 Wax Trial</td>
-                                    <td><input type="date" id="tryin-wax-date" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
-                                    <td style="font-weight:700;"><span style="color:red; font-size:14px; cursor:pointer;">&times;</span> In Process</td>
-                                </tr>
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <td style="padding:5px 0;">2 Metal/Coping Trial</td>
-                                    <td><input type="date" id="tryin-metal-date" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
-                                    <td style="font-weight:700;"><span style="color:red; font-size:14px; cursor:pointer;">&times;</span> Waiting</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding:5px 0;">3 Bisque Trial</td>
-                                    <td><input type="date" id="tryin-bisque-date" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
-                                    <td style="font-weight:700;"><span style="color:red; font-size:14px; cursor:pointer;">&times;</span> Waiting</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <h1>New Order Entry</h1>
-                <p id="current-date"></p>
-
-                <div style="display:grid; grid-template-columns: 2fr 1fr 1.5fr; gap:10px; margin-bottom:10px; font-size:12px; margin-top:10px;">
-                    <div class="form-group"><label>Patient Name</label><input type="text" id="patient-name-detail" style="width:100%; padding:4px;" placeholder="Patient Name"></div>
-                    <div class="form-group"><label>Delivery Method</label><select id="delivery-method" style="width:100%; padding:4px;"><option value=""></option><option>LOGISTICS TEAM</option><option>Courier</option><option>Delivery Boy</option><option>Doctors Pickup</option><option>Mail</option></select></div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            <select id="order-status" style="flex:1; padding:4px;" onchange="handleStatusChange()"><option>New</option><option>In Production</option><option>Complete</option><option>Hold</option><option>Try In</option><option>Cancelled</option></select>
-                            <span style="font-size:11px; color:#666;">on</span>
-                            <input type="date" id="status-date" style="width:110px; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;">
-                        </div>
-                        <div id="hold-reason-area" style="display:none; margin-top:10px;">
-                            <label id="reason-label" style="display:block; margin-bottom:5px;">Hold Reason</label>
-                            <select id="hold-reason" style="width:100%; padding:4px;">
-                                <option value=""></option>
-                                <option>Payment Pending</option>
-                                <option>Clarification Needed</option>
-                                <option>Doctor Unavailable</option>
-                                <option>Impression Issue</option>
-                                <option>Shade Issue</option>
-                                <option>Patient Not Available</option>
-                                <option>Duplicate Order</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px; font-size:12px;">
-                    <div class="form-group"><label>Pan/Tray #</label><input type="text" id="pan-tray" style="width:100%; padding:4px;"></div>
-                    <div class="form-group"><label>Assign To</label><select id="assign-to" style="width:100%; padding:4px;" onchange="handleStaffChange(this)"><option></option></select></div>
-                    <div class="form-group"><label>Manufacturer</label><select id="manufacturer" style="width:100%; padding:4px;"><option>In house Lab</option></select></div>
-                    <div class="form-group" style="display:flex; align-items:flex-end;"><a href="javascript:void(0)" style="color:#0056b3; text-decoration:none;" onclick="openEnclosuresModal()">Add Enclosures</a> <span id="enclosures-summary" style="font-size:10px; margin-left:10px; color:#666;"></span></div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; font-size:12px;">
-                    <div class="form-group"><label>Department</label><select id="department" style="width:100%; padding:4px;"><option value=""></option><option>Acrylic</option><option>Admin</option><option>Metal</option><option>Mould and Die</option><option>Orthodontic</option><option>OUTBOX</option><option>Porcelain</option><option>Quality</option><option>Wax</option></select></div>
-                    <div class="form-group"><label>Work Type</label>
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            <label><input type="radio" name="workType" value="New" checked> New</label>
-                            <label><input type="radio" name="workType" value="Repeat"> Repeat</label>
-                            <label><input type="radio" name="workType" value="Repair"> Repair</label>
-                        </div>
-                    </div>
-                    <div class="form-group"><label>Sub Doctor</label>
-                        <select id="sub-doctor" style="width:100%; padding:4px;" onchange="handleDoctorChange(this)">
-                            <option value="">Primary Doctor</option>
-                            <option value="__add_new__" style="font-weight:bold; color:#3b82f6;">+ Add New Doctor...</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Drop Location</label><input type="text" id="drop-location" placeholder="Primary Address" style="width:100%; padding:4px;"></div>
-                </div>
-                </div> <!-- End order-details-area -->
-            </div><!-- End tab-detail-content -->
-
-                <div id="tab-images-content" style="display:none; margin-top:10px;">
-                    <div style="border:1px solid #ccc;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:2px 10px; border-bottom:1px solid #ccc; height: 32px;">
-                            <h3 style="font-size:14px; margin:0; font-weight:700; color:#333;">Documents</h3>
-                            <div style="display:flex; gap:5px;">
-                                <button type="button" class="btn-outline" style="font-size:11px; padding:2px 8px; color:#0056b3; background:#fff; border:1px solid #ddd; border-radius:3px; display:flex; align-items:center; gap:4px;" onclick="showTab('detail')"><i class="fas fa-reply"></i> Return to Order Details</button>
-                                <input type="file" id="order-image-input" style="display:none;" multiple accept="image/*">
-                                <button type="button" class="btn-outline" style="font-size:11px; padding:2px 8px; color:#0056b3; background:#fff; border:1px solid #ddd; border-radius:3px; display:flex; align-items:center; gap:4px;" onclick="document.getElementById('order-image-input').click()"><i class="fas fa-upload"></i> Add Files</button>
-                                <button type="button" class="btn-outline" style="font-size:11px; padding:2px 8px; color:#0056b3; background:#fff; border:1px solid #ddd; border-radius:3px; display:flex; align-items:center; gap:4px;"><i class="fas fa-camera"></i> WebCam</button>
-                            </div>
-                        </div>
-                        <div style="padding:40px 20px; text-align:center; background:#fff; min-height: 200px;">
-                            <div id="images-placeholder" style="border:1px solid #ccc; display:inline-block; padding:15px 30px; background:#fff; margin-bottom: 20px;">
-                                <p style="font-weight:700; margin:0; font-size:16px; color:#333;">It's easy</p>
-                                <p style="margin:5px 0 0 0; font-size:13px; color:#555;">Add, Edit and Organize documents</p>
-                            </div>
-                            <div id="image-preview-area" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-log-content" style="display:none;">
-                    <div style="border:1px solid #999; margin-top:10px;">
-                        <div style="background:#e5e7eb; padding:5px 15px; border-bottom:1px solid #999; text-align:center;">
-                            <h3 style="font-size:16px; margin:0; font-weight:700; color:#333;">Order Log</h3>
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; padding:10px 15px;">
-                            <button type="button" class="btn-outline" style="font-size:11px; padding:4px 10px; color:#0056b3; background:#f8f9fa; border:1px solid #ccc; border-radius:4px;" onclick="showTab('detail')"><i class="fas fa-reply"></i> Return to Order Details</button>
-                        </div>
-                        <div style="padding:40px 20px; text-align:center;">
-                            <p style="font-size:18px; color:#333; margin:20px 0;">No Order Logs found</p>
-                        </div>
-                        <div style="display:flex; justify-content:center; gap:10px; padding:20px;">
-                            <button type="button" class="btn-outline" style="font-size:12px; color:#0056b3; border:1px solid #ccc; background:#f8f9fa; padding:5px 15px; border-radius:4px;" onclick="addNoteToOrder('Client')">Add Client Notes</button>
-                            <button type="button" class="btn-outline" style="font-size:12px; color:#0056b3; border:1px solid #ccc; background:#f8f9fa; padding:5px 15px; border-radius:4px;" onclick="addNoteToOrder('Technician')">Add Technician Notes</button>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div style="margin-top:20px; font-size:12px; padding: 0 10px;">
-                    <label style="display:block; margin-bottom:5px; font-weight: 600;">Order Notes</label>
-                    <textarea id="order-notes" style="width:100%; height:80px; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; box-sizing: border-box;" placeholder="Order Notes"></textarea>
-                </div>
-
-                <div style="margin-top:10px; padding: 0 10px;">
-                    <button type="button" class="btn-outline" style="font-weight: bold; color: #ec4899; border-color: #ec4899;" onclick="handleAddProductFromBottom()">+ Add Another Product</button>
-                </div>
-
-                <div class="btn-actions">
-                <button class="btn-outline" style="color:#d63384;" onclick="location.href='orders.html'"><i class="fas fa-undo"></i> Cancel</button>
-                <button class="btn-pink" onclick="submitOrder()">Create Order</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
         const JOB_COLORS = ['#ec4899', '#9f1239', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316'];
         let allClients = [];
         let selectedClientId = null;
@@ -471,21 +8,12 @@
         let selectedProductType = 'General';
 
         async function loadClients() {
-            const tbody = document.getElementById('client-table-body');
-            if (tbody) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #666; font-weight: 500;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: #ec4899;"></i>Loading clients... (Connecting to server, please wait up to 1 minute on first load of the day)</td></tr>`;
-            }
             try {
                 const res = await fetch(`${API_BASE}/clients` + ( `clients`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
                 allClients = await res.json();
                 renderClients(allClients);
                 populateDoctors();
-            } catch (err) { 
-                console.error(err); 
-                if (tbody) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #dc2626; font-weight: 500;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Failed to load clients. Server is offline or not responding. Please retry.</td></tr>`;
-                }
-            }
+            } catch (err) { console.error(err); }
         }
 
         function renderClients(clients) {
@@ -653,7 +181,6 @@
             const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
             const productName = (p.name || '').toUpperCase();
             const isSlabProduct = slabProducts.some(sp => productName.includes(sp));
-            const isSpecialRpd = productName === 'RPD' || productName.includes('FLEXIBLE RPD') || productName.includes('PARTIAL RPD');
             
             if (slabsContainer) {
                 slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
@@ -666,22 +193,18 @@
             
             if (isSlabProduct) {
                 const s1 = document.getElementById('slab1-rate');
-                if (s1) {
-                    s1.value = isSpecialRpd ? 17 : (p.charge || 0);
-                }
+                if (s1) s1.value = p.charge || 0;
                 const s2 = document.getElementById('slab2-rate');
                 if (s2) s2.value = 2;
             }
 
             const nameDisplay = document.getElementById('selected-product-name');
+
             const rateInput = document.getElementById('unit-rate');
-            const footerRateContainer = document.getElementById('footer-unit-rate-container');
             
-            if (nameDisplay) nameDisplay.textContent = p.name;
-            if (rateInput) rateInput.value = p.charge || 0;
-            if (footerRateContainer) {
-                footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
-            }
+            
+              if (nameDisplay) nameDisplay.textContent = p.name;
+              if (rateInput) rateInput.value = p.charge || 0;
               
               updateTeethUI(true);
               /* Disable client-specific rate overrides to enforce global rate usage
@@ -781,20 +304,26 @@
             const isSlabActive = slabsContainer && slabsContainer.style.display === 'block';
 
             if (isSlabActive) {
-                const s1r = parseFloat(slab1RateInput.value) || 0;
-                const s2r = parseFloat(slab2RateInput.value) || 0;
-                if (unitCount >= 1) {
-                    total = s1r + (unitCount - 1) * s2r;
-                }
+                const s1Rate = parseFloat(slab1RateInput.value) || 0;
+                const s2Rate = parseFloat(slab2RateInput.value) || 0;
+                
+                let slab1Units = Math.min(unitCount, 1);
+                let slab2Units = Math.max(0, unitCount - 1);
+                
+                if(document.getElementById('slab1-units-display')) document.getElementById('slab1-units-display').textContent = slab1Units + ' / 1';
+                if(document.getElementById('slab2-units-display')) document.getElementById('slab2-units-display').textContent = slab2Units;
+                
+                total = (slab1Units * s1Rate) + (slab2Units * s2Rate);
+                if(document.getElementById('slab-total-display')) document.getElementById('slab-total-display').textContent = total.toFixed(2);
             } else {
                 const rate = parseFloat(rateInput.value) || 0;
                 total = unitCount * rate;
             }
             
-            totalText.value = total.toFixed(3);
-            
+            totalText.value = total.toFixed(2);
+
             let activeColor = '#ec4899';
-            if (typeof editingJobIndex !== 'undefined' && editingJobIndex >= 0 && orderJobs[editingJobIndex]) {
+            if (typeof editingJobIndex !== 'undefined' && editingJobIndex !== -1 && orderJobs[editingJobIndex]) {
                 activeColor = orderJobs[editingJobIndex].color || activeColor;
             } else if (typeof orderJobs !== 'undefined') {
                 activeColor = JOB_COLORS[orderJobs.length % JOB_COLORS.length] || activeColor;
@@ -808,12 +337,7 @@
                 el.style.backgroundColor = '';
                 el.classList.remove('selected');
                 
-                // Parse correct tNum from onclick attribute!
-                const onclickAttr = el.getAttribute('onclick');
-                if (!onclickAttr) return;
-                const match = onclickAttr.match(/toggleTooth\(this,\s*(\d+)\)/);
-                if (!match) return;
-                const tNum = parseInt(match[1]);
+                const tNum = parseInt(el.getAttribute('data-tooth') || el.textContent);
                 
                 let circleColors = [];
                 if (typeof orderJobs !== 'undefined') {
@@ -858,13 +382,10 @@
                     el.style.borderRadius = '50%';
                 }
             });
-
-            if (selectedTeeth.length > 0 || unitCount > 0) {
-                document.getElementById('teeth-grid-container').style.display = 'block';
-            }
         }
 
         function confirmTeeth() {
+
             // Auto-fill patient name in the detailed form if it was entered earlier
             const topPatientName = document.getElementById('patient-name').value;
             if (topPatientName && !document.getElementById('patient-name-detail').value) {
@@ -977,15 +498,9 @@
             const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
             const productNameUpper = (j.product || '').toUpperCase();
             const isSlabProduct = slabProducts.some(sp => productNameUpper.includes(sp));
-            const isSpecialRpd = productNameUpper === 'RPD' || productNameUpper.includes('FLEXIBLE RPD') || productNameUpper.includes('PARTIAL RPD');
             
             if (slabsContainer) {
                 slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
-            }
-            
-            const footerRateContainer = document.getElementById('footer-unit-rate-container');
-            if (footerRateContainer) {
-                footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
             }
             
             const customUnitContainer = document.getElementById('custom-unit-text-container');
@@ -1001,7 +516,7 @@
             }
             
             const s1 = document.getElementById('slab1-rate');
-            if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : (isSpecialRpd ? 17 : j.rate);
+            if (s1) s1.value = (j.slab1Rate !== null && j.slab1Rate !== undefined) ? j.slab1Rate : j.rate;
             const s2 = document.getElementById('slab2-rate');
             if (s2) s2.value = (j.slab2Rate !== null && j.slab2Rate !== undefined) ? j.slab2Rate : 2;
             
@@ -1083,7 +598,7 @@
                     html += '    </div>';
                     html += '    <div style="display:flex; align-items:center; gap:20px; margin-top:4px; color:#555;">';
                     html += '        <div>' + j.units + ' Units @' + j.rate + '</div>';
-                    html += '        <div>Total charge: <span style="font-weight:bold; color:#111;">' + parseFloat(j.total).toFixed(3) + '</span></div>';
+                    html += '        <div>Total charge: <span style="font-weight:bold; color:#111;">' + parseFloat(j.total).toFixed(2) + '</span></div>';
                     html += '    </div>';
                     html += '    <div style="position:absolute; right:0; bottom:10px; display:flex; gap:10px;">';
                     html += '        <button type="button" onclick="editJobInList(' + idx + ')" style="padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; color:#0056b3; border-radius:3px;"><i class="fas fa-edit"></i></button>';
@@ -1475,127 +990,4 @@
                 });
             }
         });
-    </script>
-
-    <!-- Quick Product Modal -->
-    <div id="quick-product-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:#fff; padding:20px; border-radius:8px; width:400px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top:0;">Quick Add New Product</h3>
-            <div style="display:grid; gap:15px; margin-top:15px;">
-                <div>
-                    <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Product Name</label>
-                    <input type="text" id="qp-name" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-                <div>
-                    <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Product Type</label>
-                    <input type="text" id="qp-type" list="qp-type-options" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                    <datalist id="qp-type-options">
-                        <option value="PFM">
-                        <option value="Zirconia">
-                        <option value="E-Max">
-                        <option value="Denture">
-                        <option value="Implant">
-                    </datalist>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Code</label>
-                        <input type="text" id="qp-code" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Charge (OMR )</label>
-                        <input type="number" id="qp-charge" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                    </div>
-                </div>
-            </div>
-            <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
-                <button onclick="closeQuickProductModal()" style="padding:8px 16px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer;">Cancel</button>
-                <button onclick="saveQuickProduct()" style="padding:8px 16px; border:none; border-radius:4px; background:#10b981; color:#fff; cursor:pointer; font-weight:700;">Save Product</button>
-            </div>
-        </div>
-    </div>
-    <datalist id="shade-list">
-        <option value="0M1">
-        <option value="1M1">
-        <option value="1M2">
-        <option value="2L1.5">
-        <option value="2L2.5">
-        <option value="2M1">
-        <option value="2M2">
-        <option value="2M3">
-        <option value="2R1.5">
-        <option value="2R2.5">
-        <option value="3L1.5">
-        <option value="3L2.5">
-        <option value="3M1">
-        <option value="3M2">
-        <option value="3M3">
-        <option value="3R1.5">
-        <option value="3R2.5">
-        <option value="4L1.5">
-        <option value="4L2.5">
-        <option value="4M1">
-        <option value="4M2">
-        <option value="4M3">
-        <option value="4R1.5">
-        <option value="4R2.5">
-        <option value="5M1">
-        <option value="5M2">
-        <option value="5M3">
-        <option value="A1">
-        <option value="A1.5">
-        <option value="A2">
-        <option value="A3">
-        <option value="A3.5">
-        <option value="A4">
-        <option value="B1">
-        <option value="B2">
-        <option value="B3">
-        <option value="B4">
-        <option value="BL1">
-        <option value="BL2">
-        <option value="BL3">
-        <option value="BL4">
-        <option value="C1">
-        <option value="C2">
-        <option value="C3">
-        <option value="C4">
-        <option value="D2">
-        <option value="D3">
-        <option value="D4">
-        <option value="OM2">
-        <option value="OM3">
-    </datalist>
-
-    <!-- Enclosures Modal -->
-    <div id="enclosures-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content" style="width:320px; padding:20px; border-radius:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <h3 style="margin:0; font-size:18px; font-weight:700; color:#333;">Select Enclosures</h3>
-                <span style="cursor:pointer; font-size:24px; color:#999;" onclick="closeEnclosuresModal()">&times;</span>
-            </div>
-            <div style="max-height:300px; overflow-y:auto; margin-bottom:15px; padding-right:10px;">
-                <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Abutments"> Abutments</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Bite"> Bite</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="CAD CAM Files"> CAD CAM Files</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Facebow Articulator"> Facebow Articulator</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Imp Post"> Imp Post</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Impression Lower"> Impression Lower</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Impression Upper"> Impression Upper</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Lab Analogue"> Lab Analogue</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Model Lower"> Model Lower</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Model Upper"> Model Upper</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="Photos"> Photos</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="RE TRIAL"> RE TRIAL</label>
-                    <label style="display:flex; gap:10px; align-items:center; cursor:pointer;"><input type="checkbox" name="enclosure" value="UPPER"> UPPER</label>
-                </div>
-            </div>
-            <div style="display:flex; justify-content:space-between; gap:10px; border-top:1px solid #eee; padding-top:15px; margin-top:10px;">
-                <button type="button" class="btn-action" style="background:#fff; color:#0056b3; border:1px solid #ccc; flex:1; font-size:12px; padding:8px; border-radius:4px;" onclick="saveEnclosures()">Add Selected Enclosures</button>
-                <button type="button" class="btn-outline" style="flex:0.5; font-size:12px; padding:8px; border-radius:4px;" onclick="closeEnclosuresModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-</body>
-
+    
