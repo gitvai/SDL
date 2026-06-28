@@ -173,6 +173,42 @@
         .teeth-chart .teeth-quad.ul { border-bottom: 1.5px solid #333; text-align: left; }
         .teeth-chart .teeth-quad.lr { border-right: 1.5px solid #333; text-align: right; }
         .teeth-chart .teeth-quad.ll { text-align: left; }
+        @media print {
+            header, 
+            .sub-tabs-container, 
+            .reports-sidebar, 
+            #report-screen > div:first-child,
+            .pdf-action,
+            #toast,
+            #report-placeholder {
+                display: none !important;
+            }
+            
+            body, 
+            .reports-content, 
+            .reports-main-area, 
+            #report-screen, 
+            #report-viewer-content {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                border: none !important;
+                background: white !important;
+            }
+            
+            /* Ensure the report title is shown clearly */
+            #modal-report-title {
+                display: block !important;
+                margin-top: 0 !important;
+            }
+
+            @page {
+                margin: 1cm;
+            }
+        }
     </style>
     <script src="transitions.js"></script>
 </head>
