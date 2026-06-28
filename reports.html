@@ -180,7 +180,8 @@
             #report-screen > div:first-child,
             .pdf-action,
             #toast,
-            #report-placeholder {
+            #report-placeholder,
+            #backup-reminder {
                 display: none !important;
             }
             
@@ -199,6 +200,11 @@
                 background: white !important;
             }
             
+            /* Apply padding to body to prevent text from touching physical edge */
+            body {
+                padding: 1.5cm !important;
+            }
+            
             /* Ensure the report title is shown clearly */
             #modal-report-title {
                 display: block !important;
@@ -206,7 +212,8 @@
             }
 
             @page {
-                margin: 1cm;
+                /* margin: 0 removes browser headers and footers (date, title, page numbers) */
+                margin: 0;
             }
         }
     </style>
