@@ -731,19 +731,19 @@
                 <span>Product Catalogue</span>
             </a>
 
-            <!-- Shipments Tab Reports -->
+            <!-- Shipments Tab Reports (16 Reports exactly matching screenshots) -->
             <a href="javascript:void(0)" class="report-item" data-category="Favourites,Shipments" onclick="runReport('Client wise Order Job Shipments')">
                 <i class="fas fa-star"></i>
                 <i class="fas fa-table"></i>
                 <span>Client wise Order Job Shipments</span>
             </a>
-            <a href="javascript:void(0)" class="report-item" data-category="Favourites,Shipments" onclick="runReport('Shipped Orders Jobs- by ProductType, Product - Summary')">
+            <a href="javascript:void(0)" class="report-item" data-category="Favourites,Shipments" onclick="runReport('Shipped Orders Jobs- by ProductType,Product - Summary')">
                 <i class="fas fa-star"></i>
                 <i class="fas fa-share"></i>
-                <span>Shipped Orders Jobs- by ProductType, Product - Summary</span>
+                <span>Shipped Orders Jobs- by ProductType,Product - Summary</span>
             </a>
-            <a href="javascript:void(0)" class="report-item" data-category="Shipments" onclick="runReport('Client wise Order Job Shipments Summary')">
-                <i class="far fa-star empty"></i>
+            <a href="javascript:void(0)" class="report-item" data-category="Favourites,Shipments" onclick="runReport('Client wise Order Job Shipments Summary')">
+                <i class="fas fa-star"></i>
                 <i class="fas fa-table"></i>
                 <span>Client wise Order Job Shipments Summary</span>
             </a>
@@ -796,6 +796,21 @@
                 <i class="far fa-star empty"></i>
                 <i class="fas fa-table"></i>
                 <span>Product wise Shipped Order Jobs</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Shipments" onclick="runReport('Sales Manager wise Order Job Shipments')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Sales Manager wise Order Job Shipments</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Shipments" onclick="runReport('Sales Manager wise Order Job Shipments Summary')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Sales Manager wise Order Job Shipments Summary</span>
+            </a>
+            <a href="javascript:void(0)" class="report-item" data-category="Shipments" onclick="runReport('Shipments List')">
+                <i class="far fa-star empty"></i>
+                <i class="fas fa-table"></i>
+                <span>Shipments List</span>
             </a>
 
             <!-- Office Tab Reports -->
@@ -1367,13 +1382,18 @@
                 const dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
                 html += `<label>Priority</label><select data-filter="priority" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Normal">Normal</option><option value="Urgent">Urgent</option></select>`;
                 html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
-            } else if (name === 'Sales Manager wise Order Jobs') {
+            } else if (name.startsWith('Sales Manager wise')) {
                 const managers = [...new Set(filterData.clients.map(c => c.salesManager).filter(Boolean))].map(m => ({ name: m }));
+                const dateLabel = name.includes('Shipments') ? 'Dispatch Date' : 'Order Date';
                 html += `<label>Sales Manager</label><select data-filter="salesManager" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(managers)}</select>`;
-                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
-            } else if (name === 'Sub Doctor wise Order Jobs') {
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+            } else if (name.includes('Client wise') || name.includes('Client, Product wise') || name === 'Sub Doctor wise Order Jobs') {
+                const dateLabel = name.includes('Due Date') ? 'Due Date' : (name.includes('not yet delivered') ? 'Order Date' : 'Dispatch Date');
                 html += `<label>Client</label><select data-filter="client" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.clients)}</select>`;
-                html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+            } else if (name.includes('ProductType,Product - Summary')) {
+                html += `<label>Product Type</label><select data-filter="productType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getOptions(filterData.productTypes)}</select>`;
+                html += `<label>Shipment Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Orders Jobs- by Due Date' || name === 'Due Date wise Order Jobs' || name === 'Orders List' || name === 'Orders List - by Due Date' || name === 'Orders yet to be invoiced' || name === 'Pending Deliveries') {
                 let dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
                 if (name === 'Pending Deliveries') dateLabel = 'As On Date';
@@ -1386,7 +1406,8 @@
                 html += `<label>Job Type</label><select data-filter="jobType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="New">New</option><option value="Repeat">Repeat</option><option value="Repair">Repair</option></select>`;
                 html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else {
-                html += `<label>Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
+                const dateLabel = name === 'Shipments List' ? 'Shipment Date' : (name.includes('Dispatch') || name.includes('Shipment') ? 'Dispatch Date' : 'Date');
+                html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             }
             
             container.innerHTML = html;
@@ -2214,33 +2235,410 @@
                     
                     // Sort by Product Type
                     rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
-                } else if (name === 'Orders Jobs- by ProductType,Product - Summary' || name === 'Shipped Orders Jobs- by ProductType,Product - Summary' || name === 'Shipped Orders Jobs- by ProductType, Product - Summary') {
+                } else if (name === 'Client wise Order Job Shipments') {
                     const res = await fetch(`${API_BASE}/orders`);
-                    let orders = await res.json();
-                    if (name.includes('Shipped')) {
-                        orders = orders.filter(o => ['Dispatched', 'Delivered'].includes(o.shippingStatus));
-                    }
-                    const typeData = {};
-                    orders.forEach(o => {
+                    data = await res.json();
+                    headers = ['Client', 'Sub Doctor', 'Dispatch Date', 'Shipment #', 'Patient', 'Model #', 'Order #', 'Work Type', 'Product', 'Teeth', 'Units', 'Job Amt.'];
+                    let newRows = [];
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const dispatchDate = o.shipmentNote && o.shipmentNote.noteDate ? new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB') : '-';
+                        const shipmentNo = o.shipmentNote ? o.shipmentNote.noteNumber || o.shipmentNoteId : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        
                         if (o.jobs && o.jobs.length > 0) {
                             o.jobs.forEach(j => {
-                                const type = j.productType || 'Unknown';
-                                const prod = j.productName || '-';
-                                const key = type + '||' + prod;
-                                typeData[key] = (typeData[key] || 0) + 1;
+                                newRows.push([
+                                    clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
+                                    orderNo, o.orderType || 'New', j.productName || '-', createTeethGrid(j.teethSelection), j.units || '1',
+                                    (j.totalAmount || 0).toFixed(2)
+                                ]);
                             });
                         } else {
-                            const type = o.productType || 'Unknown';
-                            const prod = o.productName || '-';
-                            const key = type + '||' + prod;
-                            typeData[key] = (typeData[key] || 0) + 1;
+                            newRows.push([
+                                clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
+                                orderNo, o.orderType || 'New', o.productName || '-', createTeethGrid(o.teethSelection), o.units || '1',
+                                (o.netAmount || 0).toFixed(2)
+                            ]);
                         }
                     });
-                    headers = ['Product Type', 'Product Name', 'Order Count'];
-                    rows = Object.entries(typeData).map(([key, count]) => {
-                        const [type, prod] = key.split('||');
-                        return [type, prod, count];
-                    }).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Shipped Orders Jobs- by ProductType,Product - Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Category', 'Product', 'Jobs', 'Units', 'Amount'];
+                    const grouped = {};
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                const cat = j.productType || 'General';
+                                const prod = j.productName || '-';
+                                const key = cat + '||' + prod;
+                                if (!grouped[key]) grouped[key] = { cat, prod, jobs: 0, units: 0, amount: 0 };
+                                grouped[key].jobs += 1;
+                                grouped[key].units += parseFloat(j.units || 1);
+                                grouped[key].amount += parseFloat(j.totalAmount || 0);
+                            });
+                        } else {
+                            const cat = o.productType || 'General';
+                            const prod = o.productName || '-';
+                            const key = cat + '||' + prod;
+                            if (!grouped[key]) grouped[key] = { cat, prod, jobs: 0, units: 0, amount: 0 };
+                            grouped[key].jobs += 1;
+                            grouped[key].units += parseFloat(o.units || 1);
+                            grouped[key].amount += parseFloat(o.netAmount || 0);
+                        }
+                    });
+                    rows = Object.values(grouped).map(g => [
+                        g.cat, g.prod, g.jobs, g.units, g.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Client wise Order Job Shipments Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Client', 'Jobs', 'Units', 'Amount'];
+                    const clientData = {};
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        if (!clientData[clientName]) clientData[clientName] = { jobs: 0, units: 0, amount: 0 };
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        clientData[clientName].jobs += jobCount;
+                        clientData[clientName].units += unitsCount;
+                        clientData[clientName].amount += amt;
+                    });
+                    rows = Object.entries(clientData).map(([client, c]) => [
+                        client, c.jobs, c.units, c.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Client wise Orders not yet delivered') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Client', 'Order #', 'Order Date', 'Patient', 'Teeth', 'Product', 'Status', 'Technician', 'Units', 'Amount'];
+                    let newRows = [];
+                    data.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').forEach(o => {
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    clientName, orderNo, orderDate, o.patientName, createTeethGrid(j.teethSelection),
+                                    j.productName || '-', o.status, o.technician || '-', j.units || '1',
+                                    (j.totalAmount || 0).toFixed(2)
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                clientName, orderNo, orderDate, o.patientName, createTeethGrid(o.teethSelection),
+                                o.productName || '-', o.status, o.technician || '-', o.units || '1',
+                                (o.netAmount || 0).toFixed(2)
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Client wise Orders not yet delivered (Search by Due Date)') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Client', 'Due Date', 'Order #', 'Patient', 'Product', 'Teeth', 'Status', 'Technician', 'Units'];
+                    let newRows = [];
+                    data.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled')
+                        .sort((a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0))
+                        .forEach(o => {
+                            const clientName = o.client ? o.client.name : 'Unknown';
+                            const dueDate = o.dueDate ? new Date(o.dueDate).toLocaleDateString('en-GB') : '-';
+                            const orderNo = o.orderNumber || o.id;
+                            
+                            if (o.jobs && o.jobs.length > 0) {
+                                o.jobs.forEach(j => {
+                                    newRows.push([
+                                        clientName, dueDate, orderNo, o.patientName, j.productName || '-',
+                                        createTeethGrid(j.teethSelection), o.status, o.technician || '-', j.units || '1'
+                                    ]);
+                                });
+                            } else {
+                                newRows.push([
+                                    clientName, dueDate, orderNo, o.patientName, o.productName || '-',
+                                    createTeethGrid(o.teethSelection), o.status, o.technician || '-', o.units || '1'
+                                ]);
+                            }
+                        });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Client, Product wise Order Job Shipments Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Client', 'Product', 'Jobs', 'Units', 'Amount'];
+                    const clientProdData = {};
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                const prod = j.productName || 'General';
+                                const key = clientName + '||' + prod;
+                                if (!clientProdData[key]) clientProdData[key] = { client: clientName, prod, jobs: 0, units: 0, amount: 0 };
+                                clientProdData[key].jobs += 1;
+                                clientProdData[key].units += parseFloat(j.units || 1);
+                                clientProdData[key].amount += parseFloat(j.totalAmount || 0);
+                            });
+                        } else {
+                            const prod = o.productName || 'General';
+                            const key = clientName + '||' + prod;
+                            if (!clientProdData[key]) clientProdData[key] = { client: clientName, prod, jobs: 0, units: 0, amount: 0 };
+                            clientProdData[key].jobs += 1;
+                            clientProdData[key].units += parseFloat(o.units || 1);
+                            clientProdData[key].amount += parseFloat(o.netAmount || 0);
+                        }
+                    });
+                    rows = Object.values(clientProdData).map(cp => [
+                        cp.client, cp.prod, cp.jobs, cp.units, cp.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Date wise Dispatch Values') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Dispatch Date', 'Jobs', 'Units', 'Amount'];
+                    const daily = {};
+                    data.filter(o => o.shipmentNoteId && o.shipmentNote).forEach(o => {
+                        const dateStr = new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB');
+                        if (!daily[dateStr]) daily[dateStr] = { jobs: 0, units: 0, amount: 0 };
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        daily[dateStr].jobs += jobCount;
+                        daily[dateStr].units += unitsCount;
+                        daily[dateStr].amount += amt;
+                    });
+                    rows = Object.entries(daily).map(([d, val]) => [
+                        d, val.jobs, val.units, val.amount.toFixed(2)
+                    ]).sort((a, b) => {
+                        const partsA = a[0].split('/');
+                        const partsB = b[0].split('/');
+                        return new Date(partsA[2], partsA[1]-1, partsA[0]) - new Date(partsB[2], partsB[1]-1, partsB[0]);
+                    });
+                } else if (name === 'Delivery Mode wise Shipped Order Jobs') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Delivery Boy', 'Dispatch Date', 'Client', 'Shipment #', 'Order #', 'Order Date', 'Product', 'Units'];
+                    let newRows = [];
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const delBoy = o.shipmentNote ? o.shipmentNote.deliveryMode || 'Self' : 'Self';
+                        const dispatchDate = o.shipmentNote && o.shipmentNote.noteDate ? new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB') : '-';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const shipmentNo = o.shipmentNote ? o.shipmentNote.noteNumber || o.shipmentNoteId : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    delBoy, dispatchDate, clientName, shipmentNo, orderNo, orderDate, j.productName || '-', j.units || '1'
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                delBoy, dispatchDate, clientName, shipmentNo, orderNo, orderDate, o.productName || '-', o.units || '1'
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Delivery Mode, Client wise Shipments summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Delivery Boy', 'Client', 'Shipments', 'Orders', 'Jobs', 'Job Amount', 'Units'];
+                    const deliveryClientData = {};
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const delBoy = o.shipmentNote ? o.shipmentNote.deliveryMode || 'Self' : 'Self';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const key = delBoy + '||' + clientName;
+                        
+                        if (!deliveryClientData[key]) {
+                            deliveryClientData[key] = {
+                                delBoy, client: clientName, shipments: new Set(), orders: new Set(), jobs: 0, amount: 0, units: 0
+                            };
+                        }
+                        
+                        const record = deliveryClientData[key];
+                        record.shipments.add(o.shipmentNoteId);
+                        record.orders.add(o.id);
+                        
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        record.jobs += jobCount;
+                        record.amount += amt;
+                        record.units += unitsCount;
+                    });
+                    rows = Object.values(deliveryClientData).map(r => [
+                        r.delBoy, r.client, r.shipments.size, r.orders.size, r.jobs, r.amount.toFixed(2), r.units
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Month wise Dispatch Values') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Month', 'Jobs', 'Units', 'Amount'];
+                    const monthly = {};
+                    data.filter(o => o.shipmentNoteId && o.shipmentNote).forEach(o => {
+                        const date = new Date(o.shipmentNote.noteDate);
+                        const monthStr = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                        if (!monthly[monthStr]) {
+                            monthly[monthStr] = { sortDate: new Date(date.getFullYear(), date.getMonth(), 1), jobs: 0, units: 0, amount: 0 };
+                        }
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        monthly[monthStr].jobs += jobCount;
+                        monthly[monthStr].units += unitsCount;
+                        monthly[monthStr].amount += amt;
+                    });
+                    rows = Object.entries(monthly).sort((a, b) => a[1].sortDate - b[1].sortDate).map(([m, val]) => [
+                        m, val.jobs, val.units, val.amount.toFixed(2)
+                    ]);
+                } else if (name === 'Month wise Dispatch- Count') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Month', 'Shipments Count', 'Total Units'];
+                    const monthly = {};
+                    data.filter(o => o.shipmentNoteId && o.shipmentNote).forEach(o => {
+                        const date = new Date(o.shipmentNote.noteDate);
+                        const monthStr = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                        if (!monthly[monthStr]) {
+                            monthly[monthStr] = { sortDate: new Date(date.getFullYear(), date.getMonth(), 1), shipments: new Set(), units: 0 };
+                        }
+                        monthly[monthStr].shipments.add(o.shipmentNoteId);
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        monthly[monthStr].units += unitsCount;
+                    });
+                    rows = Object.entries(monthly).sort((a, b) => a[1].sortDate - b[1].sortDate).map(([m, val]) => [
+                        m, val.shipments.size, val.units
+                    ]);
+                } else if (name === 'Order Job Shipments') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Dispatch Date', 'Shipment #', 'Client', 'city', 'Patient', 'Model #', 'order #', 'Work Type', 'Product', 'Teeth', 'Units'];
+                    let newRows = [];
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const dispatchDate = o.shipmentNote && o.shipmentNote.noteDate ? new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB') : '-';
+                        const shipmentNo = o.shipmentNote ? o.shipmentNote.noteNumber || o.shipmentNoteId : '-';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const clientCity = o.client ? o.client.city || '-' : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    dispatchDate, shipmentNo, clientName, clientCity, o.patientName, o.modelNumber || '-',
+                                    orderNo, o.orderType || 'New', j.productName || '-', createTeethGrid(j.teethSelection), j.units || '1'
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                dispatchDate, shipmentNo, clientName, clientCity, o.patientName, o.modelNumber || '-',
+                                orderNo, o.orderType || 'New', o.productName || '-', createTeethGrid(o.teethSelection), o.units || '1'
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => {
+                        const partsA = a[0].split('/');
+                        const partsB = b[0].split('/');
+                        return new Date(partsA[2], partsA[1]-1, partsA[0]) - new Date(partsB[2], partsB[1]-1, partsB[0]);
+                    });
+                } else if (name === 'Product wise Shipped Order Jobs') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Product', 'Order #', 'Order Date', 'Shipment #', 'Dispatch Date', 'Assigned To', 'Client', 'Units'];
+                    let newRows = [];
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const orderNo = o.orderNumber || o.id;
+                        const orderDate = o.receivedDate ? new Date(o.receivedDate).toLocaleDateString('en-GB') : '-';
+                        const shipmentNo = o.shipmentNote ? o.shipmentNote.noteNumber || o.shipmentNoteId : '-';
+                        const dispatchDate = o.shipmentNote && o.shipmentNote.noteDate ? new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB') : '-';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    j.productName || 'General', orderNo, orderDate, shipmentNo, dispatchDate, o.technician || '-', clientName, j.units || '1'
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                o.productName || 'General', orderNo, orderDate, shipmentNo, dispatchDate, o.technician || '-', clientName, o.units || '1'
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Sales Manager wise Order Job Shipments') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Sales Manager', 'Client', 'Sub Doctor', 'Dispatch Date', 'Shipment #', 'Patient', 'Model #', 'Order #', 'Work Type', 'Product', 'Teeth', 'Units', 'Job Amt.'];
+                    let newRows = [];
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const salesManager = o.client ? o.client.salesManager || 'None' : 'None';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const dispatchDate = o.shipmentNote && o.shipmentNote.noteDate ? new Date(o.shipmentNote.noteDate).toLocaleDateString('en-GB') : '-';
+                        const shipmentNo = o.shipmentNote ? o.shipmentNote.noteNumber || o.shipmentNoteId : '-';
+                        const orderNo = o.orderNumber || o.id;
+                        
+                        if (o.jobs && o.jobs.length > 0) {
+                            o.jobs.forEach(j => {
+                                newRows.push([
+                                    salesManager, clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
+                                    orderNo, o.orderType || 'New', j.productName || '-', createTeethGrid(j.teethSelection), j.units || '1',
+                                    (j.totalAmount || 0).toFixed(2)
+                                ]);
+                            });
+                        } else {
+                            newRows.push([
+                                salesManager, clientName, o.subDoctor || '-', dispatchDate, shipmentNo, o.patientName, o.modelNumber || '-',
+                                orderNo, o.orderType || 'New', o.productName || '-', createTeethGrid(o.teethSelection), o.units || '1',
+                                (o.netAmount || 0).toFixed(2)
+                            ]);
+                        }
+                    });
+                    rows = newRows.sort((a, b) => a[0].localeCompare(b[0]));
+                } else if (name === 'Sales Manager wise Order Job Shipments Summary') {
+                    const res = await fetch(`${API_BASE}/orders`);
+                    data = await res.json();
+                    headers = ['Sales Manager', 'Client', 'Jobs', 'Units', 'Amount'];
+                    const managerClientData = {};
+                    data.filter(o => o.shipmentNoteId).forEach(o => {
+                        const salesManager = o.client ? o.client.salesManager || 'None' : 'None';
+                        const clientName = o.client ? o.client.name : 'Unknown';
+                        const key = salesManager + '||' + clientName;
+                        
+                        if (!managerClientData[key]) {
+                            managerClientData[key] = { salesManager, client: clientName, jobs: 0, units: 0, amount: 0 };
+                        }
+                        
+                        const record = managerClientData[key];
+                        const jobCount = o.jobs && o.jobs.length > 0 ? o.jobs.length : 1;
+                        const unitsCount = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.units || 1), 0) : parseFloat(o.units || 1);
+                        const amt = o.jobs && o.jobs.length > 0 ? o.jobs.reduce((sum, j) => sum + parseFloat(j.totalAmount || 0), 0) : parseFloat(o.netAmount || 0);
+                        
+                        record.jobs += jobCount;
+                        record.units += unitsCount;
+                        record.amount += amt;
+                    });
+                    rows = Object.values(managerClientData).map(r => [
+                        r.salesManager, r.client, r.jobs, r.units, r.amount.toFixed(2)
+                    ]).sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+                } else if (name === 'Shipments List') {
+                    const res = await fetch(`${API_BASE}/shipment-notes`);
+                    data = await res.json();
+                    headers = ['DocNo', 'Shipment Date', 'Client Name', 'Total Amount', 'Cell Phone', 'email'];
+                    rows = data.map(sn => [
+                        sn.noteNumber || sn.id,
+                        new Date(sn.noteDate).toLocaleDateString('en-GB'),
+                        sn.client ? sn.client.name : 'Unknown',
+                        (sn.totalAmount || 0).toFixed(2),
+                        sn.client ? sn.client.cellPhone || '-' : '-',
+                        sn.client ? sn.client.email || '-' : '-'
+                    ]).sort((a, b) => b[0] - a[0]);
                 } else if (name.includes('Daily Order Activity')) {
                     const res = await fetch(`${API_BASE}/orders`);
                     const orders = await res.json();
@@ -2251,18 +2649,6 @@
                     });
                     headers = ['Date', 'New Orders'];
                     rows = Object.entries(daily).map(([d, count]) => [d, count]).sort((a, b) => new Date(b[0]) - new Date(a[0]));
-                } else if (name.includes('Shipment') || name.includes('Shipped')) {
-                    const res = await fetch(`${API_BASE}/orders`);
-                    data = await res.json();
-                    data = data.filter(o => ['Dispatched', 'Delivered'].includes(o.shippingStatus));
-                    headers = ['Shipment #', 'Order #', 'Client', 'Date', 'Status'];
-                    rows = data.map(o => [
-                        o.shipmentNoteId || '-',
-                        o.orderNumber || o.id,
-                        o.client ? o.client.name : 'Unknown',
-                        new Date(o.updatedAt).toLocaleDateString(),
-                        o.shippingStatus || 'Unknown'
-                    ]);
                 } else if (name === 'Employee Master List' || name === 'Department wise Employees') {
                     const res = await fetch(`${API_BASE}/staff`);
                     data = await res.json();
@@ -2354,8 +2740,8 @@
                     </div>
             `;
 
-            // Render a beautiful bar chart if it's a monthly/value report
-            if (name === 'Month wise Order Value' || name === 'Monthly Collection Amount' || name === 'Monthly Expense') {
+            // Render a beautiful bar chart if it's a monthly/value/dispatch report
+            if (name === 'Month wise Order Value' || name === 'Monthly Collection Amount' || name === 'Monthly Expense' || name === 'Date wise Dispatch Values' || name === 'Month wise Dispatch Values' || name === 'Month wise Dispatch- Count') {
                 const maxVal = Math.max(...rows.map(r => parseFloat(String(r[r.length - 1] || '0').replace(/,/g, '')))) || 1;
                 html += `
                     <div style="margin: 30px 0; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
@@ -2380,7 +2766,7 @@
                 `;
             }
 
-            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type'];
+            const groupingHeaders = ['Due Date', 'Technician', 'Client', 'Status', 'Manufacturer', 'Order', 'Priority', 'Product Type', 'Product', 'Sales Manager', 'Work Type', 'Delivery Boy', 'Category'];
             if (groupingHeaders.includes(headers[0])) {
                 // Group by first column (index 0)
                 const grouped = {};
