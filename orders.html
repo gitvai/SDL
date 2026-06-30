@@ -5234,7 +5234,7 @@ Products: ${products.join(' | ')}
             }
             
             // Fetch hold reasons from settings lookups
-            fetch('/api/lookups')
+            fetch(`${API_BASE}/lookups`)
                 .then(r => r.json())
                 .then(lookups => {
                     const reasons = lookups.filter(l => l.type === 'hold_reason');
