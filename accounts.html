@@ -565,10 +565,11 @@
             const endStr = document.getElementById('filter-date-end').value;
             if (!startStr || !endStr) return items;
             
-            const fromDate = new Date(startStr);
-            fromDate.setHours(0,0,0,0);
-            const toDate = new Date(endStr);
-            toDate.setHours(23,59,59,999);
+            const [y1, m1, d1] = startStr.split('-').map(Number);
+            const fromDate = new Date(y1, m1 - 1, d1, 0, 0, 0, 0);
+            
+            const [y2, m2, d2] = endStr.split('-').map(Number);
+            const toDate = new Date(y2, m2 - 1, d2, 23, 59, 59, 999);
             
             return items.filter(item => {
                 const d = new Date(item[dateField]);
@@ -790,10 +791,12 @@
 
                 contentHtml = `
                     ${clientSection}
+                    <div id="payment-client-details-summary" style="display: none; margin-bottom:15px; padding:12px; border:1px solid #ddd; background:#f9fafb; border-radius:4px; font-size:12px; line-height:1.5; font-family: 'Inter', sans-serif;"></div>
                     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:15px; font-family: 'Inter', sans-serif;">
                         <div>
                             <label style="display:block; font-size:12px; color:#4b5563; margin-bottom:4px; font-weight: 500;">Amount</label>
-                            <input type="number" id="edit-amount" value="${data.amount}" style="width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: inherit; font-size: 14px; box-sizing: border-box; ${id ? 'background-color:#f3f4f6; color:#1f2937; cursor:not-allowed;' : ''}" ${id ? 'readonly' : ''}>
+                            <input type="number" id="edit-amount" value="${data.amount}" step="0.001" oninput="handlePaymentAmountInput()" style="width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: inherit; font-size: 14px; box-sizing: border-box; ${id ? 'background-color:#f3f4f6; color:#1f2937; cursor:not-allowed;' : ''}" ${id ? 'readonly' : ''}>
+                            <div id="payment-amount-alert" style="margin-top: 5px; font-size: 11px; font-weight: 600;"></div>
                         </div>
                         <div>
                             <label style="display:block; font-size:12px; color:#4b5563; margin-bottom:4px; font-weight: 500;">Payment Date</label>
@@ -967,6 +970,9 @@
                 if (res.ok) {
                     closeEditModal();
                     loadData();
+                    if (type === 'payment') {
+                        showPaymentSuccessSummary(parseInt(clientId), amount, ref);
+                    }
                 } else {
                     const errData = await res.json();
                     alert("Error saving: " + (errData.error || "Unknown error"));
@@ -1064,8 +1070,151 @@
             const client = allClients.find(c => c.name === name);
             if (client) {
                 document.getElementById('edit-client').value = client.id;
+                loadClientDetailsForPayment(client.id);
             } else {
                 document.getElementById('edit-client').value = '';
+                loadClientDetailsForPayment(null);
+            }
+        }
+
+        let clientOutstandingBalance = 0;
+        function handlePaymentAmountInput() {
+            const amountVal = parseFloat(document.getElementById('edit-amount').value) || 0;
+            const alertEl = document.getElementById('payment-amount-alert');
+            if (!alertEl) return;
+            
+            if (amountVal <= 0) {
+                alertEl.innerHTML = '';
+                return;
+            }
+            
+            const diff = clientOutstandingBalance - amountVal;
+            if (diff > 0) {
+                alertEl.style.color = '#f59e0b';
+                alertEl.innerHTML = `Remaining balance: OMR ${diff.toFixed(3)}`;
+            } else if (diff < 0) {
+                alertEl.style.color = '#ef4444';
+                alertEl.innerHTML = `Excess amount: OMR ${Math.abs(diff).toFixed(3)}`;
+            } else {
+                alertEl.style.color = '#10b981';
+                alertEl.innerHTML = `Exact payment. All invoices will be marked as Paid.`;
+            }
+        }
+
+        async function loadClientDetailsForPayment(clientId) {
+            const summaryEl = document.getElementById('payment-client-details-summary');
+            if (!summaryEl) return;
+            
+            if (!clientId) {
+                summaryEl.style.display = 'none';
+                summaryEl.innerHTML = '';
+                clientOutstandingBalance = 0;
+                return;
+            }
+            
+            try {
+                const client = allClients.find(c => c.id === clientId);
+                const summaryRes = await fetch(`${API_BASE}/clients/${clientId}/financial-summary`);
+                const summary = await summaryRes.json();
+                clientOutstandingBalance = summary.balance || 0;
+                
+                const invoicesRes = await fetch(`${API_BASE}/invoices?clientId=${clientId}`);
+                const invoices = await invoicesRes.json();
+                const pendingInvoices = invoices.filter(inv => inv.status !== 'Paid' && inv.status !== 'Cancelled');
+                
+                const receiptsRes = await fetch(`${API_BASE}/receipts?clientId=${clientId}`);
+                const receipts = await receiptsRes.json();
+                const recentPayments = receipts.slice(0, 3);
+                
+                summaryEl.style.display = 'block';
+                summaryEl.innerHTML = `
+                    <div style="font-weight:700; margin-bottom:6px; color:#1e3a8a;">Client Account Details</div>
+                    <strong>Email:</strong> ${client.email || 'N/A'}<br/>
+                    <strong>Phone:</strong> ${client.phone || client.cellPhone || 'N/A'}<br/>
+                    <strong>Address:</strong> ${client.address || 'N/A'}<br/>
+                    <strong style="color:#d63384;">Outstanding Balance:</strong> OMR ${clientOutstandingBalance.toFixed(3)}<br/>
+                    <div style="margin-top:8px;">
+                        <strong>Pending Invoices (${pendingInvoices.length}):</strong>
+                        <ul style="margin:4px 0; padding-left:15px; max-height:80px; overflow-y:auto;">
+                            ${pendingInvoices.map(inv => `<li>${inv.invoiceNumber} (Bal: OMR ${inv.balanceAmount.toFixed(3)})</li>`).join('') || '<li>None</li>'}
+                        </ul>
+                    </div>
+                    <div style="margin-top:6px;">
+                        <strong>Recent Payments:</strong>
+                        <ul style="margin:4px 0; padding-left:15px;">
+                            ${recentPayments.map(r => `<li>${r.receiptNumber} (OMR ${r.amount.toFixed(3)})</li>`).join('') || '<li>None</li>'}
+                        </ul>
+                    </div>
+                `;
+                
+                handlePaymentAmountInput();
+            } catch (e) {
+                console.error("Error loading client details for payment:", e);
+            }
+        }
+
+        async function showPaymentSuccessSummary(clientId, receiptAmount, receiptNumber) {
+            try {
+                const client = allClients.find(c => c.id === clientId);
+                const name = client ? client.name : 'Client';
+                
+                const invoicesRes = await fetch(`${API_BASE}/invoices?clientId=${clientId}`);
+                const invoices = await invoicesRes.json();
+                invoices.sort((a, b) => new Date(b.invoiceDate) - new Date(a.invoiceDate));
+                
+                const modal = document.createElement('div');
+                modal.id = 'payment-success-modal';
+                modal.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:20000; font-family:'Inter', sans-serif;";
+                
+                modal.innerHTML = `
+                    <div style="background:#fff; width:650px; padding:25px; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+                        <div style="text-align:center; margin-bottom:20px;">
+                            <div style="width:50px; height:50px; background:#dcfce7; color:#166534; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:10px;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 style="margin:0; font-size:20px; font-weight:700; color:#111827;">Payment Applied Successfully</h3>
+                            <p style="margin:5px 0 0 0; color:#4b5563; font-size:14px;">Receipt ${receiptNumber} of <strong>OMR ${receiptAmount.toFixed(3)}</strong> for ${name}</p>
+                        </div>
+                        
+                        <div style="font-weight:700; font-size:14px; color:#1f2937; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Updated Invoice Statuses:</div>
+                        <div style="max-height:250px; overflow-y:auto; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
+                            <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+                                <thead>
+                                    <tr style="background:#f9fafb; border-bottom:1px solid #eee;">
+                                        <th style="padding:8px 10px; font-weight:600;">Invoice #</th>
+                                        <th style="padding:8px 10px; font-weight:600;">Date</th>
+                                        <th style="padding:8px 10px; font-weight:600; text-align:right;">Total</th>
+                                        <th style="padding:8px 10px; font-weight:600; text-align:right;">Paid</th>
+                                        <th style="padding:8px 10px; font-weight:600; text-align:right;">Balance</th>
+                                        <th style="padding:8px 10px; font-weight:600; text-align:center;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${invoices.map(inv => `
+                                        <tr style="border-bottom:1px solid #f3f4f6;">
+                                            <td style="padding:8px 10px; font-weight:600; color:#3b82f6;">${inv.invoiceNumber}</td>
+                                            <td style="padding:8px 10px; color:#4b5563;">${formatDateToDDMMYY(inv.invoiceDate)}</td>
+                                            <td style="padding:8px 10px; text-align:right; font-weight:500;">OMR ${inv.netAmount.toFixed(3)}</td>
+                                            <td style="padding:8px 10px; text-align:right; color:#10b981; font-weight:500;">OMR ${inv.paidAmount.toFixed(3)}</td>
+                                            <td style="padding:8px 10px; text-align:right; font-weight:600;">OMR ${inv.balanceAmount.toFixed(3)}</td>
+                                            <td style="padding:8px 10px; text-align:center;">
+                                                <span style="padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; background:${inv.status === 'Paid' ? '#dcfce7; color:#166534;' : (inv.status === 'Partially Paid' ? '#fef3c7; color:#92400e;' : '#fee2e2; color:#991b1b;')}">${inv.status}</span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button onclick="document.getElementById('payment-success-modal').remove()" style="padding:8px 25px; border:none; background:#3b82f6; color:#fff; border-radius:4px; cursor:pointer; font-weight:600; font-size:14px;">Done</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            } catch (e) {
+                console.error(e);
             }
         }
 

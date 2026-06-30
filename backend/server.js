@@ -82,6 +82,111 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const toNum = (val) => (val !== undefined && val !== null && val !== "" ? Number(val) : null);
 const toMoney = (val) => (val !== undefined && val !== null && val !== "" ? Math.round(Number(val) * 1000) / 1000 : 0);
 const toDate = (val) => (val && val !== "" ? new Date(val) : null);
+const parseLocalDateStart = (dateStr) => {
+  if (!dateStr || dateStr === "") return null;
+  return new Date(dateStr + 'T00:00:00+04:00');
+};
+const parseLocalDateEnd = (dateStr) => {
+  if (!dateStr || dateStr === "") return null;
+  return new Date(dateStr + 'T23:59:59.999+04:00');
+};
+
+async function recalculateClientBalances(clientId, tx = prisma) {
+  if (!clientId) return;
+  const invoices = await tx.invoice.findMany({
+    where: { clientId: Number(clientId), NOT: { status: 'Cancelled' } },
+    orderBy: [{ invoiceDate: 'asc' }, { id: 'asc' }]
+  });
+  
+  const adjustments = await tx.adjustment.findMany({
+    where: { clientId: Number(clientId) }
+  });
+  
+  const receipts = await tx.receipt.findMany({
+    where: { clientId: Number(clientId) },
+    orderBy: [{ receiptDate: 'asc' }, { id: 'asc' }]
+  });
+  
+  const invoiceTrak = invoices.map(inv => {
+    let remaining = inv.netAmount;
+    const invAdjs = adjustments.filter(a => a.invoiceId === inv.id);
+    let adjCredit = 0;
+    let adjDebit = 0;
+    invAdjs.forEach(a => {
+      if (a.type === 'Credit') adjCredit += a.amount;
+      else if (a.type === 'Debit') adjDebit += a.amount;
+    });
+    
+    remaining = remaining - adjCredit + adjDebit;
+    
+    return {
+      id: inv.id,
+      netAmount: inv.netAmount,
+      adjCredit,
+      adjDebit,
+      remaining: Math.max(0, remaining),
+      paidFromReceipts: 0
+    };
+  });
+  
+  let totalExcess = 0;
+  const receiptTrak = receipts.map(r => ({
+    id: r.id,
+    amount: r.amount,
+    remaining: r.amount
+  }));
+  
+  for (const r of receiptTrak) {
+    for (const inv of invoiceTrak) {
+      if (r.remaining <= 0) break;
+      if (inv.remaining <= 0) continue;
+      
+      const allocated = Math.min(r.remaining, inv.remaining);
+      r.remaining -= allocated;
+      inv.remaining -= allocated;
+      inv.paidFromReceipts += allocated;
+    }
+    totalExcess += r.remaining;
+  }
+  
+  for (const inv of invoiceTrak) {
+    const totalPaid = inv.paidFromReceipts + inv.adjCredit - inv.adjDebit;
+    const balance = Math.max(0, inv.netAmount - totalPaid);
+    let status = 'Awaiting to Paid';
+    if (balance <= 0) {
+      status = 'Paid';
+    } else if (totalPaid > 0) {
+      status = 'Partially Paid';
+    }
+    
+    await tx.invoice.update({
+      where: { id: inv.id },
+      data: {
+        paidAmount: toMoney(totalPaid),
+        balanceAmount: toMoney(balance),
+        status: status
+      }
+    });
+  }
+  
+  await tx.client.update({
+    where: { id: Number(clientId) },
+    data: {
+      advanceBalance: toMoney(totalExcess)
+    }
+  });
+  
+  for (const r of receiptTrak) {
+    const applied = r.amount - r.remaining;
+    await tx.receipt.update({
+      where: { id: r.id },
+      data: {
+        appliedAmount: toMoney(applied),
+        creditAmount: toMoney(r.remaining)
+      }
+    });
+  }
+}
 
 // --- CLIENTS ---
 app.get('/api/clients', async (req, res) => {
@@ -227,16 +332,8 @@ app.get('/api/orders', async (req, res) => {
 
     if (dateFrom || dateTo) {
       let dateFilter = {};
-      if (dateFrom) {
-        let fromDate = new Date(dateFrom);
-        fromDate.setHours(0, 0, 0, 0);
-        dateFilter.gte = fromDate;
-      }
-      if (dateTo) {
-        let toDate = new Date(dateTo);
-        toDate.setHours(23, 59, 59, 999);
-        dateFilter.lte = toDate;
-      }
+      if (dateFrom) dateFilter.gte = parseLocalDateStart(dateFrom);
+      if (dateTo) dateFilter.lte = parseLocalDateEnd(dateTo);
       const dateField = req.query.dateField || 'receivedDate';
       where.AND.push({ [dateField]: dateFilter });
     }
@@ -934,6 +1031,8 @@ app.post('/api/invoices', async (req, res) => {
           data: { invoiceId: created.id }
         });
       }
+      
+      await recalculateClientBalances(created.clientId, tx);
       return created;
     });
     
@@ -1019,6 +1118,7 @@ app.put('/api/invoices/:id', async (req, res) => {
       where: { id: Number(req.params.id) },
       data
     });
+    await recalculateClientBalances(invoice.clientId);
     res.json(invoice);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -1077,29 +1177,26 @@ app.post('/api/receipts', async (req, res) => {
     const notes = body.notes;
     const reference = body.reference;
 
-    const receipt = await prisma.receipt.create({
-      data: {
-        receiptNumber,
-        receiptDate,
-        clientId,
-        amount,
-        appliedAmount,
-        creditAmount,
-        paymentMode,
-        isAdvance,
-        chequeNumber,
-        chequeDate,
-        notes,
-        reference
-      }
-    });
-    
-    if (isAdvance) {
-      await prisma.client.update({
-        where: { id: clientId },
-        data: { advanceBalance: { increment: creditAmount } }
+    const receipt = await prisma.$transaction(async (tx) => {
+      const created = await tx.receipt.create({
+        data: {
+          receiptNumber,
+          receiptDate,
+          clientId,
+          amount,
+          appliedAmount,
+          creditAmount,
+          paymentMode,
+          isAdvance,
+          chequeNumber,
+          chequeDate,
+          notes,
+          reference
+        }
       });
-    }
+      await recalculateClientBalances(clientId, tx);
+      return created;
+    });
 
     res.status(201).json(receipt);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -1118,13 +1215,21 @@ app.put('/api/receipts/:id', async (req, res) => {
       where: { id: Number(req.params.id) },
       data
     });
+    await recalculateClientBalances(receipt.clientId);
     res.json(receipt);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.delete('/api/receipts/:id', async (req, res) => {
   try {
-    await prisma.receipt.delete({ where: { id: Number(req.params.id) } });
+    const id = Number(req.params.id);
+    const receipt = await prisma.receipt.findUnique({ where: { id } });
+    if (!receipt) return res.status(404).json({ error: 'Receipt not found' });
+    
+    await prisma.$transaction(async (tx) => {
+      await tx.receipt.delete({ where: { id } });
+      await recalculateClientBalances(receipt.clientId, tx);
+    });
     res.status(204).end();
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -1145,7 +1250,11 @@ app.post('/api/adjustments', async (req, res) => {
     data.amount = toNum(data.amount);
     data.date = toDate(data.date) || new Date();
     
-    const item = await prisma.adjustment.create({ data });
+    const item = await prisma.$transaction(async (tx) => {
+      const created = await tx.adjustment.create({ data });
+      await recalculateClientBalances(created.clientId, tx);
+      return created;
+    });
     res.status(201).json(item);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -1153,41 +1262,13 @@ app.post('/api/adjustments', async (req, res) => {
 app.delete('/api/adjustments/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const adjustment = await prisma.adjustment.findUnique({
-      where: { id }
+    const adjustment = await prisma.adjustment.findUnique({ where: { id } });
+    if (!adjustment) return res.status(404).json({ error: 'Adjustment not found' });
+    
+    await prisma.$transaction(async (tx) => {
+      await tx.adjustment.delete({ where: { id } });
+      await recalculateClientBalances(adjustment.clientId, tx);
     });
-    if (!adjustment) {
-      return res.status(404).json({ error: 'Adjustment not found' });
-    }
-    
-    // Delete the adjustment
-    await prisma.adjustment.delete({ where: { id } });
-    
-    // If associated with an invoice, update the invoice paidAmount and balanceAmount
-    if (adjustment.invoiceId) {
-      const invoice = await prisma.invoice.findUnique({
-        where: { id: adjustment.invoiceId }
-      });
-      if (invoice) {
-        let newPaid = invoice.paidAmount || 0;
-        if (adjustment.type === 'Credit') {
-          newPaid -= adjustment.amount; // reverse credit
-        } else if (adjustment.type === 'Debit') {
-          newPaid += adjustment.amount; // reverse debit
-        }
-        const newBalance = invoice.netAmount - newPaid;
-        const newStatus = newBalance <= 0 ? 'Paid' : (newPaid > 0 ? 'Partial' : 'Unpaid');
-        
-        await prisma.invoice.update({
-          where: { id: adjustment.invoiceId },
-          data: {
-            paidAmount: newPaid,
-            balanceAmount: newBalance,
-            status: newStatus
-          }
-        });
-      }
-    }
     res.status(204).end();
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -1342,12 +1423,8 @@ app.get('/api/pickup-returns', async (req, res) => {
     const where = {};
     if (dateFrom || dateTo) {
       where.pickupDate = {};
-      if (dateFrom) where.pickupDate.gte = toDate(dateFrom) || new Date(dateFrom);
-      if (dateTo) {
-        let toDateVal = toDate(dateTo) || new Date(dateTo);
-        toDateVal.setHours(23, 59, 59, 999);
-        where.pickupDate.lte = toDateVal;
-      }
+      if (dateFrom) where.pickupDate.gte = parseLocalDateStart(dateFrom);
+      if (dateTo) where.pickupDate.lte = parseLocalDateEnd(dateTo);
     }
     const returns = await prisma.pickupReturn.findMany({
       where,
@@ -1400,12 +1477,8 @@ app.get('/api/shipment-notes', async (req, res) => {
     if (clientId) where.clientId = Number(clientId);
     if (dateFrom || dateTo) {
       where.noteDate = {};
-      if (dateFrom) where.noteDate.gte = toDate(dateFrom) || new Date(dateFrom);
-      if (dateTo) {
-        let toDateVal = toDate(dateTo) || new Date(dateTo);
-        toDateVal.setHours(23, 59, 59, 999);
-        where.noteDate.lte = toDateVal;
-      }
+      if (dateFrom) where.noteDate.gte = parseLocalDateStart(dateFrom);
+      if (dateTo) where.noteDate.lte = parseLocalDateEnd(dateTo);
     }
     if (search) {
       where.OR = [
@@ -1533,12 +1606,8 @@ app.get('/api/delivery-plans', async (req, res) => {
     const where = {};
     if (dateFrom || dateTo) {
       where.planDate = {};
-      if (dateFrom) where.planDate.gte = toDate(dateFrom) || new Date(dateFrom);
-      if (dateTo) {
-        let toDateVal = toDate(dateTo) || new Date(dateTo);
-        toDateVal.setHours(23, 59, 59, 999);
-        where.planDate.lte = toDateVal;
-      }
+      if (dateFrom) where.planDate.gte = parseLocalDateStart(dateFrom);
+      if (dateTo) where.planDate.lte = parseLocalDateEnd(dateTo);
     }
     const plans = await prisma.deliveryPlan.findMany({
       where,

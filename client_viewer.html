@@ -106,6 +106,10 @@
                         <div class="info-value" id="val-contact">...</div>
                     </div>
                     <div class="info-row">
+                        <div class="info-label">Email</div>
+                        <div class="info-value" id="val-email">...</div>
+                    </div>
+                    <div class="info-row">
                         <div class="info-label">Cell Phone</div>
                         <div class="info-value" id="val-phone">...</div>
                     </div>
@@ -210,6 +214,7 @@
 
                 document.getElementById('val-address').textContent = client.address || '...';
                 document.getElementById('val-contact').textContent = client.contactPerson || '...';
+                document.getElementById('val-email').textContent = client.email || '...';
                 document.getElementById('val-phone').textContent = client.cellPhone || client.phone || '...';
                 document.getElementById('val-priceband').textContent = client.priceBand || 'Standard';
                 document.getElementById('val-openbal').textContent = `${client.openingBalance || 0} ${client.openingBalanceType || 'Dr'}`;

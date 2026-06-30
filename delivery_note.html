@@ -483,6 +483,7 @@
             <div class="client-box">
                 <div class="client-name" id="clinic-name">...</div>
                 <div class="client-address" id="clinic-address">...</div>
+                <div class="client-email" id="clinic-email" style="font-size: 11px; margin-top: 5px; color: #444;"></div>
             </div>
             <div class="invoice-meta-box">
                 <div class="meta-row">
@@ -688,6 +689,7 @@
 
                 document.getElementById('clinic-name').textContent = data.client ? data.client.name : 'Unknown Clinic';
                 document.getElementById('clinic-address').textContent = data.client ? (data.client.address || 'SOHAR') : 'SOHAR';
+                document.getElementById('clinic-email').textContent = (data.client && data.client.email) ? 'Email: ' + data.client.email : '';
                 document.getElementById('inv-number').textContent = data.invoiceNumber;
                 document.getElementById('inv-date').textContent = new Date(data.invoiceDate).toLocaleDateString('en-GB');
                 document.getElementById('barcode-img').src = `https://barcodeapi.org/api/128/${data.invoiceNumber}`;
@@ -717,7 +719,7 @@
                             totalUnits += units;
                             const price = job.totalAmount || job.price || 0;
                             computedTotalAmount += price;
-                            const rate = price / units;
+                            const rate = (job.slab1Rate !== null && job.slab1Rate !== undefined && job.slab1Rate > 0) ? job.slab1Rate : (price / units);
                             const invoiceNumStr = o.invoice ? (o.invoice.invoiceNumber || o.invoice.id) : (o.invoiceId || '');
                             
                             const displayOrderNum = o.orderNumber || o.id;

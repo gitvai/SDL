@@ -1446,6 +1446,93 @@
                 searchInput.addEventListener('input', filterSidebar);
             }
 
+            // Load favorites from local storage
+            let savedFavorites = JSON.parse(localStorage.getItem('sdl_favorites') || 'null');
+            
+            // If localStorage was empty, initialize it with HTML defaults
+            if (!savedFavorites) {
+                const defaultFavs = [];
+                reportItems.forEach(item => {
+                    let categories = item.dataset.category ? item.dataset.category.split(',').map(c => c.trim()) : [];
+                    if (categories.includes('Favourites')) {
+                        defaultFavs.push(item.querySelector('span').textContent.trim());
+                    }
+                });
+                localStorage.setItem('sdl_favorites', JSON.stringify(defaultFavs));
+                savedFavorites = defaultFavs;
+            } else {
+                // Ensure HTML reflects the saved favorites
+                reportItems.forEach(item => {
+                    const title = item.querySelector('span').textContent.trim();
+                    const star = item.querySelector('.fa-star');
+                    let categories = item.dataset.category ? item.dataset.category.split(',').map(c => c.trim()) : [];
+                    
+                    if (savedFavorites.includes(title)) {
+                        if (star) {
+                            star.classList.remove('empty', 'far');
+                            star.classList.add('fas');
+                        }
+                        if (!categories.includes('Favourites')) {
+                            categories.unshift('Favourites');
+                        }
+                    } else {
+                        if (star) {
+                            star.classList.remove('fas');
+                            star.classList.add('empty', 'far');
+                        }
+                        categories = categories.filter(c => c !== 'Favourites');
+                    }
+                    item.dataset.category = categories.join(',');
+                });
+            }
+
+            // Handle favorite star clicks
+            const reportList = document.getElementById('report-list');
+            if (reportList) {
+                reportList.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('fa-star')) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        
+                        const star = e.target;
+                        const reportItem = star.closest('.report-item');
+                        
+                        if (!reportItem) return;
+
+                        const title = reportItem.querySelector('span').textContent.trim();
+                        let categories = reportItem.dataset.category ? reportItem.dataset.category.split(',').map(c => c.trim()) : [];
+                        
+                        if (star.classList.contains('empty')) {
+                            // Add favorite
+                            star.classList.remove('empty', 'far');
+                            star.classList.add('fas');
+                            if (!categories.includes('Favourites')) {
+                                categories.unshift('Favourites');
+                            }
+                            if (!savedFavorites.includes(title)) {
+                                savedFavorites.push(title);
+                            }
+                        } else {
+                            // Remove favorite
+                            star.classList.remove('fas');
+                            star.classList.add('empty', 'far');
+                            categories = categories.filter(c => c !== 'Favourites');
+                            savedFavorites = savedFavorites.filter(t => t !== title);
+                        }
+                        
+                        reportItem.dataset.category = categories.join(',');
+                        localStorage.setItem('sdl_favorites', JSON.stringify(savedFavorites));
+                        
+                        // Re-filter reports to reflect changes
+                        if (typeof filterReports === 'function') {
+                            filterReports();
+                        } else {
+                            filterSidebar();
+                        }
+                    }
+                });
+            }
+
             // Initial filter
             filterSidebar();
         });
@@ -1520,16 +1607,16 @@
         document.getElementById('report-search').addEventListener('input', filterReports);
 
         function filterReports() {
-            const activeTab = document.querySelector('.sub-tab.active').textContent;
-            const searchText = document.getElementById('report-search').value.toLowerCase();
+            const activeTab = document.querySelector('.sub-tab.active').textContent.trim();
+            const searchText = document.getElementById('report-search').value.toLowerCase().trim();
             const items = document.querySelectorAll('.report-item');
             let visibleCount = 0;
 
             items.forEach(item => {
-                const categories = item.dataset.category.split(',');
+                const categories = (item.dataset.category || '').split(',').map(c => c.trim());
                 const title = item.querySelector('span').textContent.toLowerCase();
 
-                const matchesCategory = (activeTab === 'Favourites') || categories.includes(activeTab);
+                const matchesCategory = categories.includes(activeTab);
                 const matchesSearch = title.includes(searchText);
 
                 if (matchesCategory && matchesSearch) {
@@ -1540,7 +1627,7 @@
                 }
             });
 
-            document.getElementById('report-count').textContent = `${visibleCount} Reports`;
+            document.getElementById('report-count').textContent = `(${visibleCount})`;
         }
 
         function getDateRange(preset) {
@@ -1609,8 +1696,18 @@
                 if (preset === 'Custom Date') {
                     if (startInput) startInput.disabled = false;
                     if (endInput) endInput.disabled = false;
-                    startDate = startInput ? new Date(startInput.value) : null;
-                    endDate = endInput ? new Date(endInput.value) : null;
+                    if (startInput && startInput.value) {
+                        const [y, m, d] = startInput.value.split('-').map(Number);
+                        startDate = new Date(y, m - 1, d);
+                    } else {
+                        startDate = null;
+                    }
+                    if (endInput && endInput.value) {
+                        const [y, m, d] = endInput.value.split('-').map(Number);
+                        endDate = new Date(y, m - 1, d);
+                    } else {
+                        endDate = null;
+                    }
                 } else {
                     if (startInput) startInput.disabled = true;
                     if (endInput) endInput.disabled = true;
@@ -3643,7 +3740,7 @@
                 } else if (name === 'Client emails') {
                     const res = await fetch(`${API_BASE}/clients`);
                     data = await res.json();
-                    headers = ['Client', 'email', 'email2'];
+                    headers = ['Client', 'Email', 'Phone'];
                     rows = data.map(c => [c.name, c.email || '-', c.phone || '-']).sort((a, b) => a[0].localeCompare(b[0]));
                 } else if (name === 'Client Order Analysis') {
                     const res = await fetch(`${API_BASE}/orders`);

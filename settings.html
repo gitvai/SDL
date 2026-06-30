@@ -1203,14 +1203,33 @@
                         <div style="flex:1;">
                             <h3 style="font-size:14px; font-weight:600; margin-bottom:10px;">Select Theme</h3>
                             <div class="theme-grid">
-                                ${themes.map(t => `
+                                ${themes.map(t => {
+                                    const themeColors = {
+                                        'DrKlick': 'linear-gradient(135deg, #f2f5f7, #d1d5d8)',
+                                        'Blitzer': 'linear-gradient(135deg, #cc0000, #ff3333)',
+                                        'Flick': 'linear-gradient(135deg, #0073ea, #5eb5ff)',
+                                        'Humanity': 'linear-gradient(135deg, #cb842e, #f4b465)',
+                                        'Overcast': 'linear-gradient(135deg, #dddddd, #999999)',
+                                        'Redmond': 'linear-gradient(135deg, #5c9ccc, #82b9e1)',
+                                        'Smoothness': 'linear-gradient(135deg, #e6e6e6, #cccccc)',
+                                        'Start': 'linear-gradient(135deg, #2191c0, #4eb7e3)',
+                                        'Sunny': 'linear-gradient(135deg, #fece2f, #ffe580)',
+                                        'UI Lightness': 'linear-gradient(135deg, #f6a828, #ffc766)',
+                                        'Pepper Grinder': 'linear-gradient(135deg, #ffffff, #eceadf)',
+                                        'Absolution': 'linear-gradient(135deg, #333333, #1f1f1f)'
+                                    };
+                                    const bg = themeColors[t] || '#ddd';
+                                    const textColor = (t === 'Blitzer' || t === 'Flick' || t === 'Humanity' || t === 'Redmond' || t === 'Start' || t === 'Absolution') ? '#fff' : '#6b7280';
+                                    
+                                    return `
                                     <div class="theme-card ${activeTheme===t?'active':''}" onclick="setLocalTheme('${t}')">
-                                        <div style="height:50px; background:#ddd; margin-bottom:8px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#6b7280;">
-                                            <i class="far fa-calendar"></i>
+                                        <div style="height:50px; background:${bg}; margin-bottom:8px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:18px; color:${textColor}; box-shadow: inset 0 0 4px rgba(0,0,0,0.1);">
+                                            <i class="fas fa-palette"></i>
                                         </div>
                                         <span>${t}</span>
                                     </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
@@ -3043,7 +3062,10 @@
         async function addLookupItem(type) {
             const input = document.getElementById('new-lookup-name');
             const name = input.value.trim();
-            if (!name) return;
+            if (!name) {
+                alert("Please enter a name first!");
+                return;
+            }
 
             try {
                 const res = await fetch('/api/lookups', {
@@ -3057,9 +3079,13 @@
                     await loadAllData();
                     renderTabContent(activeTab);
                     showToast("Lookup entry added successfully");
+                } else {
+                    const err = await res.json();
+                    alert("Failed to add: " + (err.error || "Unknown error"));
                 }
             } catch (err) {
                 console.error("Error adding lookup:", err);
+                alert("Network error while adding: " + err.message);
             }
         }
 
@@ -3476,11 +3502,15 @@
                         <input type="text" id="staff-name" class="form-input" value="${escapeHtml(staff.name)}">
                     </div>
                     <div>
-                        <label class="form-label">Staff Role / Group</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" style="margin-bottom:0;">Staff Role / Group</label>
+                            <a href="javascript:void(0)" onclick="addNewStaffRole()" style="font-size: 11px; color: #2563eb; font-weight: 600; text-decoration: none;"><i class="fas fa-plus"></i> Add Role</a>
+                        </div>
                         <select id="staff-role" class="form-select">
                             <option value="Lab Administrator" ${staff.role==='Lab Administrator'?'selected':''}>Lab Administrator</option>
                             <option value="Technician" ${staff.role==='Technician'?'selected':''}>Technician</option>
                             <option value="Driver" ${staff.role==='Driver'?'selected':''}>Driver</option>
+                            ${lookupsList.filter(l => l.type === 'staff_role').map(d => `<option value="${escapeHtml(d.name)}" ${staff.role===d.name?'selected':''}>${escapeHtml(d.name)}</option>`).join('')}
                         </select>
                     </div>
                     <div>
@@ -3540,6 +3570,34 @@
             };
 
             modal.style.display = 'flex';
+        }
+
+        async function addNewStaffRole() {
+            const roleName = prompt("Enter new Staff Role / Group:");
+            if (roleName && roleName.trim() !== '') {
+                const select = document.getElementById('staff-role');
+                const exists = Array.from(select.options).some(opt => opt.value.toLowerCase() === roleName.trim().toLowerCase());
+                if (!exists) {
+                    try {
+                        await fetch('/api/lookups', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type: 'staff_role', name: roleName.trim() })
+                        });
+                        await loadAllData();
+                        const option = document.createElement('option');
+                        option.value = roleName.trim();
+                        option.textContent = roleName.trim();
+                        option.selected = true;
+                        select.appendChild(option);
+                        showToast("New staff role added!");
+                    } catch (e) {
+                        console.error("Error adding role", e);
+                    }
+                } else {
+                    select.value = roleName.trim(); // Just select it if it exists
+                }
+            }
         }
 
         async function deleteStaff(id) {

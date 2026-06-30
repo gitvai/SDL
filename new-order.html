@@ -158,9 +158,13 @@
                     </div>
                 </div>
                 <div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <div style="font-size:14px;">Client <b id="display-client-name" style="color:#0056b3;">360 CARE MEDICAL...</b> <i class="fas fa-info-circle" style="color:#007bff;"></i></div>
-                        <div>Balance <span class="balance-box">458</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; position: relative;">
+                        <div style="font-size:14px; display: flex; align-items: center; gap: 6px;">
+                            Client <b id="display-client-name" style="color:#0056b3;">360 CARE MEDICAL...</b> 
+                            <i class="fas fa-info-circle" style="color:#007bff; cursor: pointer;" onclick="toggleClientInfoPanel()"></i>
+                        </div>
+                        <div id="client-info-panel" style="display: none; margin-top: 5px; padding: 10px; background: #f3f4f6; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; line-height: 1.4; color: #4b5563; position: absolute; top: 25px; left: 0; z-index: 100; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+                        <div>Balance <span class="balance-box">0.000</span></div>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12px;">
                         <div>
@@ -499,9 +503,88 @@
             });
         }
 
-        function selectClient(client) {
+        let currentSelectedClient = null;
+        function toggleClientInfoPanel() {
+            const panel = document.getElementById('client-info-panel');
+            if (!panel) return;
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function selectClient(client) {
             selectedClientId = client.id;
+            currentSelectedClient = client;
             document.getElementById('display-client-name').textContent = client.name;
+            
+            // Populate client info panel
+            const panel = document.getElementById('client-info-panel');
+            if (panel) {
+                panel.innerHTML = `
+                    <div style="font-weight:700; margin-bottom:5px; border-bottom:1px solid #ccc; padding-bottom:3px; color:#1f2937;">Client Information</div>
+                    <strong>Phone:</strong> ${client.phone || client.cellPhone || 'N/A'}<br/>
+                    <strong>Email:</strong> ${client.email || 'N/A'}<br/>
+                    <strong>Address:</strong> ${client.address || 'N/A'}<br/>
+                    <strong>Payment Terms:</strong> ${client.paymentTermsDays || 0} Days<br/>
+                    <strong>Price Band:</strong> ${client.priceBand || 'Standard'}<br/>
+                    <strong>TRN:</strong> ${client.trn || 'N/A'}
+                `;
+            }
+
+            // Fetch last saved details of this client
+            try {
+                const res = await fetch(`${API_BASE}/orders?clientId=${client.id}&limit=1`);
+                if (res.ok) {
+                    const orders = await res.json();
+                    if (orders && orders.length > 0) {
+                        const lastOrder = orders[0];
+                        // Auto-fill form fields
+                        if (lastOrder.doctorName && document.getElementById('sub-doctor')) {
+                            document.getElementById('sub-doctor').value = lastOrder.doctorName;
+                        }
+                        if (lastOrder.deliveryMethod && document.getElementById('delivery-method')) {
+                            document.getElementById('delivery-method').value = lastOrder.deliveryMethod;
+                        }
+                        if (lastOrder.dropLocation && document.getElementById('drop-location')) {
+                            document.getElementById('drop-location').value = lastOrder.dropLocation;
+                        }
+                        if (lastOrder.panTrayNumber && document.getElementById('pan-tray')) {
+                            document.getElementById('pan-tray').value = lastOrder.panTrayNumber;
+                        }
+                        if (lastOrder.priority && document.getElementById('priority')) {
+                            document.getElementById('priority').value = lastOrder.priority;
+                        }
+                        if (lastOrder.notes && document.getElementById('order-notes')) {
+                            document.getElementById('order-notes').value = lastOrder.notes;
+                        }
+                        if (lastOrder.shade1 && document.getElementById('shade1')) {
+                            document.getElementById('shade1').value = lastOrder.shade1;
+                        }
+                        if (lastOrder.shade2 && document.getElementById('shade2')) {
+                            document.getElementById('shade2').value = lastOrder.shade2;
+                        }
+                        if (lastOrder.shade3 && document.getElementById('shade3')) {
+                            document.getElementById('shade3').value = lastOrder.shade3;
+                        }
+                        if (lastOrder.shadeNotes && document.getElementById('shade-notes')) {
+                            document.getElementById('shade-notes').value = lastOrder.shadeNotes;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Error fetching client's last order:", e);
+            }
+
+            // Fetch client balance
+            try {
+                const summaryRes = await fetch(`${API_BASE}/clients/${client.id}/financial-summary`);
+                if (summaryRes.ok) {
+                    const summary = await summaryRes.json();
+                    const balanceEl = document.querySelector('.balance-box');
+                    if (balanceEl) balanceEl.textContent = (summary.balance || 0).toFixed(3);
+                }
+            } catch (e) {
+                console.error("Error fetching client financial summary:", e);
+            }
+
             showStep(2);
             loadProducts();
         }
