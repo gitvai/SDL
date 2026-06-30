@@ -1,4 +1,4 @@
-﻿        async function bulkPrintOrders(type) {
+        async function bulkPrintOrders(type) {
             const selectedCbs = document.querySelectorAll('.order-checkbox:checked');
             if (selectedCbs.length === 0) {
                 alert('Please select at least one order to print.');
@@ -117,7 +117,7 @@
                                             <div class="ls-address">AL HAMBAR, C.R.NO. 3203549,<br>MOH NO. 1771,<br>WEST SOHAR Pin - 311</div>
                                         </div>
                                         <div class="ls-contact">
-                                            Phone : +96899622728<br>email : sohardentallab@gmail.com
+                                            Phone : +968 99622728<br>email : sohardentallab@gmail.com
                                         </div>
                                     </div>
                                     <div class="ls-title">Lab Slip</div>
