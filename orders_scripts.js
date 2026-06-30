@@ -252,7 +252,7 @@
         const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
         const pName = (j.productName || j.product || '').toUpperCase();
         const pType = (j.productType || 'General').toUpperCase();
-        const isSlabProduct = slabProducts.some(sp => pName.includes(sp) || pType.includes(sp));
+        const isSlabProduct = slabProducts.includes(pName) || (pName.includes('RPD') && pName !== 'AAA');
         const isSpecialRpd = pName === 'RPD' || pName.includes('FLEXIBLE RPD') || pName.includes('PARTIAL RPD');
         if (slabsContainer) {
             slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
@@ -1610,7 +1610,8 @@ Products: ${products.join(' | ')}
             const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
             const productName = (p.name || '').toUpperCase();
             const productType = (p.type || '').toUpperCase();
-            const isSlabProduct = slabProducts.some(sp => productName.includes(sp) || productType.includes(sp));
+            const isSlabProduct = slabProducts.includes(productName) || (productName.includes('RPD') && productName !== 'AAA');
+            const isSpecialRpd = productName === 'RPD' || productName.includes('FLEXIBLE RPD') || productName.includes('PARTIAL RPD');
             if (slabsContainer) {
                 slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
             }
