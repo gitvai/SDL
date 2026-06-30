@@ -1500,8 +1500,7 @@
                                 <div id="eo-status-text" style="font-weight:600; font-size:10px; color:#666;"></div>
                             </div>
                             <div id="eo-hold-reason-container" style="display:none; margin-top:5px;">
-                                <div>Hold Reason</div>
-                                <input type="text" id="eo-hold-reason" style="width:100%; border:1px solid #ccc; padding:4px;" placeholder="Reason for hold...">
+                                <input type="text" id="eo-hold-reason" list="hold-reason-list" style="width:100%; border:1px solid #ccc; padding:4px;" placeholder="Reason for hold...">
                             </div>
                         </div>
                     </div>
@@ -5233,6 +5232,22 @@ Products: ${products.join(' | ')}
             if (typeof loadStaffForAssign === 'function') {
                 loadStaffForAssign();
             }
+            
+            // Fetch hold reasons from settings lookups
+            fetch('/api/lookups')
+                .then(r => r.json())
+                .then(lookups => {
+                    const reasons = lookups.filter(l => l.type === 'hold_reason');
+                    let datalistHtml = '';
+                    reasons.forEach(r => {
+                        datalistHtml += `<option value="${r.name.replace(/"/g, '&quot;')}">`;
+                    });
+                    const datalist = document.createElement('datalist');
+                    datalist.id = 'hold-reason-list';
+                    datalist.innerHTML = datalistHtml;
+                    document.body.appendChild(datalist);
+                })
+                .catch(err => console.error("Error loading hold reasons:", err));
         });
     </script>
 </body>
