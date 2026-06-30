@@ -1487,7 +1487,7 @@
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Products</h2>
-                        <button class="btn-primary-settings" onclick="openProductModal()">New</button>
+                        <button class="btn-primary-settings" onclick="openProductModal(null, event)">New</button>
                     </div>
                     <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
                         <div style="display:flex; flex-direction:column; gap:4px;">
@@ -1548,7 +1548,7 @@
                         <td>${escapeHtml(item.type || '')}</td>
                         <td>OMR ${item.charge || 0}</td>
                         <td style="text-align:center;">
-                            <button class="btn-sm edit" onclick="openProductModal(${item.id})">Edit</button>
+                            <button class="btn-sm edit" onclick="openProductModal(${item.id}, event)">Edit</button>
                             <button class="btn-sm delete" onclick="deleteProduct(${item.id})">Delete</button>
                         </td>
                     </tr>
@@ -3660,7 +3660,7 @@
         }
 
         // Products Modal Form
-        function openProductModal(id = null) {
+        function openProductModal(id = null, event = null) {
             const modal = document.getElementById('generic-modal');
             const title = document.getElementById('modal-title');
             const body = document.getElementById('modal-body');
@@ -3721,6 +3721,19 @@
                 showToast("Product saved");
             };
 
+            const content = modal.querySelector('.settings-modal-content');
+            if (event) {
+                const rect = event.target.getBoundingClientRect();
+                content.style.position = 'absolute';
+                let topPos = rect.bottom + window.scrollY + 10;
+                let leftPos = rect.right - 500 + window.scrollX; 
+                if (leftPos < 10) leftPos = 10;
+                
+                content.style.top = topPos + 'px';
+                content.style.left = leftPos + 'px';
+                content.style.margin = '0';
+                modal.style.alignItems = 'flex-start';
+            }
             modal.style.display = 'flex';
         }
 
@@ -3812,7 +3825,17 @@
 
         // Closing modal generic
         function closeGenericModal() {
-            document.getElementById('generic-modal').style.display = 'none';
+            const modal = document.getElementById('generic-modal');
+            modal.style.display = 'none';
+            // Reset custom positioning
+            const content = modal.querySelector('.settings-modal-content');
+            if (content) {
+                content.style.position = '';
+                content.style.top = '';
+                content.style.left = '';
+                content.style.margin = '';
+            }
+            modal.style.alignItems = 'center';
         }
 
         // Save Forms
