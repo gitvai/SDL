@@ -2007,9 +2007,9 @@ Products: ${products.join(' | ')}
                                     <tr>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${idx + 1}</td>
                                         <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${item.client.name}</td>
-                                        <td style="padding: 8px; border: 1px solid #ddd;">${item.total.toFixed(0)}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${item.total.toFixed(3)}</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">0</td>
-                                        <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${item.total.toFixed(0)}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${item.total.toFixed(3)}</td>
                                         <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${payTerms} days</td>
                                         <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dueDate.toLocaleDateString('en-GB')}</td>
                                         <td style="padding: 8px; border: 1px solid #ddd; color: #3b82f6; display: flex; align-items: center; gap: 5px;">
