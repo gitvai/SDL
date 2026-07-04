@@ -2950,7 +2950,7 @@
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Expense Heads</h2>
-                        <button class="btn-primary-settings" onclick="openLookupModal('expense_head', 'Expense Head')">New</button>
+                        <button class="btn-primary-settings" onclick="openAccountLookupModal('expense_head', 'Expense Head')">New</button>
                     </div>
                     <div style="margin-bottom:15px;">
                         <input type="text" id="expense-head-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterExpenseHeadsTable()">
@@ -2993,7 +2993,7 @@
                         <td>${idx + 1}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td style="text-align:center;">
-                            <button class="btn-sm edit" onclick="openLookupModal('expense_head', 'Expense Head', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm edit" onclick="openAccountLookupModal('expense_head', 'Expense Head', ${item.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                         </td>
                     </tr>
@@ -3012,7 +3012,7 @@
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Bank Accounts</h2>
-                        <button class="btn-primary-settings" onclick="openLookupModal('bank_account', 'Bank Account')">New</button>
+                        <button class="btn-primary-settings" onclick="openAccountLookupModal('bank_account', 'Bank Account')">New</button>
                     </div>
                     <div style="margin-bottom:15px;">
                         <input type="text" id="bankac-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterBankACsTable()">
@@ -3055,7 +3055,7 @@
                         <td>${idx + 1}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td style="text-align:center;">
-                            <button class="btn-sm edit" onclick="openLookupModal('bank_account', 'Bank Account', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm edit" onclick="openAccountLookupModal('bank_account', 'Bank Account', ${item.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                         </td>
                     </tr>
@@ -3674,6 +3674,118 @@
                 await loadAllData();
                 closeGenericModal();
                 showToast(`User login credentials for ${staffName} saved successfully`);
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        // Account Lookup Edit/Add Modal
+        function openAccountLookupModal(type, titleLabel, id = null) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = id ? `Edit ${titleLabel}` : `New ${titleLabel}`;
+            
+            const lookup = id ? lookupsList.find(l => l.id === id) : null;
+            let valData = {
+                cell: '',
+                email: '',
+                phone: '',
+                phone2: '',
+                address: '',
+                openingBalance: 0,
+                openingBalanceType: 'Dr',
+                notes: ''
+            };
+            
+            if (lookup && lookup.value) {
+                try {
+                    valData = { ...valData, ...JSON.parse(lookup.value) };
+                } catch(e) {
+                    // Ignore parsing error
+                }
+            }
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:12px; max-height: 480px; overflow-y: auto; padding-right: 5px;">
+                    <div>
+                        <label class="form-label">Name</label>
+                        <input type="text" id="acc-name" class="form-input" value="${escapeHtml(lookup ? lookup.name : '')}">
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:1;">
+                            <label class="form-label">Cell</label>
+                            <input type="text" id="acc-cell" class="form-input" value="${escapeHtml(valData.cell)}">
+                        </div>
+                        <div style="flex:2;">
+                            <label class="form-label">Email</label>
+                            <input type="text" id="acc-email" class="form-input" value="${escapeHtml(valData.email)}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Phones</label>
+                        <div style="display:flex; gap:12px;">
+                            <input type="text" id="acc-phone" class="form-input" placeholder="Phone 1" value="${escapeHtml(valData.phone)}">
+                            <input type="text" id="acc-phone2" class="form-input" placeholder="Phone 2" value="${escapeHtml(valData.phone2)}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Address</label>
+                        <textarea id="acc-address" class="form-input" style="height:60px; resize:vertical;">${escapeHtml(valData.address)}</textarea>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <div style="flex:1;">
+                            <label class="form-label">Opening Balance</label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="number" id="acc-openingBalance" class="form-input" style="width:70px;" value="${valData.openingBalance}">
+                                <label style="margin:0; font-size:12px; display:inline-flex; align-items:center; gap:3px;"><input type="radio" name="acc-openingBalanceType" value="Dr" ${valData.openingBalanceType==='Dr'?'checked':''}> Dr</label>
+                                <label style="margin:0; font-size:12px; display:inline-flex; align-items:center; gap:3px;"><input type="radio" name="acc-openingBalanceType" value="Cr" ${valData.openingBalanceType==='Cr'?'checked':''}> Cr</label>
+                            </div>
+                        </div>
+                        <div style="flex:1.5;">
+                            <label class="form-label">Notes</label>
+                            <input type="text" id="acc-notes" class="form-input" value="${escapeHtml(valData.notes)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const name = document.getElementById('acc-name').value.trim();
+                if (!name) { alert('Please enter a name.'); return; }
+                
+                const payload = {
+                    cell: document.getElementById('acc-cell').value.trim(),
+                    email: document.getElementById('acc-email').value.trim(),
+                    phone: document.getElementById('acc-phone').value.trim(),
+                    phone2: document.getElementById('acc-phone2').value.trim(),
+                    address: document.getElementById('acc-address').value.trim(),
+                    openingBalance: parseFloat(document.getElementById('acc-openingBalance').value) || 0,
+                    openingBalanceType: document.querySelector('input[name="acc-openingBalanceType"]:checked').value,
+                    notes: document.getElementById('acc-notes').value.trim()
+                };
+                
+                const value = JSON.stringify(payload);
+                
+                if (id) {
+                    await fetch(`${API_BASE}/lookups/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, value })
+                    });
+                } else {
+                    await fetch(`${API_BASE}/lookups`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type, name, value })
+                    });
+                }
+                
+                await loadAllData();
+                closeGenericModal();
+                renderTabContent(activeTab);
+                showToast(`${titleLabel} saved successfully`);
             };
             
             modal.style.display = 'flex';
