@@ -1910,8 +1910,10 @@
                                         <td style="font-weight:600; color:#374151;">${t.label}</td>
                                         <td>
                                             <select id="serial-gen-${t.id}" class="form-select" style="padding:4px 8px; font-size:13px;">
-                                                <option ${row.gen==='Serial Number'?'selected':''}>Serial Number</option>
                                                 <option ${row.gen==='Manual'?'selected':''}>Manual</option>
+                                                <option ${row.gen==='Serial Number'?'selected':''}>Serial Number</option>
+                                                <option ${row.gen==='Year based Serial'?'selected':''}>Year based Serial</option>
+                                                <option ${row.gen==='Year Month based Serial'?'selected':''}>Year Month based Serial</option>
                                             </select>
                                         </td>
                                         <td>
