@@ -1952,7 +1952,14 @@
                 calcDue: false,
                 multiScan: false,
                 allowTaxChange: false,
-                sepInvoiceSeq: false
+                sepInvoiceSeq: false,
+                taxInclusiveBilled: false,
+                enforceCreditLimit: false,
+                sepReceiptSeqTaxExempt: false,
+                preventInvoicedJobEdit: false,
+                useFullInvoiceDateSMS: false,
+                decDuration: 30,
+                decCutOff: 60
             };
 
             panel.innerHTML = `
@@ -2028,15 +2035,19 @@
                             <div style="flex:1;">
                                 <label class="form-label">Shade Selection</label>
                                 <select id="order-shadeSelect" class="form-select">
-                                    <option ${data.shadeSelect==='3 shades'?'selected':''}>3 shades</option>
-                                    <option ${data.shadeSelect==='1 shade'?'selected':''}>1 shade</option>
+                                    <option value="Single shade" ${data.shadeSelect==='Single shade'?'selected':''}>Single shade</option>
+                                    <option value="2 shades" ${data.shadeSelect==='2 shades'?'selected':''}>2 shades</option>
+                                    <option value="3 shades" ${data.shadeSelect==='3 shades'?'selected':''}>3 shades</option>
+                                    <option value="Select( Max 2)" ${data.shadeSelect==='Select( Max 2)'?'selected':''}>Select( Max 2)</option>
+                                    <option value="Select( Max 3)" ${data.shadeSelect==='Select( Max 3)'?'selected':''}>Select( Max 3)</option>
                                 </select>
                             </div>
                             <div style="flex:1;">
                                 <label class="form-label">Product Selection</label>
                                 <select id="order-productSelect" class="form-select">
-                                    <option ${data.productSelect==='1 Level'?'selected':''}>1 Level</option>
-                                    <option ${data.productSelect==='2 Levels'?'selected':''}>2 Levels</option>
+                                    <option value="3 level" ${data.productSelect==='3 level'?'selected':''}>3 level</option>
+                                    <option value="2 Level" ${data.productSelect==='2 Level'?'selected':''}>2 Level</option>
+                                    <option value="1 Level" ${data.productSelect==='1 Level'?'selected':''}>1 Level</option>
                                 </select>
                             </div>
                         </div>
@@ -2056,6 +2067,28 @@
                             <h3 style="font-size:13px; font-weight:700; margin-bottom:8px;">Billing</h3>
                             <label class="checkbox-container"><input type="checkbox" id="order-allowTaxChange" ${data.allowTaxChange?'checked':''}> Allow Tax Change</label>
                             <label class="checkbox-container"><input type="checkbox" id="order-sepInvoiceSeq" ${data.sepInvoiceSeq?'checked':''}> Separate Sequence for Invoice without Tax</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-taxInclusiveBilled" ${data.taxInclusiveBilled?'checked':''}> Tax Inclusive billed Order Amounts</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-enforceCreditLimit" ${data.enforceCreditLimit?'checked':''}> Enforce Credit Limit</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-sepReceiptSeqTaxExempt" ${data.sepReceiptSeqTaxExempt?'checked':''}> Separate Receipt Sequence for Tax Exempt Clients</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-preventInvoicedJobEdit" ${data.preventInvoicedJobEdit?'checked':''}> Prevent Invoiced Order Job Edit</label>
+                            <label class="checkbox-container"><input type="checkbox" id="order-useFullInvoiceDateSMS" ${data.useFullInvoiceDateSMS?'checked':''}> Use Full Invoice Date In Invoice SMS Message</label>
+                        </div>
+
+                        <!-- Decreasing Order alerts Box -->
+                        <div style="border:1px solid #ddd; padding:12px; border-radius:4px; background:#fafafa;">
+                            <h3 style="font-size:13px; font-weight:700; margin-bottom:8px;">Decreasing Order alerts</h3>
+                            <div style="display:flex; gap:20px; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="form-label" style="margin:0;">Duration</span>
+                                    <input type="number" id="order-decDuration" class="form-input" style="width:70px;" value="${data.decDuration}">
+                                    <span>days</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="form-label" style="margin:0;">CutOff</span>
+                                    <input type="number" id="order-decCutOff" class="form-input" style="width:70px;" value="${data.decCutOff}">
+                                    <span>%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4898,7 +4931,14 @@
                 calcDue: document.getElementById('order-calcDue').checked,
                 multiScan: document.getElementById('order-multiScan').checked,
                 allowTaxChange: document.getElementById('order-allowTaxChange').checked,
-                sepInvoiceSeq: document.getElementById('order-sepInvoiceSeq').checked
+                sepInvoiceSeq: document.getElementById('order-sepInvoiceSeq').checked,
+                taxInclusiveBilled: document.getElementById('order-taxInclusiveBilled').checked,
+                enforceCreditLimit: document.getElementById('order-enforceCreditLimit').checked,
+                sepReceiptSeqTaxExempt: document.getElementById('order-sepReceiptSeqTaxExempt').checked,
+                preventInvoicedJobEdit: document.getElementById('order-preventInvoicedJobEdit').checked,
+                useFullInvoiceDateSMS: document.getElementById('order-useFullInvoiceDateSMS').checked,
+                decDuration: parseInt(document.getElementById('order-decDuration').value) || 30,
+                decCutOff: parseInt(document.getElementById('order-decCutOff').value) || 60
             };
 
             await fetch(`${API_BASE}/settings`, {
