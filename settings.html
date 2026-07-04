@@ -1511,6 +1511,16 @@
         // Product Types Tab
         function renderProductTypesTab() {
             const panel = document.getElementById('tab-content-panel');
+
+            // Build dynamic categories from productTypesList names
+            const catKeywords = ['ACRYLIC', 'METAL', 'CERAMIC', 'ZIRCON', 'PFM', 'FLEXIBLE', 'ORTHO', 'SPLINT', 'IMPLANT', 'RPD', 'EMAX', 'VENEER'];
+            const catSet = new Set();
+            productTypesList.forEach(t => {
+                const nameUp = t.name.toUpperCase();
+                catKeywords.forEach(k => { if (nameUp.includes(k)) catSet.add(k); });
+            });
+            const catOptions = ['All', ...Array.from(catSet).sort()];
+
             panel.innerHTML = `
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -1520,11 +1530,8 @@
                     <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <label style="font-size:12px; font-weight:600; color:#6b7280;">Category</label>
-                            <select id="prodtype-cat-filter" class="form-select" style="width:150px;" onchange="filterProductTypesTable()">
-                                <option value="All">-- All --</option>
-                                <option value="Acrylic">Acrylic</option>
-                                <option value="Metal">Metal</option>
-                                <option value="Porcelain">Porcelain</option>
+                            <select id="prodtype-cat-filter" class="form-select" style="width:160px;" onchange="filterProductTypesTable()">
+                                ${catOptions.map(c => `<option value="${c}">${c === 'All' ? '-- All --' : c.charAt(0) + c.slice(1).toLowerCase()}</option>`).join('')}
                             </select>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px;">
@@ -1551,12 +1558,18 @@
 
         function loadProductTypesTable() {
             const tbody = document.getElementById('prodtypes-tbody');
-            const search = document.getElementById('prodtype-search').value.toLowerCase();
+            if (!tbody) return;
+            const search = (document.getElementById('prodtype-search') || {}).value || '';
+            const searchVal = search.toLowerCase();
+            const catFilter = (document.getElementById('prodtype-cat-filter') || {}).value || 'All';
             tbody.innerHTML = '';
 
             let filtered = productTypesList;
-            if (search) {
-                filtered = filtered.filter(t => t.name.toLowerCase().includes(search));
+            if (searchVal) {
+                filtered = filtered.filter(t => t.name.toLowerCase().includes(searchVal));
+            }
+            if (catFilter !== 'All') {
+                filtered = filtered.filter(t => t.name.toUpperCase().includes(catFilter.toUpperCase()));
             }
 
             if (filtered.length === 0) {
