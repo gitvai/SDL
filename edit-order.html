@@ -537,6 +537,7 @@
                                 <div class="form-group"><label>Shade Notes</label><input type="text" id="shade-notes"
                                         style="width:100%; padding:4px;"></div>
                             </div>
+                            <div id="dynamic-product-options" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:10px; font-size:12px;"></div>
                             <div
                                 style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px; font-size:12px;">
                                 <div class="form-group"><label>Priority</label><select id="priority"
@@ -561,7 +562,7 @@
                                         <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tryins-table-body">
                                     <tr style="border-bottom:1px solid #eee;">
                                         <td style="padding:5px 0;">1 Wax Trial</td>
                                         <td><input type="date" id="tryin-wax-date"
@@ -973,6 +974,138 @@
         let currentOrderId = null;
         let selectedTeeth = [];
         let selectedProductType = 'General';
+        let productTypesList = [];
+
+        function renderDynamicProductOptions(p, savedValues = null) {
+            const container = document.getElementById('dynamic-product-options');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const tryinsTbody = document.getElementById('tryins-table-body');
+            if (tryinsTbody) {
+                tryinsTbody.innerHTML = '';
+            }
+
+            let tryinsConfig = null;
+            let optionsConfig = null;
+            
+            if (p.tryins) {
+                try { tryinsConfig = JSON.parse(p.tryins); } catch(e) {}
+            }
+            if (p.options) {
+                try { optionsConfig = JSON.parse(p.options); } catch(e) {}
+            }
+
+            if (!tryinsConfig || !optionsConfig) {
+                const typeObj = productTypesList.find(t => t.name === (p.type || p.productType));
+                if (typeObj) {
+                    if (!tryinsConfig && typeObj.tryins) {
+                        try { tryinsConfig = JSON.parse(typeObj.tryins); } catch(e) {}
+                    }
+                    if (!optionsConfig && typeObj.options) {
+                        try { optionsConfig = JSON.parse(typeObj.options); } catch(e) {}
+                    }
+                }
+            }
+
+            let tryinsList = ["Wax Trial", "Metal/Coping Trial", "Bisque Trial"];
+            if (tryinsConfig) {
+                if (tryinsConfig.useDefault) {
+                    tryinsList = ["Try-In", "Special Tray", "Wax Test", "Setting Trial"];
+                } else if (Array.isArray(tryinsConfig.list) && tryinsConfig.list.length > 0) {
+                    tryinsList = tryinsConfig.list;
+                }
+            }
+
+            if (tryinsTbody) {
+                tryinsList.forEach((t, idx) => {
+                    const num = idx + 1;
+                    const inputId = `tryin-${t.toLowerCase().replace(/[^a-z0-9]/g, '-')}-date`;
+                    
+                    // Check if we have a saved tryin date for this option
+                    let valDate = new Date().toISOString().split('T')[0];
+                    if (savedValues && savedValues.tryinDates && savedValues.tryinDates[t]) {
+                        valDate = savedValues.tryinDates[t];
+                    }
+
+                    tryinsTbody.innerHTML += `
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:5px 0;">${num} ${escapeHtml(t)}</td>
+                            <td><input type="date" id="${inputId}" class="tryin-date-input" data-name="${escapeHtml(t)}" value="${valDate}" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
+                            <td style="font-weight:700;"><span style="color:red; font-size:14px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">&times;</span> In Process</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            if (optionsConfig && Array.isArray(optionsConfig)) {
+                optionsConfig.forEach(opt => {
+                    if (opt.status === 'Show' || opt.status === 'Optional') {
+                        const label = opt.name;
+                        const reqAttr = opt.status === 'Show' ? 'required' : '';
+                        const reqStar = opt.status === 'Show' ? '<span style="color:red;">*</span>' : '';
+                        
+                        let currentVal = opt.defaultValue || '';
+                        if (savedValues && savedValues.customOpts && savedValues.customOpts[label] !== undefined) {
+                            currentVal = savedValues.customOpts[label];
+                        }
+
+                        let inputHtml = '';
+                        if (label === 'Restoration Type') {
+                            const opts = ['Crown', 'Inlay', 'Onlay', 'Bridge', 'Veneer', 'Overlay'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Margins') {
+                            const opts = ['Chamfer', 'Shoulder', 'Feather edge', 'Knife edge'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Occlusal Clearance') {
+                            const opts = ['0.5mm', '1.0mm', '1.5mm', '2.0mm', 'Reduction coping needed'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Translucency') {
+                            const opts = ['High', 'Medium', 'Low', 'Extra High', 'Opaque'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'No Coping clearance') {
+                            const opts = ['No', 'Yes'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Pontic Design') {
+                            const opts = ['Modified ridge lap', 'Ridge lap', 'Sanitary', 'Ovate', 'Bullet'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Collar and Metal Design') {
+                            const opts = ['No collar', 'Full metal collar', 'Lingual collar', 'Buccal collar'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Proximal contacts') {
+                            const opts = ['Normal', 'Tight', 'Light'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${currentVal === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else {
+                            inputHtml = `<input type="text" class="custom-prod-opt" data-name="${escapeHtml(label)}" value="${escapeHtml(currentVal)}" ${reqAttr} style="width:100%; padding:4px;">`;
+                        }
+
+                        container.innerHTML += `
+                            <div class="form-group">
+                                <label>${escapeHtml(label)} ${reqStar}</label>
+                                ${inputHtml}
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
+
 
         async function loadClients() {
             const tbody = document.getElementById('client-table-body');
@@ -1132,6 +1265,7 @@
                         units: j.units,
                         rate: j.price,
                         total: j.totalAmount || (j.units * j.price),
+                        options: j.options,
                         slab1Rate: j.slab1Rate,
                         slab2Rate: j.slab2Rate,
                         slab1Units: j.slab1Units,
@@ -1146,7 +1280,7 @@
                     const derivedUnitRate = (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : ((order.jobs && order.jobs.length > 0) ? order.jobs[0].price : 0);
                     if (order.productName) {
                         document.getElementById('selected-product-name').textContent = order.productName;
-                        selectedProduct = { name: order.productName, type: order.productType || 'General', charge: derivedUnitRate };
+                        selectedProduct = { name: order.productName, type: order.productType || 'General', charge: derivedUnitRate, options: order.options };
                         selectedProductType = order.productType || 'General';
                     }
 
@@ -1185,6 +1319,12 @@
                     if (unitRateInput) {
                         unitRateInput.value = derivedUnitRate;
                     }
+                    
+                    let savedValues = null;
+                    if (order.options) {
+                        try { savedValues = JSON.parse(order.options); } catch(e) {}
+                    }
+                    renderDynamicProductOptions(selectedProduct, savedValues);
                     updateTeethUI();
 
                     // Hide product selection and show teeth selection
@@ -1248,12 +1388,13 @@
             try {
                 // Load Product Types for dropdown
                 const typesRes = await fetch(`${API_BASE}/product-types` + ( `product-types`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
-                let types = [];
+                productTypesList = [];
                 if (typesRes.ok) {
-                    types = await typesRes.json();
+                    productTypesList = await typesRes.json();
                 } else {
-                    types = FALLBACK_TYPES.map(n => ({ name: n }));
+                    productTypesList = FALLBACK_TYPES.map(n => ({ name: n }));
                 }
+                const types = productTypesList;
 
                 const typeSelect = document.getElementById('product-type-filter');
                 if (typeSelect) {
@@ -1361,6 +1502,7 @@
                 footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
             }
 
+            renderDynamicProductOptions(p);
             selectedTeeth = [];
             updateTeethUI();
 
@@ -1805,6 +1947,20 @@
                 if (customInput) customTeethText = customInput.value;
             }
 
+            // Collect dynamic custom options
+            const customOpts = {};
+            document.querySelectorAll('.custom-prod-opt').forEach(el => {
+                customOpts[el.dataset.name] = el.value;
+            });
+            
+            // Also collect try-ins dates
+            const tryinDates = {};
+            document.querySelectorAll('.tryin-date-input').forEach(el => {
+                tryinDates[el.dataset.name] = el.value;
+            });
+            
+            const serializedOptions = JSON.stringify({ customOpts, tryinDates });
+
             if (selectedProduct) {
                 const job = {
                     product: selectedProduct.name,
@@ -1813,6 +1969,7 @@
                     units: document.getElementById('unit-count') ? document.getElementById('unit-count').value : '1',
                     rate: document.getElementById('unit-rate') ? document.getElementById('unit-rate').value : '0',
                     total: document.getElementById('total-price') ? document.getElementById('total-price').value : '0',
+                    options: serializedOptions,
                     slab1Rate: isSlabActive && document.getElementById('slab1-rate') ? parseFloat(document.getElementById('slab1-rate').value) : null,
                     slab2Rate: isSlabActive && document.getElementById('slab2-rate') ? parseFloat(document.getElementById('slab2-rate').value) : null,
                     slab1Units: isSlabActive ? Math.min(parseInt(document.getElementById('unit-count').value)||0, 1) : null,
@@ -1861,6 +2018,7 @@
                 deliveryMethod: document.getElementById('delivery-method') ? document.getElementById('delivery-method').value : null,
                 dropLocation: document.getElementById('drop-location') ? document.getElementById('drop-location').value : null,
                 panTray: document.getElementById('pan-tray') ? document.getElementById('pan-tray').value : null,
+                options: serializedOptions,
                 
                 // Slabs data
                 slab1Rate: isSlabActive && document.getElementById('slab1-rate') ? parseFloat(document.getElementById('slab1-rate').value) : null,
@@ -1877,6 +2035,7 @@
                     units: parseInt(j.units) || 0,
                     price: parseFloat(j.rate) || 0,
                     totalAmount: parseFloat(j.total) || 0,
+                    options: j.options || serializedOptions,
                     slab1Rate: j.slab1Rate,
                     slab2Rate: j.slab2Rate,
                     slab1Units: j.slab1Units,

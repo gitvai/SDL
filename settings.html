@@ -3800,6 +3800,158 @@
             showToast("Staff record deleted");
         }
 
+        // Helper to generate custom layout HTML for Product and Product Type modals
+        function getProductOrTypeFormHtml(item, isProduct = false) {
+            const categories = ['Acrylic', 'Metal', 'Ceramic', 'Ortho', 'Flexible', 'Zircon', 'PFM', 'Implant', 'Other'];
+            const currentName = item.name || '';
+            const currentCategory = item.category || 'Acrylic';
+            const currentColor = item.color || '#ec4899';
+            
+            let tryinData = { useDefault: true, list: ["Try-In", "Special Tray", "Wax Test", "Setting Trial"] };
+            if (item.tryins) {
+                try { tryinData = JSON.parse(item.tryins); } catch(e) {}
+            }
+            
+            const defaultOptions = [
+                { name: "Restoration Type", defaultValue: "Crown", status: "Hide", labSlip: false },
+                { name: "Margins", defaultValue: "Chamfer", status: "Hide", labSlip: false },
+                { name: "Occlusal Clearance", defaultValue: "1.0mm", status: "Hide", labSlip: false },
+                { name: "Translucency", defaultValue: "Medium", status: "Hide", labSlip: false },
+                { name: "No Coping clearance", defaultValue: "No", status: "Hide", labSlip: false },
+                { name: "Pontic Design", defaultValue: "Modified ridge lap", status: "Hide", labSlip: false },
+                { name: "Collar and Metal Design", defaultValue: "No collar", status: "Hide", labSlip: false },
+                { name: "Margin For Implant Direct Impression", defaultValue: "Standard", status: "Hide", labSlip: false },
+                { name: "Margin For Implant Indirect Impression", defaultValue: "Standard", status: "Hide", labSlip: false },
+                { name: "Occlusal Platform", defaultValue: "Anatomical", status: "Hide", labSlip: false },
+                { name: "Embrasures", defaultValue: "Open", status: "Hide", labSlip: false },
+                { name: "Proximal contacts", defaultValue: "Normal", status: "Hide", labSlip: false }
+            ];
+            
+            let currentOptions = defaultOptions;
+            if (item.options) {
+                try {
+                    const parsed = JSON.parse(item.options);
+                    if (parsed && parsed.length > 0) {
+                        currentOptions = defaultOptions.map(opt => {
+                            const match = parsed.find(o => o.name === opt.name);
+                            return match ? match : opt;
+                        });
+                    }
+                } catch(e) {}
+            }
+
+            const productFieldsHtml = isProduct ? `
+                <div style="display:flex; gap:15px; align-items:center; margin-bottom: 10px;">
+                    <div style="flex:1;">
+                        <label class="form-label" style="font-weight:600; color:#374151;">Code / Alias</label>
+                        <input type="text" id="m-code" class="form-input" value="${escapeHtml(item.code || '')}">
+                    </div>
+                    <div style="flex:1.5;">
+                        <label class="form-label" style="font-weight:600; color:#374151;">Product Type</label>
+                        <select id="m-type" class="form-select" style="width:100%;">
+                            ${productTypesList.map(t => `<option value="${escapeHtml(t.name)}" ${item.type === t.name ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label" style="font-weight:600; color:#374151;">Rate / Charge (OMR)</label>
+                        <input type="number" step="any" id="m-charge" class="form-input" value="${item.charge || 0}">
+                    </div>
+                </div>
+            ` : '';
+
+            return `
+                <div style="display:flex; flex-direction:column; gap:15px; font-size:13px; max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+                    ${productFieldsHtml}
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <div style="flex:1;">
+                            <label class="form-label" style="font-weight:600; color:#374151;">Name</label>
+                            <input type="text" id="m-name" class="form-input" value="${escapeHtml(currentName)}" placeholder="enter name...">
+                        </div>
+                        <div style="width:160px;">
+                            <label class="form-label" style="font-weight:600; color:#374151;">Category</label>
+                            <select id="m-category" class="form-select" style="width:100%;">
+                                ${categories.map(c => `<option value="${c}" ${currentCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="width:70px;">
+                            <label class="form-label" style="font-weight:600; color:#374151;">Color</label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="color" id="m-color" value="${currentColor}" style="border:none; width:30px; height:30px; padding:0; cursor:pointer;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="border:1px solid #e5e7eb; border-radius:6px; padding:12px; background:#f9fafb;">
+                        <div style="font-weight:700; margin-bottom:8px; color:#1f2937;">Try Ins</div>
+                        <label class="checkbox-container" style="margin-bottom:8px; display:inline-flex; align-items:center; gap:6px;">
+                            <input type="checkbox" id="m-use-default-tryins" ${tryinData.useDefault ? 'checked' : ''} onchange="toggleTryinListState(this.checked)">
+                            Use Default Tryins
+                        </label>
+                        <div id="m-tryin-list" style="display:flex; flex-direction:column; gap:6px; padding-left:20px; ${tryinData.useDefault ? 'opacity:0.6; pointer-events:none;' : ''}">
+                            ${["Try-In", "Special Tray", "Wax Test", "Setting Trial"].map((t, idx) => {
+                                const isChecked = tryinData.list ? tryinData.list.includes(t) : true;
+                                return `
+                                    <label class="checkbox-container" style="display:flex; align-items:center; gap:6px;">
+                                        <input type="checkbox" class="tryin-item-chk" value="${t}" ${isChecked ? 'checked' : ''}>
+                                        ${idx + 1}. ${t}
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div style="font-weight:700; margin-bottom:8px; color:#1f2937;">Product Options</div>
+                        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:12px;">
+                            <thead>
+                                <tr style="background:#f3f4f6; border-bottom:1px solid #e5e7eb;">
+                                    <th style="padding:6px; width:40px;">Sr</th>
+                                    <th style="padding:6px;">Option</th>
+                                    <th style="padding:6px;">Default</th>
+                                    <th style="padding:6px; width:100px;">Status</th>
+                                    <th style="padding:6px; width:80px; text-align:center;">Lab Slip</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${currentOptions.map((opt, idx) => `
+                                    <tr style="border-bottom:1px solid #e5e7eb;" class="opt-row-data" data-name="${escapeHtml(opt.name)}">
+                                        <td style="padding:6px;">${idx + 1}</td>
+                                        <td style="padding:6px; font-weight:500;">${opt.name}</td>
+                                        <td style="padding:6px;">
+                                            <input type="text" class="opt-default-val" style="width:90%; padding:4px; border:1px solid #d1d5db; border-radius:4px;" value="${escapeHtml(opt.defaultValue || '')}">
+                                        </td>
+                                        <td style="padding:6px;">
+                                            <select class="opt-status-sel" style="width:100%; padding:4px; border:1px solid #d1d5db; border-radius:4px;">
+                                                <option value="Hide" ${opt.status === 'Hide' ? 'selected' : ''}>Hide</option>
+                                                <option value="Show" ${opt.status === 'Show' ? 'selected' : ''}>Show</option>
+                                                <option value="Optional" ${opt.status === 'Optional' ? 'selected' : ''}>Optional</option>
+                                            </select>
+                                        </td>
+                                        <td style="padding:6px; text-align:center;">
+                                            <input type="checkbox" class="opt-labslip-chk" ${opt.labSlip ? 'checked' : ''}>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <label class="checkbox-container" style="display:inline-flex; align-items:center; gap:6px; margin-top:5px; font-weight:600;">
+                        <input type="checkbox" id="m-show-advanced">
+                        Show Advanced Options
+                    </label>
+                </div>
+            `;
+        }
+
+        window.toggleTryinListState = function(checked) {
+            const list = document.getElementById('m-tryin-list');
+            if (list) {
+                list.style.opacity = checked ? '0.6' : '1';
+                list.style.pointerEvents = checked ? 'none' : 'auto';
+            }
+        };
+
         // Product Types Modal Form
         function openProductTypeModal(id = null) {
             const modal = document.getElementById('generic-modal');
@@ -3809,28 +3961,48 @@
             const type = id ? productTypesList.find(t => t.id === id) : { name: '' };
             title.textContent = id ? 'Edit Product Type' : 'New Product Type';
             
-            body.innerHTML = `
-                <div>
-                    <label class="form-label">Product Type Name</label>
-                    <input type="text" id="prodtype-name" class="form-input" value="${escapeHtml(type.name)}">
-                </div>
-            `;
+            body.innerHTML = getProductOrTypeFormHtml(type, false);
+
+            const content = modal.querySelector('.settings-modal-content');
+            if (content) {
+                content.style.width = '700px';
+                content.style.maxWidth = '95%';
+            }
 
             document.getElementById('modal-save-btn').onclick = async () => {
-                const name = document.getElementById('prodtype-name').value.trim();
+                const name = document.getElementById('m-name').value.trim();
                 if (!name) return;
+
+                const category = document.getElementById('m-category').value;
+                const color = document.getElementById('m-color').value;
+                
+                const useDefault = document.getElementById('m-use-default-tryins').checked;
+                const tryinCheckboxes = document.querySelectorAll('.tryin-item-chk:checked');
+                const tryinsList = Array.from(tryinCheckboxes).map(c => c.value);
+                const tryins = JSON.stringify({ useDefault, list: tryinsList });
+
+                const optRows = document.querySelectorAll('.opt-row-data');
+                const optionsList = Array.from(optRows).map(row => ({
+                    name: row.dataset.name,
+                    defaultValue: row.querySelector('.opt-default-val').value.trim(),
+                    status: row.querySelector('.opt-status-sel').value,
+                    labSlip: row.querySelector('.opt-labslip-chk').checked
+                }));
+                const options = JSON.stringify(optionsList);
+
+                const payload = { name, category, color, tryins, options };
 
                 if (id) {
                     await fetch(`/api/product-types/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name })
+                        body: JSON.stringify(payload)
                     });
                 } else {
                     await fetch('/api/product-types', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name })
+                        body: JSON.stringify(payload)
                     });
                 }
                 
@@ -3860,50 +4032,52 @@
             const prod = id ? productsList.find(p => p.id === id) : { name: '', code: '', type: '', charge: 0 };
             title.textContent = id ? 'Edit Product' : 'New Product';
             
-            body.innerHTML = `
-                <div class="settings-form-grid">
-                    <div class="form-group-full">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" id="prod-name" class="form-input" value="${escapeHtml(prod.name)}">
-                    </div>
-                    <div>
-                        <label class="form-label">Code / Alias</label>
-                        <input type="text" id="prod-code" class="form-input" value="${escapeHtml(prod.code || '')}">
-                    </div>
-                    <div>
-                        <label class="form-label">Product Type</label>
-                        <select id="prod-type" class="form-select">
-                            ${productTypesList.map(t => `<option value="${escapeHtml(t.name)}" ${prod.type===t.name?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="form-group-full">
-                        <label class="form-label">Rate / Charge (OMR )</label>
-                        <input type="number" id="prod-charge" class="form-input" value="${prod.charge || 0}">
-                    </div>
-                </div>
-            `;
+            body.innerHTML = getProductOrTypeFormHtml(prod, true);
+
+            const content = modal.querySelector('.settings-modal-content');
+            if (content) {
+                content.style.width = '700px';
+                content.style.maxWidth = '95%';
+            }
 
             document.getElementById('modal-save-btn').onclick = async () => {
-                const data = {
-                    name: document.getElementById('prod-name').value.trim(),
-                    code: document.getElementById('prod-code').value.trim(),
-                    type: document.getElementById('prod-type').value,
-                    charge: parseFloat(document.getElementById('prod-charge').value) || 0
-                };
+                const name = document.getElementById('m-name').value.trim();
+                if (!name) return;
 
-                if (!data.name) return;
+                const code = document.getElementById('m-code').value.trim();
+                const type = document.getElementById('m-type').value;
+                const charge = parseFloat(document.getElementById('m-charge').value) || 0;
+                
+                const category = document.getElementById('m-category').value;
+                const color = document.getElementById('m-color').value;
+                
+                const useDefault = document.getElementById('m-use-default-tryins').checked;
+                const tryinCheckboxes = document.querySelectorAll('.tryin-item-chk:checked');
+                const tryinsList = Array.from(tryinCheckboxes).map(c => c.value);
+                const tryins = JSON.stringify({ useDefault, list: tryinsList });
+
+                const optRows = document.querySelectorAll('.opt-row-data');
+                const optionsList = Array.from(optRows).map(row => ({
+                    name: row.dataset.name,
+                    defaultValue: row.querySelector('.opt-default-val').value.trim(),
+                    status: row.querySelector('.opt-status-sel').value,
+                    labSlip: row.querySelector('.opt-labslip-chk').checked
+                }));
+                const options = JSON.stringify(optionsList);
+
+                const payload = { name, code, type, charge, category, color, tryins, options };
 
                 if (id) {
                     await fetch(`/api/products/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(payload)
                     });
                 } else {
                     await fetch('/api/products', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(payload)
                     });
                 }
                 
@@ -3913,19 +4087,6 @@
                 showToast("Product saved");
             };
 
-            const content = modal.querySelector('.settings-modal-content');
-            if (event) {
-                const rect = event.target.getBoundingClientRect();
-                content.style.position = 'absolute';
-                let topPos = rect.bottom + window.scrollY + 10;
-                let leftPos = rect.right - 500 + window.scrollX; 
-                if (leftPos < 10) leftPos = 10;
-                
-                content.style.top = topPos + 'px';
-                content.style.left = leftPos + 'px';
-                content.style.margin = '0';
-                modal.style.alignItems = 'flex-start';
-            }
             modal.style.display = 'flex';
         }
 
@@ -4026,6 +4187,8 @@
                 content.style.top = '';
                 content.style.left = '';
                 content.style.margin = '';
+                content.style.width = '';
+                content.style.maxWidth = '';
             }
             modal.style.alignItems = 'center';
         }

@@ -121,6 +121,7 @@ model Order {
   hasPhotos         Boolean @default(false)
   
   notes        String?
+  options      String?   // JSON string representing selected custom product options
   units        Int       @default(1)
   price        Float     @default(0)
   discount     Float     @default(0)
@@ -187,6 +188,7 @@ model OrderJob {
   shade3         String?
   shadeNotes     String?
   stumpShade     String?
+  options        String?   // JSON string representing selected custom product options
   
   units          Int      @default(1)
   price          Float    @default(0) // Unit Rate
@@ -369,6 +371,10 @@ model Product {
   code        String?
   type        String?
   charge      Float    @default(0)
+  category    String?
+  color       String?
+  tryins      String?  // JSON string representing Try In options
+  options     String?  // JSON string representing Product Options table
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -376,6 +382,10 @@ model Product {
 model ProductType {
   id          Int      @id @default(autoincrement())
   name        String
+  category    String?
+  color       String?
+  tryins      String?  // JSON string representing Try In options
+  options     String?  // JSON string representing Product Options table
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

@@ -316,6 +316,7 @@
                              <div class="form-group"><label>Shade 3</label><input type="text" id="shade3" list="shade-list" style="width:100%; padding:4px;"></div>
                             <div class="form-group"><label>Shade Notes</label><input type="text" id="shade-notes" style="width:100%; padding:4px;"></div>
                         </div>
+                        <div id="dynamic-product-options" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:10px; font-size:12px;"></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px; font-size:12px;">
                             <div class="form-group"><label>Priority</label><select id="priority" style="width:100%; padding:4px;"><option>Normal</option><option>Urgent</option></select></div>
                             <div class="form-group" style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="io-scan"><label>I O Scan</label></div>
@@ -332,7 +333,7 @@
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                             <tbody id="tryins-table-body">
                                 <tr style="border-bottom:1px solid #eee;">
                                     <td style="padding:5px 0;">1 Wax Trial</td>
                                     <td><input type="date" id="tryin-wax-date" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
@@ -473,6 +474,130 @@
         let selectedProduct = null;
         let selectedTeeth = [];
         let selectedProductType = 'General';
+        let productTypesList = [];
+
+        function renderDynamicProductOptions(p) {
+            const container = document.getElementById('dynamic-product-options');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const tryinsTbody = document.getElementById('tryins-table-body');
+            if (tryinsTbody) {
+                tryinsTbody.innerHTML = '';
+            }
+
+            let tryinsConfig = null;
+            let optionsConfig = null;
+            
+            if (p.tryins) {
+                try { tryinsConfig = JSON.parse(p.tryins); } catch(e) {}
+            }
+            if (p.options) {
+                try { optionsConfig = JSON.parse(p.options); } catch(e) {}
+            }
+
+            if (!tryinsConfig || !optionsConfig) {
+                const typeObj = productTypesList.find(t => t.name === (p.type || p.productType));
+                if (typeObj) {
+                    if (!tryinsConfig && typeObj.tryins) {
+                        try { tryinsConfig = JSON.parse(typeObj.tryins); } catch(e) {}
+                    }
+                    if (!optionsConfig && typeObj.options) {
+                        try { optionsConfig = JSON.parse(typeObj.options); } catch(e) {}
+                    }
+                }
+            }
+
+            let tryinsList = ["Wax Trial", "Metal/Coping Trial", "Bisque Trial"];
+            if (tryinsConfig) {
+                if (tryinsConfig.useDefault) {
+                    tryinsList = ["Try-In", "Special Tray", "Wax Test", "Setting Trial"];
+                } else if (Array.isArray(tryinsConfig.list) && tryinsConfig.list.length > 0) {
+                    tryinsList = tryinsConfig.list;
+                }
+            }
+
+            if (tryinsTbody) {
+                tryinsList.forEach((t, idx) => {
+                    const num = idx + 1;
+                    const inputId = `tryin-${t.toLowerCase().replace(/[^a-z0-9]/g, '-')}-date`;
+                    tryinsTbody.innerHTML += `
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:5px 0;">${num} ${escapeHtml(t)}</td>
+                            <td><input type="date" id="${inputId}" class="tryin-date-input" data-name="${escapeHtml(t)}" style="width:90%; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;"></td>
+                            <td style="font-weight:700;"><span style="color:red; font-size:14px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">&times;</span> In Process</td>
+                        </tr>
+                    `;
+                });
+                
+                const today = new Date().toISOString().split('T')[0];
+                document.querySelectorAll('.tryin-date-input').forEach(input => {
+                    input.value = today;
+                });
+            }
+
+            if (optionsConfig && Array.isArray(optionsConfig)) {
+                optionsConfig.forEach(opt => {
+                    if (opt.status === 'Show' || opt.status === 'Optional') {
+                        const label = opt.name;
+                        const reqAttr = opt.status === 'Show' ? 'required' : '';
+                        const reqStar = opt.status === 'Show' ? '<span style="color:red;">*</span>' : '';
+                        
+                        let inputHtml = '';
+                        if (label === 'Restoration Type') {
+                            const opts = ['Crown', 'Inlay', 'Onlay', 'Bridge', 'Veneer', 'Overlay'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Margins') {
+                            const opts = ['Chamfer', 'Shoulder', 'Feather edge', 'Knife edge'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Occlusal Clearance') {
+                            const opts = ['0.5mm', '1.0mm', '1.5mm', '2.0mm', 'Reduction coping needed'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Translucency') {
+                            const opts = ['High', 'Medium', 'Low', 'Extra High', 'Opaque'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'No Coping clearance') {
+                            const opts = ['No', 'Yes'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Pontic Design') {
+                            const opts = ['Modified ridge lap', 'Ridge lap', 'Sanitary', 'Ovate', 'Bullet'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Collar and Metal Design') {
+                            const opts = ['No collar', 'Full metal collar', 'Lingual collar', 'Buccal collar'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else if (label === 'Proximal contacts') {
+                            const opts = ['Normal', 'Tight', 'Light'];
+                            inputHtml = `<select class="custom-prod-opt" data-name="${escapeHtml(label)}" ${reqAttr} style="width:100%; padding:4px;">
+                                ${opts.map(o => `<option value="${o}" ${opt.defaultValue === o ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>`;
+                        } else {
+                            inputHtml = `<input type="text" class="custom-prod-opt" data-name="${escapeHtml(label)}" value="${escapeHtml(opt.defaultValue || '')}" ${reqAttr} style="width:100%; padding:4px;">`;
+                        }
+
+                        container.innerHTML += `
+                            <div class="form-group">
+                                <label>${escapeHtml(label)} ${reqStar}</label>
+                                ${inputHtml}
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
 
         async function loadClients() {
             const tbody = document.getElementById('client-table-body');
@@ -617,12 +742,13 @@
             try {
                 // Load Product Types for dropdown
                 const typesRes = await fetch(`${API_BASE}/product-types` + ( `product-types`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
-                let types = [];
+                productTypesList = [];
                 if (typesRes.ok) {
-                    types = await typesRes.json();
+                    productTypesList = await typesRes.json();
                 } else {
-                    types = FALLBACK_TYPES.map(n => ({ name: n }));
+                    productTypesList = FALLBACK_TYPES.map(n => ({ name: n }));
                 }
+                const types = productTypesList;
 
                 const typeSelect = document.getElementById('product-type-filter');
                 if (typeSelect) {
@@ -766,6 +892,7 @@
                 footerRateContainer.style.display = isSpecialRpd ? 'none' : 'block';
             }
               
+              renderDynamicProductOptions(p);
               updateTeethUI(true);
               /* Disable client-specific rate overrides to enforce global rate usage
               if (window.fetchCustomRate) {
@@ -1260,6 +1387,20 @@
                 customTeethText = document.getElementById('custom-unit-text').value;
             }
 
+            // Collect dynamic custom options
+            const customOpts = {};
+            document.querySelectorAll('.custom-prod-opt').forEach(el => {
+                customOpts[el.dataset.name] = el.value;
+            });
+            
+            // Also collect try-ins dates
+            const tryinDates = {};
+            document.querySelectorAll('.tryin-date-input').forEach(el => {
+                tryinDates[el.dataset.name] = el.value;
+            });
+            
+            const serializedOptions = JSON.stringify({ customOpts, tryinDates });
+
             if (selectedProduct) {
                 const job = {
                     product: selectedProduct.name,
@@ -1268,6 +1409,7 @@
                     units: document.getElementById('unit-count').value,
                     rate: document.getElementById('unit-rate').value,
                     total: document.getElementById('total-price').value,
+                    options: serializedOptions,
                     slab1Rate: isSlabActive ? parseFloat(document.getElementById('slab1-rate').value) : null,
                     slab2Rate: isSlabActive ? parseFloat(document.getElementById('slab2-rate').value) : null,
                     slab1Units: isSlabActive ? Math.min(parseInt(document.getElementById('unit-count').value)||0, 1) : null,
@@ -1332,6 +1474,7 @@
                     units: j.units,
                     price: j.rate,
                     totalAmount: j.total,
+                    options: j.options,
                     slab1Rate: j.slab1Rate,
                     slab2Rate: j.slab2Rate,
                     slab1Units: j.slab1Units,
