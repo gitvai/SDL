@@ -1752,6 +1752,10 @@
                 defaultSlots: { due: '', datein: 'Morning' }
             };
 
+            // Get dynamic time slots from lookups list
+            const timeSlots = lookupsList.filter(l => l.type === 'time_slot').map(l => l.name);
+            const slots = timeSlots.length > 0 ? timeSlots : ['Morning', 'Afternoon', 'Evening', 'Anytime'];
+
             panel.innerHTML = `
                 <div style="max-width: 650px; border:1px solid #e5e7eb; border-radius:6px; padding:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
@@ -1829,14 +1833,13 @@
                                     <label class="form-label">Due Date</label>
                                     <select id="app-defaultSlots-due" class="form-select">
                                         <option value="" ${data.defaultSlots.due===''?'selected':''}></option>
-                                        <option value="Evening" ${data.defaultSlots.due==='Evening'?'selected':''}>Evening</option>
+                                        ${slots.map(s => `<option value="${escapeHtml(s)}" ${data.defaultSlots.due===s?'selected':''}>${escapeHtml(s)}</option>`).join('')}
                                     </select>
                                 </div>
                                 <div style="flex:1;">
                                     <label class="form-label">DateIn</label>
                                     <select id="app-defaultSlots-datein" class="form-select">
-                                        <option value="Morning" ${data.defaultSlots.datein==='Morning'?'selected':''}>Morning</option>
-                                        <option value="Afternoon" ${data.defaultSlots.datein==='Afternoon'?'selected':''}>Afternoon</option>
+                                        ${slots.map(s => `<option value="${escapeHtml(s)}" ${data.defaultSlots.datein===s?'selected':''}>${escapeHtml(s)}</option>`).join('')}
                                     </select>
                                 </div>
                             </div>
