@@ -366,17 +366,28 @@ model Material {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  code        String?
-  type        String?
-  charge      Float    @default(0)
-  category    String?
-  color       String?
-  tryins      String?  // JSON string representing Try In options
-  options     String?  // JSON string representing Product Options table
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  name             String
+  code             String?
+  type             String?
+  charge           Float    @default(0)
+  warranty         Int?     @default(0)
+  completionPeriod Int?     @default(0)
+  unitSelection    String?  @default("Teeth")
+  useSlabPricing   Boolean? @default(false)
+  slab1Rate        Float?   @default(0)
+  slab2Rate        Float?   @default(0)
+  slab1Units       Int?     @default(0)
+  slab2Units       Int?     @default(0)
+  priceBands       String?  // JSON string for price band configurations
+  notes            String?
+  inactive         Boolean? @default(false)
+  category         String?
+  color            String?
+  tryins           String?  // JSON string representing Try In options
+  options          String?  // JSON string representing Product Options table
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model ProductType {
@@ -400,5 +411,6 @@ model SettingLookup {
   id        Int      @id @default(autoincrement())
   type      String
   name      String
+  value     String?
   createdAt DateTime @default(now())
 }
