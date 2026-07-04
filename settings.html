@@ -1312,30 +1312,36 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Tax Options</h2>
                         <div style="display:flex; gap:10px;">
-                            <button class="btn-secondary-settings" onclick="openTaxSettingsModal()">Tax Settings</button>
-                            <button class="btn-primary-settings" onclick="openLookupModal('tax_option', 'Tax Option')">New</button>
+                            <button class="btn-secondary-settings" onclick="openTaxSettingsModal()">Tax Setup</button>
+                            <button class="btn-primary-settings" onclick="openTaxOptionModal(null, '', '')">New</button>
                         </div>
                     </div>
                     <table class="settings-table">
                         <thead>
                             <tr>
                                 <th style="width:50px;">Sr</th>
-                                <th>Name</th>
+                                <th>Description</th>
+                                <th style="width:80px; text-align:center;">%</th>
                                 <th style="width:140px; text-align:center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${taxOptions.length === 0 ? `<tr><td colspan="3" style="text-align:center; color:#999;">No tax options defined. Click New to add.</td></tr>` : ''}
-                            ${taxOptions.map((item, idx) => `
+                            ${taxOptions.length === 0 ? `<tr><td colspan="4" style="text-align:center; color:#999;">No tax options defined. Click New to add.</td></tr>` : ''}
+                            ${taxOptions.map((item, idx) => {
+                                let pct = '';
+                                try { const d = JSON.parse(item.name); pct = d.pct !== undefined ? d.pct : ''; } catch(e) { pct = ''; }
+                                const desc = (() => { try { return JSON.parse(item.name).desc || item.name; } catch(e) { return item.name; } })();
+                                return `
                                 <tr>
                                     <td>${idx + 1}</td>
-                                    <td>${escapeHtml(item.name)}</td>
+                                    <td>${escapeHtml(desc)}</td>
+                                    <td style="text-align:center;">${pct !== '' ? pct + '%' : '-'}</td>
                                     <td style="text-align:center;">
-                                        <button class="btn-sm edit" onclick="openLookupModal('tax_option', 'Tax Option', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                                        <button class="btn-sm edit" onclick="openTaxOptionModal(${item.id}, '${escapeHtml(desc).replace(/'/g, "\\'")}',' ${pct}')">Edit</button>
                                         <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                                     </td>
-                                </tr>
-                            `).join('')}
+                                </tr>`;
+                            }).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -3344,47 +3350,124 @@
             const title = document.getElementById('modal-title');
             const body = document.getElementById('modal-body');
             
-            title.textContent = "Global Tax Settings";
+            title.textContent = "Tax Setup";
             
-            const data = systemSettings.tax_settings || { defaultRate: 5, taxName: 'VAT', inclusive: false };
+            const saved = systemSettings.tax_scheme || 'No GST';
+            const schemes = ['GST', 'Composition Scheme', 'No GST', 'Not Applicable'];
+            const descriptions = {
+                'GST': 'Your lab is registered under GST and charges tax on invoices.',
+                'Composition Scheme': 'Your lab is under GST Composition Scheme (lower fixed rate).',
+                'No GST': 'Your lab is based in India and has a turnover less than Rs. 20L',
+                'Not Applicable': 'Tax is not applicable to your lab (e.g., outside India).'
+            };
+            
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:0;">
+                    <p style="font-size:13px; color:#374151; margin:0 0 10px;">Select your Taxation scheme</p>
+                    <div id="tax-scheme-list" style="border:1px solid #d1d5db; border-radius:4px; overflow:hidden; margin-bottom:14px;">
+                        ${schemes.map((s, i) => `
+                            <div onclick="selectTaxScheme('${s}')" id="scheme-opt-${i}" style="
+                                padding: 9px 14px;
+                                cursor: pointer;
+                                font-size:13px;
+                                color: ${
+                                    s === 'GST' ? '#2563eb' :
+                                    s === 'Composition Scheme' ? '#7c3aed' :
+                                    s === 'No GST' ? '#dc2626' : '#059669'
+                                };
+                                background: ${saved === s ? '#eff6ff' : '#fff'};
+                                border-bottom: ${i < schemes.length - 1 ? '1px solid #e5e7eb' : 'none'};
+                                font-weight: ${saved === s ? '600' : '400'};
+                            ">${s}</div>
+                        `).join('')}
+                    </div>
+                    <div id="tax-scheme-desc" style="font-size:13px; color:#374151; background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:10px 14px; min-height:40px;">
+                        ${escapeHtml(descriptions[saved] || '')}
+                    </div>
+                    <input type="hidden" id="selected-tax-scheme" value="${escapeHtml(saved)}">
+                </div>
+            `;
+
+            // expose selectTaxScheme globally
+            window.selectTaxScheme = function(s) {
+                document.getElementById('selected-tax-scheme').value = s;
+                const descs = ${JSON.stringify({
+                    'GST': 'Your lab is registered under GST and charges tax on invoices.',
+                    'Composition Scheme': 'Your lab is under GST Composition Scheme (lower fixed rate).',
+                    'No GST': 'Your lab is based in India and has a turnover less than Rs. 20L',
+                    'Not Applicable': 'Tax is not applicable to your lab (e.g., outside India).'
+                })};
+                document.getElementById('tax-scheme-desc').textContent = descs[s] || '';
+                const colors = { 'GST':'#2563eb','Composition Scheme':'#7c3aed','No GST':'#dc2626','Not Applicable':'#059669' };
+                ['GST','Composition Scheme','No GST','Not Applicable'].forEach((opt, i) => {
+                    const el = document.getElementById('scheme-opt-' + i);
+                    if (!el) return;
+                    el.style.background = s === opt ? '#eff6ff' : '#fff';
+                    el.style.fontWeight = s === opt ? '600' : '400';
+                    el.style.color = colors[opt];
+                });
+            };
+            
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const scheme = document.getElementById('selected-tax-scheme').value;
+                await fetch(`${API_BASE}/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'tax_scheme', value: scheme })
+                });
+                systemSettings.tax_scheme = scheme;
+                closeGenericModal();
+                showToast('Tax Setup saved: ' + scheme);
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        function openTaxOptionModal(id, desc, pct) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = id ? 'Edit Tax Option' : 'New Tax Option';
             
             body.innerHTML = `
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     <div>
-                        <label class="form-label">Tax Name / Label</label>
-                        <input type="text" id="tax-name-input" class="form-input" value="${escapeHtml(data.taxName)}" placeholder="e.g. VAT, GST">
+                        <label class="form-label">Description</label>
+                        <input type="text" id="taxopt-desc" class="form-input" value="${escapeHtml((desc || '').trim())}" placeholder="enter name...">
                     </div>
                     <div>
-                        <label class="form-label">Default Tax Rate (%)</label>
-                        <input type="number" step="0.001" id="tax-rate-input" class="form-input" value="${data.defaultRate}">
-                    </div>
-                    <div>
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="tax-inclusive-input" ${data.inclusive ? 'checked' : ''}>
-                            Tax is inclusive in rates by default
-                        </label>
+                        <label class="form-label">%</label>
+                        <input type="number" step="0.001" id="taxopt-pct" class="form-input" style="width:80px;" value="${(pct || '').toString().trim() || '0'}">
                     </div>
                 </div>
             `;
-            
+
             document.getElementById('modal-save-btn').onclick = async () => {
-                const config = {
-                    taxName: document.getElementById('tax-name-input').value.trim() || 'VAT',
-                    defaultRate: parseFloat(document.getElementById('tax-rate-input').value) || 0,
-                    inclusive: document.getElementById('tax-inclusive-input').checked
-                };
-                
-                await fetch('/api/settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key: 'tax_settings', value: config })
-                });
-                
+                const d = document.getElementById('taxopt-desc').value.trim();
+                const p = parseFloat(document.getElementById('taxopt-pct').value) || 0;
+                if (!d) { alert('Please enter a description.'); return; }
+                const nameVal = JSON.stringify({ desc: d, pct: p });
+
+                if (id) {
+                    await fetch(`${API_BASE}/lookups/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: nameVal })
+                    });
+                } else {
+                    await fetch(`${API_BASE}/lookups`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'tax_option', name: nameVal })
+                    });
+                }
                 await loadAllData();
                 closeGenericModal();
-                showToast("Global Tax Settings saved successfully");
+                renderTabContent(activeTab);
+                showToast('Tax option saved.');
             };
-            
+
             modal.style.display = 'flex';
         }
 
