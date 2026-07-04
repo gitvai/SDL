@@ -2124,10 +2124,10 @@ app.get('/api/lookups', async (req, res) => {
 
 app.post('/api/lookups', async (req, res) => {
   try {
-    const { type, name } = req.body;
+    const { type, name, value } = req.body;
     if (!type || !name) return res.status(400).json({ error: 'Type and name are required' });
     const lookup = await prisma.settingLookup.create({
-      data: { type, name }
+      data: { type, name, value }
     });
     res.status(201).json(lookup);
   } catch (error) {
@@ -2138,11 +2138,10 @@ app.post('/api/lookups', async (req, res) => {
 app.put('/api/lookups/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ error: 'Name is required' });
+    const { name, value } = req.body;
     const lookup = await prisma.settingLookup.update({
       where: { id },
-      data: { name }
+      data: { name, value }
     });
     res.json(lookup);
   } catch (error) {
@@ -2458,10 +2457,10 @@ app.get('/api/lookups', async (req, res) => {
 
 app.post('/api/lookups', async (req, res) => {
   try {
-    const { type, name } = req.body;
+    const { type, name, value } = req.body;
     if (!type || !name) return res.status(400).json({ error: 'Missing type or name' });
     const lookup = await prisma.settingLookup.create({
-      data: { type, name }
+      data: { type, name, value }
     });
     res.status(201).json(lookup);
   } catch (error) {
@@ -2472,10 +2471,10 @@ app.post('/api/lookups', async (req, res) => {
 app.put('/api/lookups/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name } = req.body;
+    const { name, value } = req.body;
     const lookup = await prisma.settingLookup.update({
       where: { id },
-      data: { name }
+      data: { name, value }
     });
     res.json(lookup);
   } catch (error) {
