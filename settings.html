@@ -1705,14 +1705,16 @@
                             <label class="form-label">Scan Final Delivery</label>
                             <select id="logistics-scanFinal" class="form-select">
                                 <option ${data.scanFinal==='Not Required'?'selected':''}>Not Required</option>
-                                <option ${data.scanFinal==='Barcode Required'?'selected':''}>Barcode Required</option>
+                                <option ${data.scanFinal==='Scan Shipment barcode'?'selected':''}>Scan Shipment barcode</option>
+                                <option ${data.scanFinal==='Scan Individual Orders barcode'?'selected':''}>Scan Individual Orders barcode</option>
                             </select>
                         </div>
                         <div>
                             <label class="form-label">Scan TryIn Delivery</label>
                             <select id="logistics-scanTryin" class="form-select">
                                 <option ${data.scanTryin==='Not Required'?'selected':''}>Not Required</option>
-                                <option ${data.scanTryin==='Barcode Required'?'selected':''}>Barcode Required</option>
+                                <option ${data.scanTryin==='Scan Shipment barcode'?'selected':''}>Scan Shipment barcode</option>
+                                <option ${data.scanTryin==='Scan Individual Orders barcode'?'selected':''}>Scan Individual Orders barcode</option>
                             </select>
                         </div>
                         <div style="margin-top:10px;">
