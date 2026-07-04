@@ -3074,7 +3074,7 @@
                 <div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Suppliers</h2>
-                        <button class="btn-primary-settings" onclick="openLookupModal('supplier', 'Supplier')">New</button>
+                        <button class="btn-primary-settings" onclick="openAccountLookupModal('supplier', 'Supplier')">New</button>
                     </div>
                     <div style="margin-bottom:15px;">
                         <input type="text" id="supplier-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterSuppliersTable()">
@@ -3117,7 +3117,7 @@
                         <td>${idx + 1}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td style="text-align:center;">
-                            <button class="btn-sm edit" onclick="openLookupModal('supplier', 'Supplier', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm edit" onclick="openAccountLookupModal('supplier', 'Supplier', ${item.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                         </td>
                     </tr>
@@ -3711,7 +3711,7 @@
                 <div style="display:flex; flex-direction:column; gap:12px; max-height: 480px; overflow-y: auto; padding-right: 5px;">
                     <div>
                         <label class="form-label">Name</label>
-                        <input type="text" id="acc-name" class="form-input" value="${escapeHtml(lookup ? lookup.name : '')}">
+                        <input type="text" id="acc-name" class="form-input" placeholder="enter name..." value="${escapeHtml(lookup ? lookup.name : '')}">
                     </div>
                     <div style="display:flex; gap:12px;">
                         <div style="flex:1;">
