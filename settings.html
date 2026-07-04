@@ -637,6 +637,9 @@
         let activeTab = 'lab';
         let activeLab = 'SOHAR DENTAL LABORATORY';
         
+        let activeProductTypeTryins = [];
+        let activeShadeGuideShades = [];
+        
         // Define subtabs configuration
         const subTabsConfig = {
             lab: [
@@ -963,7 +966,7 @@
                                     <td>${idx + 1}</td>
                                     <td id="lookup-name-td-${item.id}">${escapeHtml(item.name)}</td>
                                     <td style="text-align: center;">
-                                        ${type === 'shade_guide' ? `<button class="btn-sm" style="background:#3b82f6; color:#fff; margin-right:5px;" onclick="openShadeGuideEditModal(${item.id})">Edit</button>` : ''}
+                                        ${type === 'shade_guide' ? ('<button class="btn-sm" style="background:#3b82f6; color:#fff; margin-right:5px;" onclick="openShadeGuideEditModal(' + item.id + ')">Edit</button>') : ''}
                                         <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                                     </td>
                                 </tr>
@@ -3955,7 +3958,6 @@
             `;
         }
 
-        let activeProductTypeTryins = [];
 
         window.toggleTryinListState = function(checked) {
             const addContainer = document.getElementById('m-add-tryin-container');
@@ -4021,7 +4023,6 @@
             wrapper.innerHTML = html;
         };
 
-        let activeShadeGuideShades = [];
 
         window.openShadeGuideEditModal = function(id) {
             const modal = document.getElementById('generic-modal');
