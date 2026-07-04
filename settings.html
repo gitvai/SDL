@@ -3487,12 +3487,12 @@
             // expose selectTaxScheme globally
             window.selectTaxScheme = function(s) {
                 document.getElementById('selected-tax-scheme').value = s;
-                const descs = ${JSON.stringify({
+                const descs = {
                     'GST': 'Your lab is registered under GST and charges tax on invoices.',
                     'Composition Scheme': 'Your lab is under GST Composition Scheme (lower fixed rate).',
                     'No GST': 'Your lab is based in India and has a turnover less than Rs. 20L',
                     'Not Applicable': 'Tax is not applicable to your lab (e.g., outside India).'
-                })};
+                };
                 document.getElementById('tax-scheme-desc').textContent = descs[s] || '';
                 const colors = { 'GST':'#2563eb','Composition Scheme':'#7c3aed','No GST':'#dc2626','Not Applicable':'#059669' };
                 ['GST','Composition Scheme','No GST','Not Applicable'].forEach((opt, i) => {
