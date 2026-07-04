@@ -3195,12 +3195,19 @@
             }
 
             filtered.forEach((item, idx) => {
+                let unitDisp = item.unit || '';
+                if (unitDisp.startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(unitDisp);
+                        unitDisp = parsed.stdUnit || parsed.unit || '';
+                    } catch(e) {}
+                }
                 tbody.innerHTML += `
                     <tr>
                         <td>${idx + 1}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td>${escapeHtml(item.category || '')}</td>
-                        <td>${item.stock} ${escapeHtml(item.unit || '')}</td>
+                        <td>${item.stock} ${escapeHtml(unitDisp)}</td>
                         <td>${item.minStock || 0}</td>
                         <td style="text-align:center;">
                             <button class="btn-sm edit" onclick="openMaterialModal(${item.id})">Edit</button>
@@ -4708,46 +4715,136 @@
             const title = document.getElementById('modal-title');
             const body = document.getElementById('modal-body');
             
-            const item = id ? materialsList.find(m => m.id === id) : { name: '', category: '', stock: 0, unit: 'pcs', minStock: 0 };
+            // Adjust modal width for wide form layout
+            const content = modal.querySelector('.settings-modal-content');
+            if (content) {
+                content.style.position = 'relative';
+                content.style.width = '680px';
+                content.style.maxWidth = '90%';
+            }
+
+            const item = id ? materialsList.find(m => m.id === id) : { name: '', category: '', stock: 0, unit: '', minStock: 0 };
             title.textContent = id ? 'Edit Inventory Item' : 'New Inventory Item';
             
+            let extra = {
+                version: '',
+                code: '',
+                favourite: false,
+                purchaseUnit: '',
+                stdUnit: 'pc',
+                purchaseRate: 0,
+                retailPrice: 0,
+                taxPercent: 0,
+                prefSupplier: '',
+                comments: ''
+            };
+            
+            if (item && item.unit && item.unit.startsWith('{')) {
+                try {
+                    extra = { ...extra, ...JSON.parse(item.unit) };
+                } catch(e) {}
+            } else if (item && item.unit) {
+                extra.stdUnit = item.unit;
+            }
+
             body.innerHTML = `
-                <div class="settings-form-grid">
-                    <div class="form-group-full">
-                        <label class="form-label">Item Name</label>
-                        <input type="text" id="mat-name" class="form-input" value="${escapeHtml(item.name)}">
+                <div style="display:flex; flex-direction:column; gap:12px; max-height: 480px; overflow-y: auto; padding-right: 5px;">
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:2;">
+                            <label class="form-label">Description</label>
+                            <input type="text" id="mat-name" class="form-input" value="${escapeHtml(item.name)}">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Product Version</label>
+                            <input type="text" id="mat-version" class="form-input" value="${escapeHtml(extra.version)}">
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Category</label>
-                        <select id="mat-cat" class="form-select">
-                            ${lookupsList.filter(l => l.type==='stock_category').map(c => `<option value="${escapeHtml(c.name)}" ${item.category===c.name?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
-                        </select>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <div style="flex:2;">
+                            <label class="form-label">Category</label>
+                            <select id="mat-cat" class="form-select">
+                                <option value=""></option>
+                                ${lookupsList.filter(l => l.type==='stock_category').map(c => `<option value="${escapeHtml(c.name)}" ${item.category===c.name?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Code</label>
+                            <input type="text" id="mat-code" class="form-input" value="${escapeHtml(extra.code)}">
+                        </div>
+                        <div style="flex:1; display:flex; align-items:center; margin-top:20px;">
+                            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:13px; cursor:pointer;">
+                                <input type="checkbox" id="mat-favourite" ${extra.favourite?'checked':''}> Favourite
+                            </label>
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Stock Unit</label>
-                        <input type="text" id="mat-unit" class="form-input" placeholder="e.g. pcs, kg, box" value="${escapeHtml(item.unit || 'pcs')}">
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:1;">
+                            <label class="form-label">Purchase Unit</label>
+                            <input type="text" id="mat-purchaseUnit" class="form-input" value="${escapeHtml(extra.purchaseUnit)}">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Std Unit</label>
+                            <input type="text" id="mat-stdUnit" class="form-input" value="${escapeHtml(extra.stdUnit)}">
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Opening Stock</label>
-                        <input type="number" id="mat-stock" class="form-input" value="${item.stock || 0}">
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:1;">
+                            <label class="form-label">Purchase Rate</label>
+                            <input type="number" id="mat-purchaseRate" class="form-input" value="${extra.purchaseRate}">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Retail Price</label>
+                            <input type="number" id="mat-retailPrice" class="form-input" value="${extra.retailPrice}">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Reorder Level</label>
+                            <input type="number" id="mat-minStock" class="form-input" value="${item.minStock || 0}">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Tax %</label>
+                            <input type="number" id="mat-taxPercent" class="form-input" value="${extra.taxPercent}">
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Min. Stock Alert Limit</label>
-                        <input type="number" id="mat-minStock" class="form-input" value="${item.minStock || 0}">
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:1;">
+                            <label class="form-label">Preferred Supplier</label>
+                            <select id="mat-supplier" class="form-select">
+                                <option value=""></option>
+                                ${lookupsList.filter(l => l.type==='supplier').map(s => `<option value="${escapeHtml(s.name)}" ${extra.prefSupplier===s.name?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <label class="form-label">Comments</label>
+                            <input type="text" id="mat-comments" class="form-input" value="${escapeHtml(extra.comments)}">
+                        </div>
                     </div>
                 </div>
             `;
 
             document.getElementById('modal-save-btn').onclick = async () => {
-                const data = {
-                    name: document.getElementById('mat-name').value.trim(),
-                    category: document.getElementById('mat-cat').value,
-                    unit: document.getElementById('mat-unit').value.trim(),
-                    stock: parseFloat(document.getElementById('mat-stock').value) || 0,
-                    minStock: parseFloat(document.getElementById('mat-minStock').value) || 0
+                const name = document.getElementById('mat-name').value.trim();
+                if (!name) return;
+
+                const payload = {
+                    version: document.getElementById('mat-version').value.trim(),
+                    code: document.getElementById('mat-code').value.trim(),
+                    favourite: document.getElementById('mat-favourite').checked,
+                    purchaseUnit: document.getElementById('mat-purchaseUnit').value.trim(),
+                    stdUnit: document.getElementById('mat-stdUnit').value.trim(),
+                    purchaseRate: parseFloat(document.getElementById('mat-purchaseRate').value) || 0,
+                    retailPrice: parseFloat(document.getElementById('mat-retailPrice').value) || 0,
+                    taxPercent: parseFloat(document.getElementById('mat-taxPercent').value) || 0,
+                    prefSupplier: document.getElementById('mat-supplier').value,
+                    comments: document.getElementById('mat-comments').value.trim()
                 };
 
-                if (!data.name) return;
+                const data = {
+                    name,
+                    category: document.getElementById('mat-cat').value,
+                    unit: JSON.stringify(payload),
+                    minStock: parseFloat(document.getElementById('mat-minStock').value) || 0,
+                    stock: item.stock || 0
+                };
 
                 if (id) {
                     await fetch(`${API_BASE}/materials/${id}`, {
