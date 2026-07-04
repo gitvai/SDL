@@ -79,7 +79,8 @@
     
 
 
-        const API_BASE = (window.location.protocol === 'file:') ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
         let currentMode = 'invoices';
         let currentAdjustmentType = 'Credit';
         let currentEditingReceiptId = null;

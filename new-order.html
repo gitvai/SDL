@@ -467,7 +467,7 @@
 
     <script>
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || (isLocalhost && window.location.port !== '5000')) ? 'https://sdl-backend-l5r2.onrender.com/api' : window.location.origin + '/api';
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
         const JOB_COLORS = ['#ec4899', '#9f1239', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316'];
         let allClients = [];
         let selectedClientId = null;
