@@ -3807,10 +3807,13 @@
             const currentCategory = item.category || 'Acrylic';
             const currentColor = item.color || '#ec4899';
             
-            let tryinData = { useDefault: true, list: ["Try-In", "Special Tray", "Wax Test", "Setting Trial"] };
+            let tryinData = { useDefault: true, list: ["Wax Trial", "Metal/Coping Trial", "Bisque Trial"] };
             if (item.tryins) {
                 try { tryinData = JSON.parse(item.tryins); } catch(e) {}
             }
+            
+            // Set global active try-ins list for the view
+            activeProductTypeTryins = tryinData.list || [];
             
             const defaultOptions = [
                 { name: "Restoration Type", defaultValue: "Crown", status: "Hide", labSlip: false },
@@ -3882,21 +3885,28 @@
                     </div>
                     
                     <div style="border:1px solid #e5e7eb; border-radius:6px; padding:12px; background:#f9fafb;">
-                        <div style="font-weight:700; margin-bottom:8px; color:#1f2937;">Try Ins</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <div style="font-weight:700; color:#1f2937;">Try Ins</div>
+                            <div id="m-add-tryin-container" style="${tryinData.useDefault ? 'display:none;' : 'display:flex; align-items:center; gap:6px;'}">
+                                <span style="font-weight:600; color:#374151;">Add TryIn</span>
+                                <select id="m-add-tryin-select" class="form-select" style="padding:2px 6px; font-size:12px; width:140px;" onchange="addProductTypeTryin(this.value)">
+                                    <option value="">-- select --</option>
+                                    <option value="Try-In">Try-In</option>
+                                    <option value="Special Tray">Special Tray</option>
+                                    <option value="Metal/Coping Trial">Metal/Coping Trial</option>
+                                    <option value="Record Base">Record Base</option>
+                                    <option value="Setting Trial">Setting Trial</option>
+                                    <option value="Wax Test">Wax Test</option>
+                                    <option value="Bisque Trial">Bisque Trial</option>
+                                </select>
+                            </div>
+                        </div>
                         <label class="checkbox-container" style="margin-bottom:8px; display:inline-flex; align-items:center; gap:6px;">
                             <input type="checkbox" id="m-use-default-tryins" ${tryinData.useDefault ? 'checked' : ''} onchange="toggleTryinListState(this.checked)">
                             Use Default Tryins
                         </label>
-                        <div id="m-tryin-list" style="display:flex; flex-direction:column; gap:6px; padding-left:20px; ${tryinData.useDefault ? 'opacity:0.6; pointer-events:none;' : ''}">
-                            ${["Try-In", "Special Tray", "Wax Test", "Setting Trial"].map((t, idx) => {
-                                const isChecked = tryinData.list ? tryinData.list.includes(t) : true;
-                                return `
-                                    <label class="checkbox-container" style="display:flex; align-items:center; gap:6px;">
-                                        <input type="checkbox" class="tryin-item-chk" value="${t}" ${isChecked ? 'checked' : ''}>
-                                        ${idx + 1}. ${t}
-                                    </label>
-                                `;
-                            }).join('')}
+                        <div id="m-tryins-table-wrapper" style="margin-top:8px;">
+                            <!-- Dynamically loaded table of Try-ins -->
                         </div>
                     </div>
                     
@@ -3944,12 +3954,70 @@
             `;
         }
 
+        let activeProductTypeTryins = [];
+
         window.toggleTryinListState = function(checked) {
-            const list = document.getElementById('m-tryin-list');
-            if (list) {
-                list.style.opacity = checked ? '0.6' : '1';
-                list.style.pointerEvents = checked ? 'none' : 'auto';
+            const addContainer = document.getElementById('m-add-tryin-container');
+            if (addContainer) {
+                addContainer.style.display = checked ? 'none' : 'flex';
             }
+            if (checked) {
+                activeProductTypeTryins = ["Wax Trial", "Metal/Coping Trial", "Bisque Trial"];
+            }
+            renderProductTypeTryinsTable();
+        };
+
+        window.addProductTypeTryin = function(val) {
+            if (!val) return;
+            if (!activeProductTypeTryins.includes(val)) {
+                activeProductTypeTryins.push(val);
+                renderProductTypeTryinsTable();
+            }
+            document.getElementById('m-add-tryin-select').value = '';
+        };
+
+        window.removeProductTypeTryin = function(val) {
+            activeProductTypeTryins = activeProductTypeTryins.filter(t => t !== val);
+            renderProductTypeTryinsTable();
+        };
+
+        window.renderProductTypeTryinsTable = function() {
+            const wrapper = document.getElementById('m-tryins-table-wrapper');
+            if (!wrapper) return;
+            
+            const useDefault = document.getElementById('m-use-default-tryins').checked;
+            
+            if (activeProductTypeTryins.length === 0) {
+                wrapper.innerHTML = `<div style="text-align:center; color:#999; padding:10px; font-size:12px;">No try-ins added.<br>Select one from the dropdown to add.</div>`;
+                return;
+            }
+            
+            let html = `
+                <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+                    <thead>
+                        <tr style="border-bottom:1px solid #ccc; background:#f3f4f6;">
+                            <th style="padding:4px; width:40px;">#</th>
+                            <th style="padding:4px;">TryIn</th>
+                            ${!useDefault ? '<th style="padding:4px; width:60px; text-align:center;">Delete</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            activeProductTypeTryins.forEach((t, idx) => {
+                html += `
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:4px;">${idx + 1}</td>
+                        <td style="padding:4px; font-weight:600;">${escapeHtml(t)}</td>
+                        ${!useDefault ? `
+                            <td style="padding:4px; text-align:center;">
+                                <span style="color:#2563eb; font-weight:bold; cursor:pointer; font-size:14px;" onclick="removeProductTypeTryin('${escapeHtml(t).replace(/'/g, "\\'")}')">✖</span>
+                            </td>
+                        ` : ''}
+                    </tr>
+                `;
+            });
+            html += `</tbody></table>`;
+            wrapper.innerHTML = html;
         };
 
         // Product Types Modal Form
@@ -3962,25 +4030,25 @@
             title.textContent = id ? 'Edit Product Type' : 'New Product Type';
             
             body.innerHTML = getProductOrTypeFormHtml(type, false);
-
+            renderProductTypeTryinsTable();
+ 
             const content = modal.querySelector('.settings-modal-content');
             if (content) {
                 content.style.width = '700px';
                 content.style.maxWidth = '95%';
             }
-
+ 
             document.getElementById('modal-save-btn').onclick = async () => {
                 const name = document.getElementById('m-name').value.trim();
                 if (!name) return;
-
+ 
                 const category = document.getElementById('m-category').value;
                 const color = document.getElementById('m-color').value;
                 
                 const useDefault = document.getElementById('m-use-default-tryins').checked;
-                const tryinCheckboxes = document.querySelectorAll('.tryin-item-chk:checked');
-                const tryinsList = Array.from(tryinCheckboxes).map(c => c.value);
+                const tryinsList = useDefault ? ["Wax Trial", "Metal/Coping Trial", "Bisque Trial"] : activeProductTypeTryins;
                 const tryins = JSON.stringify({ useDefault, list: tryinsList });
-
+ 
                 const optRows = document.querySelectorAll('.opt-row-data');
                 const optionsList = Array.from(optRows).map(row => ({
                     name: row.dataset.name,
@@ -3989,7 +4057,7 @@
                     labSlip: row.querySelector('.opt-labslip-chk').checked
                 }));
                 const options = JSON.stringify(optionsList);
-
+ 
                 const payload = { name, category, color, tryins, options };
 
                 if (id) {
