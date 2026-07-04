@@ -1351,13 +1351,12 @@
         // Payment Modes Tab
         function renderPaymentModesTab() {
             const panel = document.getElementById('tab-content-panel');
-            const modes = lookupsList.filter(l => l.type === 'payment_mode');
 
             panel.innerHTML = `
-                <div style="max-width: 600px;">
+                <div style="max-width: 640px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <h2 style="font-size:18px; font-weight:700; color:#1f2937; margin:0;">Payment Modes</h2>
-                        <button class="btn-primary-settings" onclick="openLookupModal('payment_mode', 'Payment Mode')">New</button>
+                        <button class="btn-primary-settings" onclick="openPaymentModeModal(null)">New</button>
                     </div>
                     <div style="margin-bottom:15px;">
                         <input type="text" id="paymentmode-search" class="form-input" style="width:200px;" placeholder="enter filter text" oninput="filterPaymentModesTable()">
@@ -1365,9 +1364,12 @@
                     <table class="settings-table">
                         <thead>
                             <tr>
-                                <th style="width:50px;">Sr</th>
-                                <th>Name</th>
-                                <th style="width:140px; text-align:center;">Actions</th>
+                                <th style="width:40px;">Sr</th>
+                                <th>Description</th>
+                                <th style="width:110px;">Type</th>
+                                <th style="width:120px;">Related Account</th>
+                                <th style="width:80px;">Access</th>
+                                <th style="width:120px; text-align:center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="paymentmodes-tbody">
@@ -1381,26 +1383,41 @@
 
         function loadPaymentModesTable() {
             const tbody = document.getElementById('paymentmodes-tbody');
-            const search = document.getElementById('paymentmode-search').value.toLowerCase();
+            if (!tbody) return;
+            const search = (document.getElementById('paymentmode-search') || {}).value || '';
+            const searchVal = search.toLowerCase();
             tbody.innerHTML = '';
             
             let filtered = lookupsList.filter(l => l.type === 'payment_mode');
-            if (search) {
-                filtered = filtered.filter(l => l.name.toLowerCase().includes(search));
+            if (searchVal) {
+                filtered = filtered.filter(l => {
+                    try { const d = JSON.parse(l.name); return (d.desc || l.name).toLowerCase().includes(searchVal); } catch(e) { return l.name.toLowerCase().includes(searchVal); }
+                });
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">No payment modes found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">No payment modes found.</td></tr>`;
                 return;
             }
 
             filtered.forEach((item, idx) => {
+                let desc = item.name, pmType = '-', relAccount = '-', access = '-';
+                try {
+                    const d = JSON.parse(item.name);
+                    desc = d.desc || item.name;
+                    pmType = d.type || '-';
+                    relAccount = d.relAccount || '-';
+                    access = d.access || '-';
+                } catch(e) {}
                 tbody.innerHTML += `
                     <tr>
                         <td>${idx + 1}</td>
-                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(desc)}</td>
+                        <td>${escapeHtml(pmType)}</td>
+                        <td>${escapeHtml(relAccount)}</td>
+                        <td>${escapeHtml(access)}</td>
                         <td style="text-align:center;">
-                            <button class="btn-sm edit" onclick="openLookupModal('payment_mode', 'Payment Mode', ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">Edit</button>
+                            <button class="btn-sm edit" onclick="openPaymentModeModal(${item.id})">Edit</button>
                             <button class="btn-sm delete" onclick="deleteLookupItem(${item.id})">Delete</button>
                         </td>
                     </tr>
@@ -1410,6 +1427,85 @@
 
         function filterPaymentModesTable() {
             loadPaymentModesTable();
+        }
+
+        function openPaymentModeModal(id) {
+            const modal = document.getElementById('generic-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            let existingData = { desc: '', type: 'Cash', relAccount: '', access: 'Edit' };
+            if (id) {
+                const item = lookupsList.find(l => l.id === id);
+                if (item) {
+                    try { Object.assign(existingData, JSON.parse(item.name)); } catch(e) { existingData.desc = item.name; }
+                }
+            }
+
+            title.textContent = id ? 'Edit Payment Mode' : 'New Payment Mode';
+
+            const typeOptions = ['Cash', 'Cheque', 'Bank Transfer', 'Credit Card', 'Debit Card', 'UPI', 'Online', 'Other'];
+            const accountOptions = ['None', 'Bank a/c', 'Cash a/c', 'Petty Cash', 'Wallet'];
+            const accessOptions = ['Edit', 'View Only', 'No Access'];
+
+            body.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div>
+                        <label class="form-label" style="color:#2563eb; font-size:12px; font-weight:600;">Description</label>
+                        <input type="text" id="pm-desc" class="form-input" value="${escapeHtml(existingData.desc)}" placeholder="enter name...">
+                    </div>
+                    <div>
+                        <label class="form-label" style="color:#374151; font-size:12px; font-weight:600;">Type</label>
+                        <select id="pm-type" class="form-select" style="width:160px;">
+                            ${typeOptions.map(o => `<option value="${o}" ${existingData.type === o ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label" style="color:#374151; font-size:12px; font-weight:600;">Related Account</label>
+                        <select id="pm-rel-account" class="form-select" style="width:160px;">
+                            ${accountOptions.map(o => `<option value="${o}" ${existingData.relAccount === o ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label" style="color:#374151; font-size:12px; font-weight:600;">Related Account Access</label>
+                        <select id="pm-access" class="form-select" style="width:160px;">
+                            ${accessOptions.map(o => `<option value="${o}" ${existingData.access === o ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-save-btn').onclick = async () => {
+                const d = document.getElementById('pm-desc').value.trim();
+                if (!d) { alert('Please enter a description.'); return; }
+                const payload = {
+                    desc: d,
+                    type: document.getElementById('pm-type').value,
+                    relAccount: document.getElementById('pm-rel-account').value,
+                    access: document.getElementById('pm-access').value
+                };
+                const nameVal = JSON.stringify(payload);
+
+                if (id) {
+                    await fetch(`${API_BASE}/lookups/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: nameVal })
+                    });
+                } else {
+                    await fetch(`${API_BASE}/lookups`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'payment_mode', name: nameVal })
+                    });
+                }
+                await loadAllData();
+                closeGenericModal();
+                renderTabContent(activeTab);
+                showToast('Payment mode saved.');
+            };
+
+            modal.style.display = 'flex';
         }
 
         // Product Types Tab
