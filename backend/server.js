@@ -488,7 +488,7 @@ app.post('/api/orders', async (req, res) => {
       cleanData.units = toNum(firstJob.units) || 1;
       cleanData.price = toNum(firstJob.price) || toNum(firstJob.rate) || 0;
     } else if (cleanData.productName) {
-      const uRate = toNum(req.body.unitRate) || (cleanData.units ? (toNum(cleanData.price) / cleanData.units) : toNum(cleanData.price)) || 0;
+      const uRate = toNum(req.body.unitRate) || toNum(cleanData.price) || 0;
       cleanData.jobs = {
         create: [{
           productType: cleanData.productType || 'General',
@@ -528,7 +528,7 @@ app.post('/api/orders', async (req, res) => {
         }
       }
     } else if (cleanData.productName && (req.body.unitRate !== undefined || cleanData.price !== undefined)) {
-       const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : (cleanData.units ? (Number(cleanData.price) / cleanData.units) : Number(cleanData.price));
+       const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : Number(cleanData.price);
        await prisma.product.updateMany({
          where: { name: cleanData.productName },
          data: { charge: pCharge || 0 }
@@ -724,7 +724,7 @@ app.put('/api/orders/:id', async (req, res) => {
         shadeNotes: cleanData.shadeNotes !== undefined ? cleanData.shadeNotes : existingOrder.shadeNotes,
         stumpShade: cleanData.stumpShade !== undefined ? cleanData.stumpShade : existingOrder.stumpShade,
         units: finalUnits,
-        price: toNum(req.body.unitRate) || (finalUnits ? (finalPrice / finalUnits) : finalPrice) || 0,
+        price: toNum(req.body.unitRate) || finalPrice || 0,
         totalAmount: finalPrice,
         slab1Rate: cleanData.slab1Rate !== undefined ? cleanData.slab1Rate : existingOrder.slab1Rate,
         slab2Rate: cleanData.slab2Rate !== undefined ? cleanData.slab2Rate : existingOrder.slab2Rate,
@@ -757,7 +757,7 @@ app.put('/api/orders/:id', async (req, res) => {
           }
         }
     } else if (cleanData.productName && (req.body.unitRate !== undefined || cleanData.price !== undefined)) {
-         const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : (cleanData.units ? (Number(cleanData.price) / cleanData.units) : Number(cleanData.price));
+         const pCharge = req.body.unitRate !== undefined ? Number(req.body.unitRate) : Number(cleanData.price);
          await prisma.product.updateMany({
            where: { name: cleanData.productName },
            data: { charge: pCharge || 0 }

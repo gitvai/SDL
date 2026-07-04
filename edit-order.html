@@ -1142,9 +1142,8 @@
                     document.getElementById('product-selection-area').style.display = 'block';
                     document.getElementById('teeth-selection-area').style.display = 'none';
                 } else {
-                    // Single product order: populate the single product selection view
-                    // Derive unit rate from the job's price (which stores unit rate) or fallback to order.price/order.units
-                    const derivedUnitRate = (order.jobs && order.jobs.length > 0) ? order.jobs[0].price : (order.units ? (order.price / order.units) : 0);
+                    // Use saved unitRate first (the correct per-unit price), then fallback to jobs[0].price, avoid dividing total by units
+                    const derivedUnitRate = (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : ((order.jobs && order.jobs.length > 0) ? order.jobs[0].price : 0);
                     if (order.productName) {
                         document.getElementById('selected-product-name').textContent = order.productName;
                         selectedProduct = { name: order.productName, type: order.productType || 'General', charge: derivedUnitRate };
@@ -1158,7 +1157,7 @@
                     if (slabsContainer) {
                         slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
                     }
-                    const stdRate = (order.slab1Rate !== null && order.slab1Rate !== undefined) ? order.slab1Rate : (order.units ? (order.price / order.units) : 17);
+                    const stdRate = (order.slab1Rate !== null && order.slab1Rate !== undefined) ? order.slab1Rate : (order.unitRate || 17);
                     const s1 = document.getElementById('slab1-rate');
                     if (s1) s1.value = stdRate;
 

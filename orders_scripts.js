@@ -1354,7 +1354,7 @@ Products: ${products.join(' | ')}
                         productType: order.productType || 'General',
                         teethSelection: order.teethSelection || '',
                         units: order.units || 1,
-                        price: (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : (order.units ? (order.totalAmount / order.units) : 0),
+                        price: (order.unitRate !== undefined && order.unitRate !== null) ? order.unitRate : ((order.jobs && order.jobs.length > 0) ? order.jobs[0].price : 0),
                         totalAmount: order.totalAmount || 0,
                         slab1Rate: order.slab1Rate,
                         slab2Rate: order.slab2Rate,
@@ -1392,7 +1392,7 @@ Products: ${products.join(' | ')}
                 const slabProducts = ['RPD', 'FLEXIBLE RPD', 'CAST PARTIAL', 'RPD REPAIR AND ADD TEETH'];
                 const pName = (order.productName || '').toUpperCase();
                 const pType = (order.productType || '').toUpperCase();
-                const isSlabProduct = slabProducts.some(sp => pName.includes(sp) || pType.includes(sp));
+                const isSlabProduct = slabProducts.includes(pName) || (pName.includes('RPD') && pName !== 'AAA');
                 const isSpecialRpd = pName === 'RPD' || pName.includes('FLEXIBLE RPD') || pName.includes('PARTIAL RPD');
                 if (slabsContainer) {
                     slabsContainer.style.display = isSlabProduct ? 'block' : 'none';
