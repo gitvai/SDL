@@ -1833,9 +1833,22 @@ app.get('/api/materials', async (req, res) => {
 
 app.post('/api/materials', async (req, res) => {
   try {
-    const data = { ...req.body };
-    data.stock = toNum(data.stock) || 0;
-    data.minStock = toNum(data.reorderLevel) || toNum(data.minStock) || 0;
+    const body = req.body;
+    const data = {
+      name: body.name,
+      category: body.category,
+      stock: toNum(body.stock) || 0,
+      unit: body.unit || body.stdUnit || 'pc',
+      minStock: toNum(body.reorderLevel) || toNum(body.minStock) || 0,
+      code: body.code || null,
+      version: body.version || null,
+      favourite: !!body.favourite,
+      purchaseUnit: body.purchaseUnit || null,
+      stdUnit: body.stdUnit || null,
+      purchaseRate: toNum(body.purchaseRate) || 0,
+      retailPrice: toNum(body.retailPrice) || 0,
+      taxPercent: toNum(body.taxPercent) || 0
+    };
     const material = await prisma.material.create({ data });
     res.status(201).json(material);
   } catch (error) { res.status(500).json({ error: error.message }); }
