@@ -422,3 +422,17 @@ model SettingLookup {
   value     String?
   createdAt DateTime @default(now())
 }
+
+model DropdownOption {
+  id            Int      @id @default(autoincrement())
+  page          String   // page/module name (e.g. "Order", "Shipment", "Account")
+  dropdownKey   String   // unique dropdown key
+  dropdownLabel String   // human-readable label of the dropdown
+  optionLabel   String   // displayed label of the option
+  optionValue   String   // internal value of the option
+  sortOrder     Int      @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+

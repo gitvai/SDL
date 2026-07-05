@@ -291,10 +291,6 @@
                             <div style="display: grid; grid-template-columns: 160px 1fr; gap: 15px; align-items: center; margin-bottom: 12px;">
                                 <label style="font-size: 14px; font-weight: 500; color: #4b5563;">Payment Mode</label>
                                 <select id="inline-exp-method" style="width: 180px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; background: white; font-size: 14px; color: #111827;">
-                                    <option>Cash</option>
-                                    <option>Bank Transfer</option>
-                                    <option>UPI</option>
-                                    <option>Cheque</option>
                                 </select>
                             </div>
                             <div style="display: grid; grid-template-columns: 160px 1fr; gap: 15px; align-items: center; margin-bottom: 12px;">
@@ -393,9 +389,6 @@
                                         <div>
                                             <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Document Type</label>
                                             <select id="inward-doc-type" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
-                                                <option>Purchase</option>
-                                                <option>Return</option>
-                                                <option>Opening Balance</option>
                                             </select>
                                         </div>
                                         <div>
@@ -583,9 +576,6 @@
                                         <div>
                                             <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Document Type</label>
                                             <select id="outward-doc-type" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
-                                                <option>Consumption</option>
-                                                <option>Issued</option>
-                                                <option>Damaged</option>
                                             </select>
                                         </div>
                                         <div>
@@ -701,9 +691,6 @@
                                 <div>
                                     <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Document Type</label>
                                     <select id="scan-out-doc-type" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
-                                        <option>Consumption</option>
-                                        <option>Issued</option>
-                                        <option>Damaged</option>
                                     </select>
                                 </div>
                                 <div>
@@ -846,7 +833,7 @@
 
     <script>
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
 
         let currentStockFilter = 'All';
         function setStockFilter(filter, btn) {
@@ -2250,8 +2237,39 @@
             closeAddItemModal();
         }
 
+        async function initDropdowns() {
+            try {
+                await Promise.all([
+                    window.populateDropdown('inward_doc_type', 'inward-doc-type', 'Purchase'),
+                    window.populateDropdown('outward_doc_type', 'outward-doc-type', 'Consumption'),
+                    window.populateDropdown('outward_doc_type', 'scan-out-doc-type', 'Consumption'),
+                    window.populateDropdown('expense_method', 'inline-exp-method', 'Cash'),
+                    window.populateDropdown('expense_category', 'exp-category', 'Office Supplies'),
+                    window.populateDropdown('expense_method', 'exp-method', 'Cash'),
+                    window.populateDropdown('material_category', 'mat-category', 'Ceramic'),
+                    window.populateDropdown('staff_role', 'staff-role', 'Technician'),
+                    window.populateDropdown('product_type', 'prod-type', 'PFM'),
+                    window.populateDropdown('material_category', 'inward-side-category', 'All', true, '-- All --', 'All'),
+                    window.populateDropdown('material_category', 'outward-side-category', 'All', true, '-- All --', 'All'),
+                    window.populateDropdown('material_category', 'stock-category', 'All', true, '-- All --', 'All')
+                ]);
+                const prodTypeSelect = document.getElementById('prod-type');
+                if (prodTypeSelect && !Array.from(prodTypeSelect.options).some(o => o.value === 'Other')) {
+                    const otherOpt = document.createElement('option');
+                    otherOpt.value = 'Other';
+                    otherOpt.textContent = 'Other (Custom)';
+                    prodTypeSelect.appendChild(otherOpt);
+                }
+            } catch (err) {
+                console.error("Error initializing dynamic dropdowns in office.html:", err);
+            }
+        }
+
         // Initialize
-        showSection('inward');
+        (async () => {
+            await initDropdowns();
+            showSection('inward');
+        })();
     </script>
 
     <!-- Product Modal -->
@@ -2270,13 +2288,6 @@
                 <div style="margin-bottom:15px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Product Type</label>
                     <select id="prod-type" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; margin-bottom:10px;" onchange="if(this.value==='Other'){document.getElementById('prod-type-new').style.display='block';document.getElementById('prod-type-new').required=true;}else{document.getElementById('prod-type-new').style.display='none';document.getElementById('prod-type-new').required=false;}">
-                        <option value="PFM">PFM</option>
-                        <option value="Zirconia">Zirconia</option>
-                        <option value="E-Max">E-Max</option>
-                        <option value="Denture">Denture</option>
-                        <option value="Implant">Implant</option>
-                        <option value="General">General</option>
-                        <option value="Other">Other (Custom)</option>
                     </select>
                     <input type="text" id="prod-type-new" placeholder="Enter custom type" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; display:none;">
                 </div>
@@ -2352,12 +2363,6 @@
                     <div>
                         <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Category</label>
                         <select id="exp-category" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                            <option>Office Supplies</option>
-                            <option>Travel & Fuel</option>
-                            <option>Meals</option>
-                            <option>Utilities</option>
-                            <option>Maintenance</option>
-                            <option>Other</option>
                         </select>
                     </div>
                 </div>
@@ -2374,9 +2379,6 @@
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Payment Method</label>
                     <select id="exp-method" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                        <option>Cash</option>
-                        <option>Bank Transfer</option>
-                        <option>UPI</option>
                     </select>
                 </div>
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
@@ -2409,12 +2411,6 @@
                     <div>
                         <label style="display:block; font-size:13px; font-weight:600; margin-bottom:4px; color:#4b5563;">Category</label>
                         <select id="mat-category" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;">
-                            <option>Ceramic</option>
-                            <option>Metal</option>
-                            <option>Ortho</option>
-                            <option>Resins</option>
-                            <option>Zircon</option>
-                            <option>Acrylic</option>
                         </select>
                     </div>
                     <div>
@@ -2482,11 +2478,6 @@
                 <div style="margin-bottom:15px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">Role</label>
                     <select id="staff-role" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                        <option value="Technician">Technician</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Delivery Boy">Delivery Boy</option>
-                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div style="margin-bottom:15px;">

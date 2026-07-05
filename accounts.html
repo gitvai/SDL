@@ -262,7 +262,7 @@
 
 
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
         let currentMode = 'invoices';
         let currentAdjustmentType = 'Credit';
         let currentEditingReceiptId = null;
@@ -811,10 +811,6 @@
                         <div>
                             <label style="display:block; font-size:12px; color:#4b5563; margin-bottom:4px; font-weight: 500;">Payment Mode</label>
                             <select id="edit-mode" style="width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: inherit; font-size: 14px; background: #fff;">
-                                <option ${data.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
-                                <option ${data.paymentMode === 'Cheque' ? 'selected' : ''}>Cheque</option>
-                                <option ${data.paymentMode === 'UPI' ? 'selected' : ''}>UPI</option>
-                                <option ${data.paymentMode === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
                             </select>
                         </div>
                         <div>
@@ -896,6 +892,9 @@
                 </div>
             `;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+            if (type === 'payment') {
+                await window.populateDropdown('payment_mode', 'edit-mode', data.paymentMode || 'Cash');
+            }
         }
 
         function closeEditModal() {
@@ -2636,7 +2635,13 @@
         }, 500);
 
         // Sidebar clicks
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.populateDropdown('account_type', 'adj-type', 'Credit');
+            } catch (err) {
+                console.error("Error populating dropdowns:", err);
+            }
+
             document.querySelectorAll('.sidebar-link, .profile-tab').forEach(link => {
                 link.addEventListener('click', () => {
                     setTimeout(() => { let type = detectActiveType(); if(ALL_COLUMNS_DEF[type]) applyColumnVisibility(type); }, 100);

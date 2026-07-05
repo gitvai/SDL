@@ -340,7 +340,7 @@
 
     <script>
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
         window.currentReportType = 'orders';
 
         async function fetchData(endpoint) {
@@ -614,6 +614,10 @@
             if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
 
             loadDashboard();
+            if (window.populateDropdown) {
+                window.populateDropdown('payment_mode', 'p-mode', 'Cash');
+                window.populateDropdown('expense_method', 'e-mode', 'Cash');
+            }
         });
         function downloadInvoicePDF(id) {
             window.open(`invoice.html?id=${id}`, '_blank');

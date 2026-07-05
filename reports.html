@@ -1722,7 +1722,7 @@
         };
 
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
 
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2157,28 +2157,36 @@
             if (!window.cachedFilterData) {
                 window.cachedFilterData = {};
                 try {
-                    const [staffRes, prodRes, typeRes, clientRes] = await Promise.all([
+                    const [staffRes, prodRes, typeRes, clientRes, dropdownRes] = await Promise.all([
                         fetch(`${API_BASE}/staff`).then(r => r.json()),
                         fetch(`${API_BASE}/products`).then(r => r.json()),
                         fetch(`${API_BASE}/product-types`).then(r => r.json()),
-                        fetch(`${API_BASE}/clients`).then(r => r.json())
+                        fetch(`${API_BASE}/clients`).then(r => r.json()),
+                        window.fetchDropdownOptions ? window.fetchDropdownOptions() : fetch(`${API_BASE}/dropdowns?activeOnly=true`).then(r => r.json())
                     ]);
                     window.cachedFilterData.staff = staffRes || [];
                     window.cachedFilterData.products = prodRes || [];
                     window.cachedFilterData.productTypes = typeRes || [];
                     window.cachedFilterData.clients = clientRes || [];
+                    window.cachedFilterData.dropdowns = dropdownRes || [];
                 } catch (e) {
                     console.error("Error loading filter dropdowns:", e);
                     window.cachedFilterData.staff = [];
                     window.cachedFilterData.products = [];
                     window.cachedFilterData.productTypes = [];
                     window.cachedFilterData.clients = [];
+                    window.cachedFilterData.dropdowns = [];
                 }
             }
             const filterData = window.cachedFilterData;
 
             const getOptions = (list, key = 'name') => {
                 return `<option value="All">All</option>` + list.map(item => `<option value="${item[key]}">${item[key]}</option>`).join('');
+            };
+
+            const getDropdownFilterOptions = (dropdownKey) => {
+                const filtered = (filterData.dropdowns || []).filter(o => o.dropdownKey === dropdownKey);
+                return `<option value="All">All</option>` + filtered.map(o => `<option value="${o.optionValue}">${o.optionLabel}</option>`).join('');
             };
 
             if (name === 'Technician wise Activity Log' || name === 'Last Assigned Technician wise Jobs') {
@@ -2193,7 +2201,7 @@
                 html += `<label>Due Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.startsWith('Priority wise Order Jobs')) {
                 const dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
-                html += `<label>Priority</label><select data-filter="priority" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Normal">Normal</option><option value="Urgent">Urgent</option></select>`;
+                html += `<label>Priority</label><select data-filter="priority" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getDropdownFilterOptions('order_priority')}</select>`;
                 html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.startsWith('Sales Manager wise')) {
                 const managers = [...new Set(filterData.clients.map(c => c.salesManager).filter(Boolean))].map(m => ({ name: m }));
@@ -2227,13 +2235,13 @@
             } else if (name === 'Orders Jobs- by Due Date' || name === 'Due Date wise Order Jobs' || name === 'Orders List' || name === 'Orders List - by Due Date' || name === 'Orders yet to be invoiced' || name === 'Pending Deliveries') {
                 let dateLabel = name.includes('Due Date') ? 'Due Date' : 'Order Date';
                 if (name === 'Pending Deliveries') dateLabel = 'As On Date';
-                html += `<label>Status</label><select data-filter="status" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Received">Received</option><option value="In Progress">In Progress</option><option value="Dispatched">Dispatched</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option></select>`;
+                html += `<label>Status</label><select data-filter="status" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getDropdownFilterOptions('order_status')}</select>`;
                 html += `<label>${dateLabel}</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name.includes('Try-In') || name === 'Scheduled Try Ins') {
                 html += `<label>Try In</label><select data-filter="tryIn" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="Yes">Yes</option><option value="No">No</option></select>`;
                 html += `<label>Scheduled Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else if (name === 'Work Type wise production') {
-                html += `<label>Job Type</label><select data-filter="jobType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;"><option value="All">All</option><option value="New">New</option><option value="Repeat">Repeat</option><option value="Repair">Repair</option></select>`;
+                html += `<label>Job Type</label><select data-filter="jobType" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${getDropdownFilterOptions('order_type')}</select>`;
                 html += `<label>Order Date</label><select data-filter="date-preset" style="border: 1px solid #ccc; padding: 4px; border-radius: 2px;">${dateOptions}</select>${defaultDateInputs}`;
             } else {
                 const dateLabel = name === 'Shipments List' ? 'Shipment Date' : (name.includes('Dispatch') || name.includes('Shipment') ? 'Dispatch Date' : (name.includes('Registration') || name.includes('emails') || name.includes('Clients list') ? 'Registration Date' : 'Date'));

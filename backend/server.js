@@ -2514,6 +2514,114 @@ app.delete('/api/lookups/:id', async (req, res) => {
   }
 });
 
+// --- DROPDOWN MANAGER CRUD ---
+app.get('/api/dropdowns', async (req, res) => {
+  try {
+    const { activeOnly, dropdownKey } = req.query;
+    const where = {};
+    if (activeOnly === 'true') {
+      where.active = true;
+    }
+    if (dropdownKey) {
+      where.dropdownKey = dropdownKey;
+    }
+    const options = await prisma.dropdownOption.findMany({
+      where,
+      orderBy: [
+        { sortOrder: 'asc' },
+        { id: 'asc' }
+      ]
+    });
+    res.json(options);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/dropdowns', async (req, res) => {
+  try {
+    const { page, dropdownKey, dropdownLabel, optionLabel, optionValue, sortOrder, active } = req.body;
+    if (!page || !dropdownKey || !optionLabel || !optionValue) {
+      return res.status(400).json({ error: 'Page, dropdown key, option label, and option value are required' });
+    }
+    
+    // Check duplicate
+    const existing = await prisma.dropdownOption.findFirst({
+      where: {
+        dropdownKey,
+        optionLabel: { equals: optionLabel }
+      }
+    });
+    if (existing) {
+      return res.status(400).json({ error: 'Option already exists in this dropdown' });
+    }
+
+    const option = await prisma.dropdownOption.create({
+      data: {
+        page,
+        dropdownKey,
+        dropdownLabel: dropdownLabel || dropdownKey,
+        optionLabel,
+        optionValue,
+        sortOrder: Number(sortOrder) || 0,
+        active: active !== undefined ? active : true
+      }
+    });
+    res.status(201).json(option);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/dropdowns/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { page, dropdownKey, dropdownLabel, optionLabel, optionValue, sortOrder, active } = req.body;
+    if (!optionLabel || !optionValue) {
+      return res.status(400).json({ error: 'Option label and option value are required' });
+    }
+
+    // Check duplicate excluding self
+    const existing = await prisma.dropdownOption.findFirst({
+      where: {
+        dropdownKey,
+        optionLabel: { equals: optionLabel },
+        NOT: { id }
+      }
+    });
+    if (existing) {
+      return res.status(400).json({ error: 'Option already exists in this dropdown' });
+    }
+
+    const option = await prisma.dropdownOption.update({
+      where: { id },
+      data: {
+        page,
+        dropdownKey,
+        dropdownLabel,
+        optionLabel,
+        optionValue,
+        sortOrder: sortOrder !== undefined ? Number(sortOrder) : undefined,
+        active: active !== undefined ? active : undefined
+      }
+    });
+    res.json(option);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/dropdowns/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.dropdownOption.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // --- PICKUPS ---
 app.get('/api/pickup-requests', async (req, res) => {
   try {

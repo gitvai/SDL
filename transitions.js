@@ -226,4 +226,96 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// --- CENTRAL DROPDOWN MANAGER UTILITIES ---
+window.dropdownCache = null;
+
+window.clearDropdownCache = function() {
+    window.dropdownCache = null;
+};
+
+window.fetchDropdownOptions = async function() {
+    if (window.dropdownCache) return window.dropdownCache;
+    try {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
+        
+        const res = await fetch(`${API_BASE}/dropdowns?activeOnly=true&_t=${Date.now()}`);
+        if (res.ok) {
+            const data = await res.json();
+            window.dropdownCache = data;
+            return data;
+        }
+    } catch (err) {
+        console.error("Error fetching dropdown options:", err);
+    }
+    return [];
+};
+
+window.populateDropdown = async function(dropdownKey, selectOrId, currentValue = null, hasEmptyOption = false, emptyText = '', emptyValue = '') {
+    const select = typeof selectOrId === 'string' ? document.getElementById(selectOrId) : selectOrId;
+    if (!select) return;
+    
+    const options = await window.fetchDropdownOptions();
+    const filtered = options.filter(o => o.dropdownKey === dropdownKey);
+    
+    select.innerHTML = '';
+    
+    if (hasEmptyOption) {
+        const emptyOpt = document.createElement('option');
+        emptyOpt.value = emptyValue;
+        emptyOpt.textContent = emptyText || '';
+        if (currentValue === emptyValue) {
+            emptyOpt.selected = true;
+        }
+        select.appendChild(emptyOpt);
+    }
+    
+    filtered.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.optionValue;
+        opt.textContent = o.optionLabel;
+        if (currentValue !== null && o.optionValue === currentValue && currentValue !== emptyValue) {
+            opt.selected = true;
+        }
+        select.appendChild(opt);
+    });
+};
+
+window.populateRadioButtons = async function(dropdownKey, containerId, name, currentValue = null) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const options = await window.fetchDropdownOptions();
+    const filtered = options.filter(o => o.dropdownKey === dropdownKey);
+    
+    container.innerHTML = '';
+    filtered.forEach((o, idx) => {
+        const label = document.createElement('label');
+        label.style.marginRight = '10px';
+        label.style.cursor = 'pointer';
+        label.style.display = 'inline-flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '4px';
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = name;
+        input.value = o.optionValue;
+        if (currentValue === o.optionValue || (currentValue === null && idx === 0)) {
+            input.checked = true;
+        }
+        
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(' ' + o.optionLabel));
+        container.appendChild(label);
+    });
+};
+
+window.getDropdownOptionsHtml = function(dropdownKey, selectedValue = null) {
+    if (!window.dropdownCache) return '';
+    const filtered = window.dropdownCache.filter(o => o.dropdownKey === dropdownKey);
+    return filtered.map(o => `<option value="${o.optionValue}" ${selectedValue === o.optionValue ? 'selected' : ''}>${o.optionLabel}</option>`).join('');
+};
+
+
 

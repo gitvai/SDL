@@ -369,17 +369,7 @@
                         </div>
                         <div id="hold-reason-area" style="display:none; margin-top:10px;">
                             <label id="reason-label" style="display:block; margin-bottom:5px;">Hold Reason</label>
-                            <select id="hold-reason" style="width:100%; padding:4px;">
-                                <option value=""></option>
-                                <option>Payment Pending</option>
-                                <option>Clarification Needed</option>
-                                <option>Doctor Unavailable</option>
-                                <option>Impression Issue</option>
-                                <option>Shade Issue</option>
-                                <option>Patient Not Available</option>
-                                <option>Duplicate Order</option>
-                                <option>Other</option>
-                            </select>
+                            <select id="hold-reason" style="width:100%; padding:4px;"><option value=""></option></select>
                         </div>
                     </div>
                 </div>
@@ -391,8 +381,9 @@
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; font-size:12px;">
                     <div class="form-group"><label>Department</label><select id="department" style="width:100%; padding:4px;"><option value=""></option><option>Acrylic</option><option>Admin</option><option>Metal</option><option>Mould and Die</option><option>Orthodontic</option><option>OUTBOX</option><option>Porcelain</option><option>Quality</option><option>Wax</option></select></div>
+
                     <div class="form-group"><label>Work Type</label>
-                        <div style="display:flex; gap:5px; align-items:center;">
+                        <div id="work-type-options" style="display:flex; gap:5px; align-items:center;">
                             <label><input type="radio" name="workType" value="New" checked> New</label>
                             <label><input type="radio" name="workType" value="Repeat"> Repeat</label>
                             <label><input type="radio" name="workType" value="Repair"> Repair</label>
@@ -466,8 +457,17 @@
     </div>
 
     <script>
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+        const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : window.location.origin + '/api';
         const JOB_COLORS = ['#ec4899', '#9f1239', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316'];
         let allClients = [];
         let selectedClientId = null;
@@ -704,7 +704,7 @@
                 if (summaryRes.ok) {
                     const summary = await summaryRes.json();
                     const balanceEl = document.querySelector('.balance-box');
-                    if (balanceEl) balanceEl.textContent = (summary.balance || 0).toFixed(3);
+                    if (balanceEl) balanceEl.textContent = parseFloat(summary.balance || 0).toFixed(3);
                 }
             } catch (e) {
                 console.error("Error fetching client financial summary:", e);
@@ -1070,7 +1070,8 @@
             });
 
             if (selectedTeeth.length > 0 || unitCount > 0) {
-                document.getElementById('teeth-grid-container').style.display = 'block';
+                const teethGridCont = document.getElementById('teeth-grid-container');
+                if (teethGridCont) teethGridCont.style.display = 'block';
             }
         }
 
@@ -1630,8 +1631,18 @@
                 }
             }
         }
-
         document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await Promise.all([
+                    window.populateDropdown('order_status', 'order-status', 'New'),
+                    window.populateRadioButtons('order_type', 'work-type-options', 'workType', 'New'),
+                    window.populateDropdown('shipment_partner', 'delivery-method', null, true),
+                    window.populateDropdown('order_priority', 'priority', 'Normal'),
+                    window.populateDropdown('hold_reason', 'hold-reason', null, true)
+                ]);
+            } catch (err) {
+                console.error("Error populating dropdowns:", err);
+            }
             await loadClients();
             loadStaff();
             
