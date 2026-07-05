@@ -545,7 +545,7 @@
                             </div>
                             <div style="margin-left: auto; display: flex; gap: 10px;">
                                 <button class="btn-action" style="background: #f9fafb; color: #3b82f6; font-weight: 700; padding: 8px 24px;" onclick="showInlineNewOutward()">New</button>
-                                <button class="btn-action" style="background: #f9fafb; color: #3b82f6; font-weight: 700; padding: 8px 24px;">Scan Out</button>
+                                <button class="btn-action" style="background: #f9fafb; color: #3b82f6; font-weight: 700; padding: 8px 24px;" onclick="showScanOutView()">Scan Out</button>
                                 <button class="btn-action" style="color: #3b82f6;" onclick="fetchTransactions('Outward')"><i class="fas fa-sync-alt"></i></button>
                             </div>
                         </div>
@@ -691,6 +691,43 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Scan Out Goods Outward View -->
+                    <div id="outward-scan-view" style="display: none; padding-top: 10px;">
+                        <h2 style="font-size: 26px; font-weight: 700; color: #374151; margin-bottom: 20px;">Add Goods Outward</h2>
+                        <form id="outward-scan-form" onsubmit="handleScanOutSubmit(event)">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; max-width: 800px;">
+                                <div>
+                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Document Type</label>
+                                    <select id="scan-out-doc-type" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option>Consumption</option>
+                                        <option>Issued</option>
+                                        <option>Damaged</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Document No</label>
+                                    <input type="text" id="scan-out-doc-no" readonly style="width: 100%; padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 4px; background: #f3f4f6; color: #4b5563;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Date</label>
+                                    <input type="date" id="scan-out-doc-date" required style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Reference #</label>
+                                    <input type="text" id="scan-out-doc-ref" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 20px; max-width: 800px;">
+                                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563;">Bar Code</label>
+                                <input type="text" id="scan-out-barcode" placeholder="Scan here" style="width: 100%; padding: 12px 15px; font-size: 18px; border: 1px solid #ddd; border-radius: 4px;" autofocus>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" class="btn-action" style="border: 1px solid #d1d5db; background: #f9fafb; color: #2563eb; font-weight: bold; padding: 8px 24px; border-radius: 4px;">OK</button>
+                                <button type="button" class="btn-action" style="border: 1px solid #e5e7eb; background: #f9fafb; color: #2563eb; padding: 8px 24px; border-radius: 4px;" onclick="cancelScanOut()">Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1623,6 +1660,101 @@
             } catch(err) {
                 console.error('Error saving Goods Inward:', err);
             }
+        }
+
+        // --- BARCODE SCAN OUT FUNCTIONS ---
+        async function showScanOutView() {
+            document.getElementById('outward-list-view').style.display = 'none';
+            document.getElementById('outward-form-view').style.display = 'none';
+            document.getElementById('outward-scan-view').style.display = 'block';
+            
+            document.getElementById('outward-scan-form').reset();
+            document.getElementById('scan-out-doc-date').value = new Date().toISOString().split('T')[0];
+            
+            // Fetch next document number
+            try {
+                const res = await fetch(`${API_BASE}/inventory/transactions/next-number?type=Outward` + ( `inventory/transactions/next-number?type=Outward`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
+                const data = await res.json();
+                document.getElementById('scan-out-doc-no').value = data.nextNumber;
+            } catch(e) {
+                document.getElementById('scan-out-doc-no').value = '00001';
+            }
+            
+            setTimeout(() => {
+                document.getElementById('scan-out-barcode').focus();
+            }, 100);
+        }
+
+        function cancelScanOut() {
+            document.getElementById('outward-scan-view').style.display = 'none';
+            document.getElementById('outward-list-view').style.display = 'block';
+        }
+
+        async function handleScanOutSubmit(event) {
+            event.preventDefault();
+            const barcode = document.getElementById('scan-out-barcode').value.trim();
+            const docType = document.getElementById('scan-out-doc-type').value;
+            const docNo = document.getElementById('scan-out-doc-no').value;
+            const date = document.getElementById('scan-out-doc-date').value;
+            const ref = document.getElementById('scan-out-doc-ref').value;
+            
+            if (!barcode) {
+                alert("Please scan or enter a barcode.");
+                return;
+            }
+            
+            try {
+                // Fetch the latest materials list
+                const res = await fetch(`${API_BASE}/materials?category=All` + ( `materials?category=All`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
+                const materials = await res.json();
+                
+                // Try matching by barcode (code) or item name (case-insensitive)
+                const match = materials.find(m => (m.code && m.code.toLowerCase() === barcode.toLowerCase()) || m.name.toLowerCase() === barcode.toLowerCase());
+                
+                if (!match) {
+                    alert(`Material not found for barcode/name: ${barcode}`);
+                    document.getElementById('scan-out-barcode').focus();
+                    return;
+                }
+                
+                // Prepare transaction data
+                const data = {
+                    type: 'Outward',
+                    materialId: match.id,
+                    quantity: 1,
+                    date: date,
+                    supplier: docType, // Save Document Type as supplier/recipient
+                    docNumber: `${docType} #${docNo}` + (ref ? ` (Ref: ${ref})` : ''),
+                    notes: `Scanned Barcode: ${barcode}`
+                };
+                
+                // Post transaction
+                const saveRes = await fetch(`${API_BASE}/inventory/transactions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (saveRes.ok) {
+                    alert(`Successfully scanned and issued: ${match.name}`);
+                    document.getElementById('scan-out-barcode').value = '';
+                    
+                    // Fetch next document number for the next scan
+                    const numRes = await fetch(`${API_BASE}/inventory/transactions/next-number?type=Outward` + ( `inventory/transactions/next-number?type=Outward`.includes('?') ? '&' : '?' ) + '_t=' + Date.now());
+                    const numData = await numRes.json();
+                    document.getElementById('scan-out-doc-no').value = numData.nextNumber;
+                    
+                    // Refresh transaction list in the background
+                    fetchTransactions('Outward');
+                } else {
+                    alert("Failed to save transaction.");
+                }
+            } catch (err) {
+                console.error("Error in barcode scanning out:", err);
+                alert("An error occurred during scan out.");
+            }
+            
+            document.getElementById('scan-out-barcode').focus();
         }
 
         // --- INLINE GOODS OUTWARD ENTRY FUNCTIONS ---
