@@ -1400,8 +1400,330 @@
     </div>
 
     <script>
+        // Mock API Interceptor for Offline/Mock Reports Rendering
+        const mockDatabase = (() => {
+            const getRelativeDateStr = (offset) => {
+                // If offset is positive, it's days ago. If negative, it's days in future.
+                // To keep it in the current month, if today's date is less than the offset, we cap the offset to today's date - 1.
+                const d = new Date();
+                let days = offset;
+                if (offset > 0 && d.getDate() <= offset) {
+                    days = Math.max(0, d.getDate() - 1);
+                }
+                d.setDate(d.getDate() - days);
+                return d.toISOString();
+            };
+
+            const clients = [
+                { id: 1, name: "AMAZON DENTAL CLINIC", code: "00048", city: "Sohar", area: "Al Hambar", route: "Sohar Route", salesManager: "Mohammed", phone: "26841234", phone2: "26845678", cellPhone: "99887766", cellPhone2: "99887765", email: "amazon.dental@gmail.com", address: "Sohar Main St", taxId: "OM-10293-1", trn: "1002345", taxExemption: false, openingBalance: 150.000, discountPercentage: 10, defaultDeliveryAgent: "Ali" },
+                { id: 2, name: "AL REEF DENTAL CLINIC", code: "00049", city: "Saham", area: "Saham City", route: "Saham Route", salesManager: "Saeed", phone: "26851234", phone2: "", cellPhone: "99776655", cellPhone2: "", email: "alreef.dental@gmail.com", address: "Saham Market", taxId: "OM-10293-2", trn: "1002346", taxExemption: false, openingBalance: 75.000, discountPercentage: 5, defaultDeliveryAgent: "Saeed" },
+                { id: 3, name: "AL MISK CLINIC SUWAIQ", code: "00050", city: "Suwaiq", area: "Suwaiq Town", route: "Batinah Route", salesManager: "John", phone: "26861234", phone2: "", cellPhone: "99665544", cellPhone2: "", email: "almisk.suwaiq@gmail.com", address: "Suwaiq Highway", taxId: "OM-10293-3", trn: "1002347", taxExemption: true, openingBalance: 0.000, discountPercentage: 0, defaultDeliveryAgent: "Ali" },
+                { id: 4, name: "AL HUDA DENTAL CLINIC", code: "00189", city: "Sohar", area: "Al Hambar", route: "Sohar Route", salesManager: "Mohammed", phone: "26841222", phone2: "", cellPhone: "99881122", cellPhone2: "", email: "alhuda@gmail.com", address: "Sohar Main Road", taxId: "OM-10293-4", trn: "1002348", taxExemption: false, openingBalance: 200.000, discountPercentage: 15, defaultDeliveryAgent: "Ali" },
+                { id: 5, name: "AL EMAN DENTAL CLINIC", code: "00190", city: "Rustaq", area: "Rustaq City", route: "Rustaq Route", salesManager: "Vikas", phone: "26871234", phone2: "", cellPhone: "99554433", cellPhone2: "", email: "aleman.dental@gmail.com", address: "Rustaq Fort Road", taxId: "OM-10293-5", trn: "1002349", taxExemption: false, openingBalance: 50.000, discountPercentage: 0, defaultDeliveryAgent: "Saeed" },
+                { id: 6, name: "GLOBAL DENTAL CENTER", code: "00200", city: "Muscat", area: "Ruwi", route: "Muscat Route", salesManager: "Vikas", phone: "24701234", phone2: "", cellPhone: "99443322", cellPhone2: "", email: "global.dental@gmail.com", address: "Ruwi High Street", taxId: "OM-10293-6", trn: "1002350", taxExemption: false, openingBalance: 0.000, discountPercentage: 12, defaultDeliveryAgent: "Ali" },
+                { id: 7, name: "AHMMED SOHAR", code: "00028", city: "Sohar", area: "Al Hambar", route: "Sohar Route", salesManager: "Mohammed", phone: "26849999", phone2: "", cellPhone: "99119911", cellPhone2: "", email: "ahmmed.sohar@gmail.com", address: "Sohar Souq", taxId: "OM-10293-7", trn: "1002351", taxExemption: false, openingBalance: 120.000, discountPercentage: 8, defaultDeliveryAgent: "Ali" },
+                { id: 8, name: "AL REEF DENTAL CLINIC KHABURAH", code: "00272", city: "Khaburah", area: "Khaburah Town", route: "Batinah Route", salesManager: "John", phone: "26881234", phone2: "", cellPhone: "99228822", cellPhone2: "", email: "alreef.khaburah@gmail.com", address: "Khaburah Coastal Rd", taxId: "OM-10293-8", trn: "1002352", taxExemption: false, openingBalance: 0.000, discountPercentage: 5, defaultDeliveryAgent: "Saeed" }
+            ];
+
+            const staff = [
+                { id: 1, name: "Ali", role: "Driver", department: "Logistics", status: "Active", salary: 350 },
+                { id: 2, name: "Saeed", role: "Driver", department: "Logistics", status: "Active", salary: 340 },
+                { id: 3, name: "John Doe", role: "Technician", department: "Crown & Bridge", status: "Active", salary: 450 },
+                { id: 4, name: "Alna", role: "Technician", department: "Zirconia", status: "Active", salary: 500 },
+                { id: 5, name: "Mohammed", role: "Sales Manager", department: "Sales", status: "Active", salary: 550 },
+                { id: 6, name: "Vikas", role: "Sales Manager", department: "Sales", status: "Active", salary: 550 }
+            ];
+
+            const products = [
+                { id: 1, name: "PFM", code: "PFM", type: "PFM", charge: 7.000 },
+                { id: 2, name: "ZIRCON", code: "ZIRC", type: "ZIRCONIUM", charge: 15.000 },
+                { id: 3, name: "FLEXIBLE DENTURE", code: "FLEX", type: "ACRYLIC", charge: 25.000 },
+                { id: 4, name: "NIGHT GUARD", code: "NG", type: "ORTHO", charge: 6.000 },
+                { id: 5, name: "HAWLEY'S APPLIANCE", code: "HAW", type: "ORTHO", charge: 12.000 },
+                { id: 6, name: "RPD LOWER ACRYLIC", code: "RPD", type: "ACRYLIC", charge: 18.000 },
+                { id: 7, name: "BITE RIM UPPER", code: "BRU", type: "ACRYLIC", charge: 5.000 }
+            ];
+
+            const productTypes = [
+                { id: 1, name: "PFM" },
+                { id: 2, name: "ZIRCONIUM" },
+                { id: 3, name: "ACRYLIC" },
+                { id: 4, name: "ORTHO" }
+            ];
+
+            const materials = [
+                { id: 1, name: "Zirconia Block", code: "MAT-001", category: "Zirconia", stock: 45, unit: "pc" },
+                { id: 2, name: "PFM Alloy", code: "MAT-002", category: "Metal", stock: 120, unit: "g" },
+                { id: 3, name: "Ceramic Powder", code: "MAT-003", category: "Porcelain", stock: 15, unit: "bottle" },
+                { id: 4, name: "Flexible Acrylic Cartridge", code: "MAT-004", category: "Acrylic", stock: 80, unit: "pc" }
+            ];
+
+            // Helper to find client by ID
+            const getClient = (id) => clients.find(c => c.id === id) || clients[0];
+
+            // Generate shipment notes
+            const shipmentNotes = [
+                { id: 1, noteNumber: "SH-2026-001", noteDate: getRelativeDateStr(2), totalAmount: 140.000, clientId: 1, client: getClient(1) },
+                { id: 2, noteNumber: "SH-2026-002", noteDate: getRelativeDateStr(2), totalAmount: 18.000, clientId: 2, client: getClient(2) },
+                { id: 3, noteNumber: "SH-2026-003", noteDate: getRelativeDateStr(1), totalAmount: 30.000, clientId: 7, client: getClient(7) }
+            ];
+
+            // Generate orders
+            const orders = [
+                {
+                    id: 1, orderNumber: "29048", receivedDate: getRelativeDateStr(4), createdAt: getRelativeDateStr(4), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "MARYAM HAMOOD AL AMRI", modelNumber: "21194", teethSelection: "36,37", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "Delivered", priority: "Normal", units: 2, netAmount: 14.000, totalAmount: 14.000,
+                    trialDate: "", shippingStatus: "Dispatched", technician: "John Doe", subDoctor: "Dr. Khaled", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(1), invoiceId: 1, shipmentNoteId: 1, shipmentNote: shipmentNotes[0],
+                    jobs: [{ teethSelection: "36,37", productType: "PFM", productName: "PFM", totalAmount: 14.000, units: 2, shade1: "A2" }],
+                    warranty: { durationYears: 5 }
+                },
+                {
+                    id: 2, orderNumber: "29049", receivedDate: getRelativeDateStr(4), createdAt: getRelativeDateStr(4), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "AYSHA LOWER", modelNumber: "21195", teethSelection: "31,32", productName: "LOWER DENTURE", productType: "ACRYLIC",
+                    shade1: "A2", shade2: "", shade3: "", status: "Try In", priority: "Normal", units: 1, netAmount: 18.000, totalAmount: 18.000,
+                    trialDate: getRelativeDateStr(2), shippingStatus: "Returned", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 18.000, client: getClient(2), invoiceId: 2, shipmentNoteId: 2, shipmentNote: shipmentNotes[1],
+                    jobs: [{ teethSelection: "31,32", productType: "ACRYLIC", productName: "LOWER DENTURE", totalAmount: 18.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 3, orderNumber: "29209", receivedDate: getRelativeDateStr(2), createdAt: getRelativeDateStr(2), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "SALMA", modelNumber: "21355", teethSelection: "46", productName: "FIXED HABIT BREAKER WITH MOLAR TUBE", productType: "ORTHO",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 12.000, totalAmount: 12.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "Dr. Baneen", orderType: "New",
+                    manufacturer: "Sohar Dental Lab", price: 12.000, client: getClient(3), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "46", productType: "ORTHO", productName: "FIXED HABIT BREAKER WITH MOLAR TUBE", totalAmount: 12.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 4, orderNumber: "29244", receivedDate: getRelativeDateStr(2), createdAt: getRelativeDateStr(2), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "SALEEMA AL BADI", modelNumber: "21391", teethSelection: "33,34", productName: "RPD LOWER ACRYLIC", productType: "ACRYLIC",
+                    shade1: "A3/C4", shade2: "", shade3: "", status: "New", priority: "Normal", units: 2, netAmount: 36.000, totalAmount: 36.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 18.000, client: getClient(8), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "33,34", productType: "ACRYLIC", productName: "RPD LOWER ACRYLIC", totalAmount: 36.000, units: 2, shade1: "A3/C4" }]
+                },
+                {
+                    id: 5, orderNumber: "29252", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "111", modelNumber: "21399", teethSelection: "31", productName: "RPD WITH MOLAR BANDS", productType: "ORTHO",
+                    shade1: "", shade2: "", shade3: "", status: "New", priority: "Normal", units: 2, netAmount: 24.000, totalAmount: 24.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 12.000, client: getClient(4), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "31", productType: "ORTHO", productName: "RPD WITH MOLAR BANDS", totalAmount: 24.000, units: 2 }]
+                },
+                {
+                    id: 6, orderNumber: "29284", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "AMAL", modelNumber: "21431", teethSelection: "43,42,41,31,32,33,34", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 8, netAmount: 56.000, totalAmount: 56.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(1), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "43,42,41,31,32,33,34", productType: "PFM", productName: "PFM", totalAmount: 56.000, units: 8, shade1: "A2" }]
+                },
+                {
+                    id: 7, orderNumber: "29297", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "ALGHAIL DENTAL CLINIC", modelNumber: "21444", teethSelection: "11", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(2), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "11", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 8, orderNumber: "29279", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "FATMASAID MOHAMMED DR ABUITH", modelNumber: "21426", teethSelection: "22", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "Dr. Khaled", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(4), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "22", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 9, orderNumber: "29292", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "BM 097557 DR SUSHAMA", modelNumber: "21439", teethSelection: "12", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(6), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "12", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 10, orderNumber: "29287", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "EMARATAL SHARQ", modelNumber: "21434", teethSelection: "13", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(5), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "13", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A2" }]
+                },
+                {
+                    id: 11, orderNumber: "29289", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "RAJEENDRAN", modelNumber: "21436", teethSelection: "14", productName: "PFM", productType: "PFM",
+                    shade1: "A1", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(1), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "14", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A1" }]
+                },
+                {
+                    id: 12, orderNumber: "29290", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "PRABHUL", modelNumber: "21437", teethSelection: "15", productName: "PFM", productType: "PFM",
+                    shade1: "A3", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(2), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "15", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "A3" }]
+                },
+                {
+                    id: 13, orderNumber: "29291", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "FEERI MEDICAL CENTRE", modelNumber: "21438", teethSelection: "16", productName: "PFM", productType: "PFM",
+                    shade1: "M2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 7.000, totalAmount: 7.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(3), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "16", productType: "PFM", productName: "PFM", totalAmount: 7.000, units: 1, shade1: "M2" }]
+                },
+                {
+                    id: 14, orderNumber: "29307", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "ZIRCON", modelNumber: "21454", teethSelection: "36,37", productName: "ZIRCON", productType: "ZIRCONIUM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 2, netAmount: 30.000, totalAmount: 30.000,
+                    trialDate: "", shippingStatus: "", technician: "Alna", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 15.000, client: getClient(7), invoiceId: 3, shipmentNoteId: 3, shipmentNote: shipmentNotes[2],
+                    jobs: [{ teethSelection: "36,37", productType: "ZIRCONIUM", productName: "ZIRCON", totalAmount: 30.000, units: 2, shade1: "A2" }]
+                },
+                {
+                    id: 15, orderNumber: "29277", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "FATMA AL BALUSHI", modelNumber: "21424", teethSelection: "45", productName: "PFM", productType: "PFM",
+                    shade1: "A2", shade2: "", shade3: "", status: "New", priority: "Normal", units: 2, netAmount: 14.000, totalAmount: 14.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "KHALID", orderType: "New",
+                    manufacturer: "", price: 7.000, client: getClient(8), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "45", productType: "PFM", productName: "PFM", totalAmount: 14.000, units: 2, shade1: "A2" }]
+                },
+                {
+                    id: 16, orderNumber: "29304", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "MAWADA", modelNumber: "21451", teethSelection: "11", productName: "NIGHT GUARD", productType: "ORTHO",
+                    shade1: "", shade2: "", shade3: "", status: "Delivered", priority: "Normal", units: 1, netAmount: 6.000, totalAmount: 6.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 6.000, client: getClient(2), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "11", productType: "ORTHO", productName: "NIGHT GUARD", totalAmount: 6.000, units: 1 }]
+                },
+                {
+                    id: 17, orderNumber: "11067", receivedDate: getRelativeDateStr(1), createdAt: getRelativeDateStr(1), dueDate: getRelativeDateStr(-2), timeSlot: "Evening",
+                    patientName: "BITE RIM UPPER", modelNumber: "03201", teethSelection: "", productName: "BITE RIM UPPER", productType: "ACRYLIC",
+                    shade1: "", shade2: "", shade3: "", status: "New", priority: "Normal", units: 1, netAmount: 5.000, totalAmount: 5.000,
+                    trialDate: "", shippingStatus: "", technician: "John Doe", subDoctor: "None", orderType: "New",
+                    manufacturer: "", price: 5.000, client: getClient(8), invoiceId: null, shipmentNoteId: null,
+                    jobs: [{ teethSelection: "", productType: "ACRYLIC", productName: "BITE RIM UPPER", totalAmount: 5.000, units: 1 }]
+                }
+            ];
+
+            // Invoices linking
+            const invoices = [
+                {
+                    id: 1, invoiceNumber: "INV-2026-001", invoiceDate: getRelativeDateStr(2), dueDate: getRelativeDateStr(-25),
+                    grossAmount: 14.000, taxAmount: 0.700, netAmount: 14.700, paidAmount: 14.700, balanceAmount: 0.000,
+                    status: "Paid", clientId: 1, client: getClient(1), orders: [orders[0]], adjustments: []
+                },
+                {
+                    id: 2, invoiceNumber: "INV-2026-002", invoiceDate: getRelativeDateStr(2), dueDate: getRelativeDateStr(-25),
+                    grossAmount: 18.000, taxAmount: 0.900, netAmount: 18.900, paidAmount: 0.000, balanceAmount: 18.900,
+                    status: "Awaiting Payment", clientId: 2, client: getClient(2), orders: [orders[1]], adjustments: []
+                },
+                {
+                    id: 3, invoiceNumber: "INV-2026-003", invoiceDate: getRelativeDateStr(1), dueDate: getRelativeDateStr(-25),
+                    grossAmount: 30.000, taxAmount: 1.500, netAmount: 31.500, paidAmount: 0.000, balanceAmount: 31.500,
+                    status: "Awaiting Payment", clientId: 7, client: getClient(7), orders: [orders[13]], adjustments: []
+                }
+            ];
+
+            // Adjustments
+            const adjustments = [
+                { id: 1, adjustmentNumber: "ADJ-2026-001", date: getRelativeDateStr(1), amount: 5.000, type: "Credit", reason: "Discount", clientId: 1, client: getClient(1), invoice: invoices[0] }
+            ];
+
+            // Receipts
+            const receipts = [
+                { id: 1, receiptNumber: "REC-2026-001", receiptDate: getRelativeDateStr(1), amount: 14.700, appliedAmount: 14.700, paymentMode: "Bank Transfer", chequeNumber: "", reference: "REF-998877", clientId: 1, client: getClient(1) }
+            ];
+
+            // Expenses
+            const expenses = [
+                { id: 1, voucherNo: "EXP-2026-001", date: getRelativeDateStr(3), amount: 50.000, category: "Rent", description: "Office Rent", paymentMode: "Bank Transfer", paidTo: "Landlord" },
+                { id: 2, voucherNo: "EXP-2026-002", date: getRelativeDateStr(2), amount: 25.000, category: "Office Supplies", description: "Stationery", paymentMode: "Cash", paidTo: "Stationery Shop" },
+                { id: 3, voucherNo: "EXP-2026-003", date: getRelativeDateStr(1), amount: 15.000, category: "Utilities", description: "Electricity", paymentMode: "Cash", paidTo: "Utility Company" }
+            ];
+
+            // Pickup Requests
+            const pickupRequests = [
+                { id: 1, requestDate: getRelativeDateStr(2), pickupDate: getRelativeDateStr(2), status: "Completed", notes: "Please pick up urgent Zirconia model", assignedTo: "Ali", patientName: "Aysha Lower", productType: "ACRYLIC", clientId: 2, client: getClient(2) },
+                { id: 2, requestDate: getRelativeDateStr(1), pickupDate: getRelativeDateStr(1), status: "Scheduled", notes: "Crown impression", assignedTo: "Saeed", patientName: "Saleema Al Badi", productType: "ACRYLIC", clientId: 8, client: getClient(8) }
+            ];
+
+            // Pickup Returns
+            const pickupReturns = [
+                { id: 1, pickupDate: getRelativeDateStr(2), createdAt: getRelativeDateStr(2), status: "Received at Lab", itemType: "Impression", order: orders[1] }
+            ];
+
+            return {
+                clients,
+                staff,
+                products,
+                productTypes,
+                materials,
+                shipmentNotes,
+                orders,
+                invoices,
+                adjustments,
+                receipts,
+                expenses,
+                pickupRequests,
+                pickupReturns
+            };
+        })();
+
+        // Global Fetch Overrides to Serve Mock Database
+        const originalFetch = window.fetch;
+        window.fetch = async function(url, options) {
+            const urlStr = String(url);
+            if (urlStr.includes('/api/')) {
+                let data = null;
+                const clientMatch = urlStr.match(/\/api\/clients\/(\d+)/);
+                if (clientMatch) {
+                    const cid = parseInt(clientMatch[1]);
+                    data = mockDatabase.clients.find(c => c.id === cid) || mockDatabase.clients[0];
+                } else if (urlStr.includes('/api/clients')) {
+                    data = mockDatabase.clients;
+                } else if (urlStr.includes('/api/staff')) {
+                    data = mockDatabase.staff;
+                } else if (urlStr.includes('/api/products')) {
+                    data = mockDatabase.products;
+                } else if (urlStr.includes('/api/product-types')) {
+                    data = mockDatabase.productTypes;
+                } else if (urlStr.includes('/api/materials')) {
+                    data = mockDatabase.materials;
+                } else if (urlStr.includes('/api/shipment-notes')) {
+                    data = mockDatabase.shipmentNotes;
+                } else if (urlStr.includes('/api/orders')) {
+                    data = mockDatabase.orders;
+                } else if (urlStr.includes('/api/invoices')) {
+                    data = mockDatabase.invoices;
+                } else if (urlStr.includes('/api/receipts')) {
+                    data = mockDatabase.receipts;
+                } else if (urlStr.includes('/api/adjustments')) {
+                    data = mockDatabase.adjustments;
+                } else if (urlStr.includes('/api/pickup-requests') || urlStr.includes('/api/pickups')) {
+                    data = mockDatabase.pickupRequests;
+                } else if (urlStr.includes('/api/pickup-returns')) {
+                    data = mockDatabase.pickupReturns;
+                } else if (urlStr.includes('/api/expenses')) {
+                    data = mockDatabase.expenses;
+                }
+
+                if (data !== null) {
+                    return new Response(JSON.stringify(data), {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+            }
+            return originalFetch(url, options);
+        };
+
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const API_BASE = (window.location.protocol === 'file:' || isLocalhost) ? 'http://localhost:5000/api' : (window.location.hostname === 'sdl-backend-l5r2.onrender.com' ? window.location.origin + '/api' : 'https://sdl-backend-l5r2.onrender.com/api');
+
 
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.sub-tab');
@@ -1730,7 +2052,7 @@
                         if (!cellVal || cellVal === '-') return false;
                         const parts = cellVal.split('/');
                         if (parts.length === 3) {
-                            const cellDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                            const cellDate = new Date(parts[2].trim().split(' ')[0], parts[1] - 1, parts[0]);
                             return cellDate >= startDate && cellDate <= endDate;
                         }
                         return true;

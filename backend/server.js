@@ -1875,7 +1875,16 @@ app.get('/api/inventory/transactions', async (req, res) => {
       );
     }
     
-    res.json(transactions.reverse()); // Newest first
+    // Populate material object dynamically from SQLite database
+    const materials = await prisma.material.findMany();
+    const materialsMap = {};
+    materials.forEach(m => { materialsMap[m.id] = m; });
+    const populatedTransactions = transactions.map(t => ({
+      ...t,
+      material: materialsMap[t.materialId] || { name: t.materialName || 'Unknown', unit: 'pc' }
+    }));
+    
+    res.json(populatedTransactions.reverse()); // Newest first
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 

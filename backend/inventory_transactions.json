@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1783222643175,
+    "type": "Inward",
+    "materialId": 250,
+    "materialName": "3D PRINTER FILM",
+    "quantity": 20,
+    "date": "2026-07-03T09:15:43.175262Z",
+    "supplier": "Prime Materials LLC",
+    "docNumber": "Purchase #00001",
+    "notes": "Rate: OMR 5.000 | Tax: 5% | Checked and verified"
+  },
+  {
+    "id": 1783222743175,
+    "type": "Inward",
+    "materialId": 260,
+    "materialName": "ALGINATE ALGINPLUS (453 GM)",
+    "quantity": 10,
+    "date": "2026-07-02T09:15:43.175262Z",
+    "supplier": "Dental Depot",
+    "docNumber": "Purchase #00002",
+    "notes": "Rate: OMR 3.500 | Tax: 0%"
+  },
+  {
+    "id": 1783222843175,
+    "type": "Inward",
+    "materialId": 268,
+    "materialName": "BASE PASTE TUBE",
+    "quantity": 150,
+    "date": "2026-06-30T09:15:43.175262Z",
+    "supplier": "Sohar Dental Supplier",
+    "docNumber": "Purchase #00003",
+    "notes": "Rate: OMR 12.000 | Tax: 5%"
+  },
+  {
+    "id": 1783222943175,
+    "type": "Outward",
+    "materialId": 250,
+    "materialName": "3D PRINTER FILM",
+    "quantity": 2,
+    "date": "2026-07-04T09:15:43.175262Z",
+    "supplier": "Resins Dept",
+    "docNumber": "Issue #00001",
+    "notes": "For printing custom surgical guides"
+  },
+  {
+    "id": 1783223043175,
+    "type": "Outward",
+    "materialId": 253,
+    "materialName": "ACRYLIC POWDER - BLACK 4O GM",
+    "quantity": 1,
+    "date": "2026-07-03T09:15:43.175262Z",
+    "supplier": "Acrylic Dept",
+    "docNumber": "Issue #00002",
+    "notes": "Stock transfer"
+  }
+]
