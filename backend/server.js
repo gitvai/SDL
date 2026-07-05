@@ -2548,9 +2548,44 @@ app.get('/api/materials', async (req, res) => {
   }
 });
 
-const server = app.listen(PORT, () => {
+// Startup Database Auto-Seeder Check for Materials
+async function ensureMaterialsSeeded() {
+  try {
+    const count = await prisma.material.count();
+    if (count === 0) {
+      console.log("[Seeder] Material table is empty. Auto-seeding 565 materials from user_materials.json...");
+      const fs = require('fs');
+      const path = require('path');
+      const seedFile = path.join(__dirname, 'user_materials.json');
+      if (fs.existsSync(seedFile)) {
+        const seedData = JSON.parse(fs.readFileSync(seedFile, 'utf8'));
+        for (const item of seedData) {
+          await prisma.material.create({
+            data: {
+              name: item.name,
+              category: item.category,
+              stock: item.stock,
+              unit: item.unit,
+              minStock: item.minStock
+            }
+          });
+        }
+        console.log(`[Seeder] Successfully seeded ${seedData.length} materials!`);
+      } else {
+        console.warn(`[Seeder] Seed file not found at ${seedFile}`);
+      }
+    } else {
+      console.log(`[Seeder] Materials table already has ${count} records. Skipping seeder.`);
+    }
+  } catch (e) {
+    console.error("[Seeder] Error during materials startup check:", e.message);
+  }
+}
+
+const server = app.listen(PORT, async () => {
   console.log(`[${new Date().toLocaleTimeString()}] Server is successfully running on port ${PORT}`);
   console.log('Keep this window open to maintain server connection.');
+  await ensureMaterialsSeeded();
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`Error: Port ${PORT} is already in use. Please close the other application or restart your computer.`);

@@ -1,0 +1,3957 @@
+[
+  {
+    "name": "3D PRINTER FILM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "3D PRINTER SCREEN",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "3D PRINTER TANK",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - BLACK 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - CREAM 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - LIGHT GREEN 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - ORANGE 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - PINK 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - WHITE 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ACRYLIC POWDER - YELLOW 4O GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ALGINATE ALGINPLUS (453 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ALGINATE HYDROGUM (453 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ALGINATE ZHERMACK (453 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ARCH TRIMMER (JG- 217)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ARTICULATING PAPER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ARTICULATOR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BALL CLASP SS",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BAND MATERIAL, SIZE 180X006",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BASE PASTE TUBE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BASE PLATE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BENCH GRINDER BELT CMQ 2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BENCH GRINDER BELT JT 24",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BP BLADE (SIZE 11)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BP BLADE HANDLE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH - BUILDUP, SIZE 10",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH - BUILDUP, SIZE 6",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH - SIZE 0",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH - SIZE 2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH - SMALL POINTED 4KD",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH FLAT",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BRUSH-SMALL POINTED 4XY",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - ACRYLIC BLACK LARGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - ACRYLIC BLACK SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - COTTON, 22 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - COTTON, 3X50",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - COTTON, 4X50",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUFF - COTTON, 5X50",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUILD UP LIQUID",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC A04",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC F05",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC G05",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC L05",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC M2.35",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ACRYLIC TA1.40",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR BALL CARBIDE LARGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR BALL CARBIDE MEDIUM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR BALL CARBIDE SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR DIAMOND SET (CHINA MAKE)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR DIAMOND SF-15",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR DIAMOND SI-48",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR DIAMOND TAPERED ROUND END",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR DIAMOND TF-11",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR FLAT END CYLINDER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR PMMA 1 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR PMMA 2 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ROUND EXTRA SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ROUND LARGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ROUND MEDIUM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ROUND SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR STAR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR STONE LATHE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR STONE PINK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR TAPERED FLAT",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ZIRCON MILLING 0.6 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ZIRCON MILLING 1 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BUR ZIRCON MILLING 2 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "BURNER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CARVER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CARVER SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CASTING CRUCIBLE",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CASTING MACHINE JG-214",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CASTING METAL (1 KG)",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CEMENT SPATULA",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A3 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A3.5 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - A4 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B3 (113GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - B4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - C1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - C2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - C2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - C3 ( 113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - C3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - D2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - D2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - D3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO DENTIN - D4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - CLEAR (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - CLEAR (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - LIGHT (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - LIGHT (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - MEDIUM (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO ENAMEL - MEDIUM (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO GLAZE LIQUID",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A3 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A3.5 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - A4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - B1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - B2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - B3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - B4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - C1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - C2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - C3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - C4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - D2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - D2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - D3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE - D4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A3 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A3.5 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A4 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - A4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B1 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B2 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B3 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - B4 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - C1 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - C2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - C3 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - C4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - D2 (113 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - D3 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE DENTIN - D4 (28 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO OPAQUE LIQUID 250 ML",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO PASTE OPAQUE A1 2ML",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMCO PASTE OPAQUE A2 2ML",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMIC PIN WHITE",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CERAMIC SEPARTING TOOL",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CHIP BLOWER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLAMP",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, BIO ART, SOFT- 2MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, NNT, HARD - 1MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, HARD - 1.5MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, HARD - 1MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, HARD- 2MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, SOFT- 1.5MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, SOFT- 2MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CLEAR THERMOFORMING SHEET, OTRES, SOFT- 3MM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE MONOMER VERACRIL (500 ML)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE MONOMER, OTRES (500ML)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE MONOMER, OTRES 1L",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE MONOMER, TRIPLEX (500 ML)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER CLEAR, OTRES 500GM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER PINK HDS",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER PINK, OTRES 500GM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, OTRESS, CLEAR 1KG",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, PREVALENT, CLEAR (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, TRIPLEX, LIGHT PINK (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, TRIPLEX, PINK (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, VERACRIL CLEAR 500GM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, VERACRIL DARK PINK (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COLD CURE POLYMER, VERACRIL LIGHT PINK (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "COTTON BRUSH 22MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CURE BOX DUAL VERICON",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CUTTING DISC 0.25 MM (20PCS) YELLOW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CUTTING DISC 0.6 MM (100PCS) OTRESS",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CUTTING DISC 0.6 MM (100PCS) SAN I",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CUTTING DISC 0.6 MM (100PCS) YELLOW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "CUTTING DISC 3.0 MM (20PCS) YELLOW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DAPPEN DISH GLASS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL CASTING RESIN DC001 1L-ZECIE TECH",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL FLASK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL ORTHODONTICS RESIN DR002 1L -ZECIE TECH",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL SG RESIN GR001 1L -ZECIE TECH",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL STONE POWDER - TYPE 3 (25 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL STONE POWDER - TYPE 4 (25 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL STONE POWDER ZHERMACK- TYPE 3 (3 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL TWEEZERS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTAL VIBRATOR (JG-202)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTULOUS SILICON MOULD",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTURE BOX - BIG (12 PCS/BOX)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DENTURE BOX - SMALL (12 PCS/BOX)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIAMOND DISC",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIAMOND RUBBER WHEEL, 26X2MM BLUE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIAMOND RUBBER WHEEL, 26X2MM RED",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIAMOND RUBBER WHEEL, 26X2MM WHITE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIE CUTTING BLADE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIE CUTTING SAW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DIE HARDNER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DISC MANDREL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DISINFECTANT",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DISPOSABLE SYRINGE 3 ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DISPOSABLE 3 LAYER MASK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "DUST COLLECTOR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ELECTRIC WAX SPOON",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "EXPANSION SCREW 11 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "EXPANSION SCREW 14 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "EXPANSION SCREW SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FACE MASK ELASTIC MORELLI",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FACE SHIELD",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FIRING STAND ANTERIORS",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FIRING STAND MOLAR LARGE",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FIRING STAND MOLAR SMALL",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FIRING STAND PREMOLARS",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEX KWIK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXCEED PUTTY MATERIAL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDG, KELLO",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE, FLEXI LUSTER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE, RAWDENT",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE,LUXUS DE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE- FULLY FLEXIBLE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE CARTRIDGE- SEMI FLEXIBLE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE FLASK ACRYLIC",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "FLEXIBLE FURNACE COIL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ENAMEL BL (50 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ENAMEL E-57 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ENAMEL E-58 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ENAMEL E-59 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ENAMEL E-60 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC GLAZE LIQUID (25 ML)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC GLAZE POWDER (10 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC BLD-1 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC BLD-2 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC BLD-3 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC E-57 (50 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC E-58 (50 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC ENAMEL BL (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC IN MB (8 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC OM-1 (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC METAL CERAMIC OPAQUE LIQUID OL (50 ML)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC PINK STAIN G 34 (4 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC STAIN - SPS 8 (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON CL-F (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON CL-W (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A1 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A1 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A2 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A3 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A3.5 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - A4 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - B1 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - B1 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - B2 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - B3 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - B4 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - C1 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - C2 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - C3 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - C4 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - D2 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - D3 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN - D4 (20 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN BLD-1 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN BLD-2 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GC ZIRCON DENTIN BLD-3 (50 GM)",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GLAZING TRAY",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GLOVES",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE CYLINDER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE G013",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE G022",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE G042",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE SHARP CYLINDER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE SHARP CYLINDER SMOOTH",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL - 15* 3.5 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL - 17* 3.5 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL - 22* 2 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL - 22* 4.5 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL SDH071G",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GREEN STONE WHEEL- 1.5*3.5 MM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GRINDING MACHINE CQM-2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GYPSUM FILTER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "GYPSUM POWDER (30 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HAND MOTOR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HAND PIECE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAD CAP",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAD GEAR TUBE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE MONOMER OTRES (1 L)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE MONOMER VERACRIL (500 ML)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE MONOMER, TRIPLEX (500 ML)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER CLEAR OTRES 500GM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER DARK PINK VERACRIL (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER OTRES (1 KG)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER OTRES (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER PINK HDS",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HEAT CURE POLYMER PINK HIGH IMPACT VERACRIL (500 GM)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HINGE ARTICULATOR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HONEYCOMB FIRING TRAY",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HYRAX SCREW 11 MM, LEONE BRAND",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HYRAX SCREW 11 MM, MORELLI BRAND",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HYRAX SCREW 9 MM, LEONE BRAND",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "HYRAX SCREW 9 MM, MORELLI BRAND",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IMPLANT DRIVE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IMPRESSION TRAY",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INLAY WAX",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT LIQUID - BEGO",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT LIQUID - GILVEST",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT LIQUID- CALIBRA EXPRESS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT LIQUID- SAINT BON",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT POWDER - BEGO (12.8 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT POWDER - GILVEST (160 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT POWDER - SAINT BON",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "INVESTMENT POWDER- CALIBRA EXPRESS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX CERAM DENTIN A2 20GM",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX CERAM DENTIN B1 20GM",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX CERAM MAMELON LIGHT 20GM",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX CERAM TRANSPA BLUE (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX CERAM TRANSPA NEUTRAL (20 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX GLAZE PASTE",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX INGOTS - A1",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX INGOTS - A2",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX INGOTS - MO3",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX INGOTS - MO4",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IPS EMAX INGOTS- B1",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - BLUE (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - MAHAGANY BROWN (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - SHADE B (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - SHADE C (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - SHADE D (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "IVOCLORE STAIN - WHITE (3 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "LIGHT CURING INDIVIDUAL TRAY PLATE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "LIGHT CURING INDIVIDUAL TRAY PLATE OTRESS",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "LINGUAL RETAINER WIRE",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "LINGUAL SHEATH WITH WINDOW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MAGNIFER WITH LIGHT",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "METAL CALIPER",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MIXING SPATULA",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MODEL TRIMMER JG-209A",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MODELLING WAX - CHINA (500 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MODELLING WAX - HDP BRAND (225 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - DOUBLE (LOWER)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - DOUBLE (UPPER)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - SINGLE (LOWER)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - SINGLE (UPPER)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - TRIPLE LL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - TRIPLE LR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - TRIPLE UL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "MOLAR TUBE - TRIPLE UR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "NITI OPEN COIL 12*30",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "NORITAKE SUPER PORCELIN EX-3 DARK PINK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "NORITAKE SUPER PORCELIN EX-3 LIGHT PINK",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "O-CRYL ORTHODONTIC POLYMER GLITTER CLEAR 500GM",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ORTHO BANDS LOWER 28-42",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ORTHO BANDS UPPER 28-42",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ORTHOCRYL BLUE COLOUR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PENUMATIC POLYMERIZING POT",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PICOSEP RENFERT 30ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PLASTER CUTTER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "POLISHING CAKE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PORCELIN PLATE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PUMICE POWDER (1 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PUTTY IMPRESSION MATERIAL ,ORMACTIVATOR 900ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PUTTY IMPRESSION MATERIAL CATALYST, ZETAPLUS 60ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PUTTY IMPRESSION MATERIAL CATAYST, ORMACTIVATOR",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "PUTTY IMPRESSION MATERIAL, ZETAPLUS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "REPLACEMENT TIP FOR SANDBLASTER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "RESIN FILTER",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "RESTORATIVE DENTAL MODEL RESINS DR003 1L -ZECIE TEC",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "REZPRO 3D WASHABLE RESIN",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "RUBBER BOWL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "RUBBER DIAMOND POLISHER - YELLOW",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND BLASTER JG-218",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND BLASTING SAND - ALUMINIUM OXIDE (10 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND BLASTING SAND DENTIFY - ALUMINIUM OXIDE (5 KG)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER (1000 P)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER (180C)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER (220 C)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER (400 C)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER (600 C)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SAND PAPER MANDREL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SCAN SPRAY 250GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SELF CURE POLYMER (LOOSE)",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING DISC CERAMIC",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING FLUID (1 LTR)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING FLUID DENTA KRIS 450 ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING FLUID DPI (450 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING FLUID ISOLATE 450 ML",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SEPARATING FLUID IVOCLAR (500 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SHEET POLISH BRUSH BROWN",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SHEET POLISH BRUSH GREEN",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SHEET POLISH BRUSH RED",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON DAPPEN DISH (LARGE)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON DAPPEN DISH (MEDIUM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON DAPPEN DISH (SMALL)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON POLISHING WHEEL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON SPRAY",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SILICON WAX TRAY",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SINTERING BEADS",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SINTERING FURNACE BASE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SINTERING FURNACE COIL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SINTERING TRAY LARGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SINTERING TRAY SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SNAP ON SMILE 0.8 MM (OM1)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SNAP ON SMILE 1.0MM (A1)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SOLDERING FLUX",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SOLDERING WIRE SILVER",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SPRUE STICKS SURANA 2MM",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SPRUE WIRE",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SPRUE WIRE BLUE",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SS WIRE 8MM (50 GMS)",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SS WIRE 9MM (50 GMS)",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN GLAZE YUCERA 4GM",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML A4",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML B1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML B2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML B3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML C1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML C2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML C3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML D2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - DYE SOLUTION 50ML D3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, A1 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, A2 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, A3 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, A3.5 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, B1 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, B2 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, B3 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, BL2 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, BL3 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, C1 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STAIN LIQUID - YURUCHENG, C2 (50 ML)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STICKY WAX",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STRAIGHT FISSURE SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "STRAIGHT FISSURE THIN",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SURGICAL HAND WASH",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SURGICAL SPIRIT BIO CHEMIX 20L",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "SURGICAL SPIRIT TRUSTA 5L",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - ACRYROCK, A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - ACRYROCK, A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - ACRYROCK, A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - ACRYROCK, A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - BIOROCK, A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - BIOROCK, A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - CRISMA A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - CRISMA A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PIGEON, A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PIGEON, A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PIGEON, A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PRESTOROCK, A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PRESTOROCK, A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PRESTOROCK, A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PRESTOROCK, A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT 448 A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT 448 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT 448 A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M385- A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M385- A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M385- A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M419- A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M419- A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M419- A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M425 -A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M425- A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M425- A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M438- A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M438- A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M448- A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M448-A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M468- A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M468- A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M468- A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - PREVALENT M468- A3.5",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - UNIQUE, A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - UNIQUE, A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - WEL BITE TEETH A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL 385 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL 438 A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL 438 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL 468 A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL 468 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M390 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M425 OMI",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M438 A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M490 A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M490 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M501 A1",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M501 A2",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEETH SET - YP DENTAL M501 A3",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEMPERATURE MEASURING RING",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEMPORARY DENTAL RESINS A1 TD001 -ZECIE TECH",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TEMPORARY DENTAL RESINS A2 TD001 -ZECIE TECH",
+    "category": "Resins",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TMA WIRE - 32 MM",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER HEAT CURE - SHADE F (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER HEAT CURE - SHADE G (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - A (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - A1 (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - A2 (400 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - A2 (55 GM",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - SHADE A (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - SHADE D (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TOOTH MOULDING POWDER SELF CURE - SHADE E (55 GM)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "TRUSTA DISPENSER MEDICAL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ULTRASONIC CLEANER",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "UNIVERSAL GLAZE LIQUID (15 ML)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "VACUUM FORMING MACHINE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "VITA GLAZE LIQUID 20ML",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "VITA GLAZE POWDER 5g",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "VITA STAIN - ES03 LEMON YELLOW(3 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "VITA STAIN - PINK (3 GM)",
+    "category": "Ceramic",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "WAX CASTING RESIN",
+    "category": "Metal",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "WAX KNIFE HEATER (JG-29)",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "WAX KNIFE LARGE",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "WAX KNIFE SMALL",
+    "category": "Ortho",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ACONIA 14 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ACONIA 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - CRYSTAL ZR 20 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 18 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 20 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 4D PRO BL2 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 4D PRO BL2 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 4D PRO BL3 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 10MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 12MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ESTETICA 4D PRO BL3 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - GLORIOUS 16 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 10MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 12MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 14MM A1",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 14MM A2",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 14MM A3",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 16MM A1",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 16MM A2",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 16MM A3",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 18MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KEROX DENTAL (ZIRCOSTAR) 20MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 10MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 12MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 16MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 18MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 20MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 22MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - KYOZIR 25MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - SKYDENT 14 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - UPCERA 14MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - XTCERA 12 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 10 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 12 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 14 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 14 MM BL 2",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 14 MM BL1",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 16 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 18 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - YUCERA 20 MM",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ZIRCOSTAR 18 MM, A1",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  },
+  {
+    "name": "ZIRCON BLOCK - ZIRCOSTAR 18 MM, A2",
+    "category": "Zircon",
+    "stock": 25,
+    "unit": "pc",
+    "minStock": 5
+  }
+]
